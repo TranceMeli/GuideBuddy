@@ -1,0 +1,37 @@
+{% load static %}<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>{% block title %}Home{% endblock %} – GuideBuddy</title>
+  <meta name="description" content="{% block description %}Step-by-step guides on any topic – free to read and to download as PDF.{% endblock %}">
+  <link rel="stylesheet" href="{% static 'css/style.css' %}">
+  <script src="https://unpkg.com/htmx.org@2.0.4" defer></script>
+  {% block head %}{% endblock %}
+</head>
+<body>
+  <a class="skip" href="#main">Skip to content</a>
+  <header class="site-header">
+    <a class="brand" href="{% url 'guides:home' %}">GuideBuddy</a>
+    <nav aria-label="Main navigation">
+      {% if user.is_authenticated %}
+        <a href="{% url 'guides:create' %}">New guide</a>
+        <span class="muted">{{ user.username }}</span>
+        <form method="post" action="{% url 'logout' %}" class="inline">
+          {% csrf_token %}
+          <button type="submit" class="link">Sign out</button>
+        </form>
+      {% else %}
+        <a href="{% url 'login' %}">Sign in</a>
+        <a href="{% url 'register' %}">Register</a>
+      {% endif %}
+    </nav>
+  </header>
+  <main id="main">
+    {% block content %}{% endblock %}
+  </main>
+  <footer class="site-footer">
+    <p>GuideBuddy – guides by the community. <a href="{% url 'sitemap' %}">Sitemap</a></p>
+  </footer>
+</body>
+</html>

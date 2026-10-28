@@ -1,0 +1,13 @@
+{% if guides %}
+  <ul class="guide-list">
+    {% for guide in guides %}
+      <li>
+        <h2><a href="{{ guide.get_absolute_url }}">{{ guide.title }}</a></h2>
+        {% if guide.category %}<span class="tag">{{ guide.category.name }}</span>{% endif %}
+        {% if guide.summary %}<p>{{ guide.summary }}</p>{% endif %}
+      </li>
+    {% endfor %}
+  </ul>
+{% else %}
+  <p class="muted">No guides found.</p>
+{% endif %}

@@ -1,0 +1,7 @@
+{% extends "base.html" %}
+{% block title %}Not allowed{% endblock %}
+{% block content %}
+  <h1>That is not possible right now</h1>
+  <p>{{ message }}</p>
+  <p><a href="{% url 'guides:home' %}">Go to the home page</a></p>
+{% endblock %}

@@ -1,0 +1,110 @@
+/*
+ * Design tokens, style "Technisch & freundlich" (style D).
+ *
+ * One look (calm reading, serif text, a narrow column, one accent colour). Dark mode is
+ * independent (data-mode="light" | "dark", none = follow the OS).
+ *
+ * Colour roles (never distinguish by colour alone):
+ *   primary and accent (one blue) actions, links, active step, badges, table heads, header bar,
+ *                        progress, success, tip and result boxes
+ *   warning (coral)      warnings only
+ * Coral is never text on white; use the *-text variants (WCAG AA).
+ */
+@import "@fontsource-variable/plus-jakarta-sans/wght.css";
+@import "@fontsource-variable/jetbrains-mono/wght.css";
+/* small labels of the standard look (section, box and figure labels) */
+@import "@fontsource/ibm-plex-mono/400.css";
+@import "@fontsource/ibm-plex-mono/500.css";
+/* only fetched when a guide uses the font (text styles "Serif" and "Handwriting") */
+@import "@fontsource-variable/source-serif-4/wght.css";
+@import "@fontsource-variable/caveat/wght.css";
+
+:root {
+  --font-sans: "Plus Jakarta Sans Variable", "Plus Jakarta Sans", system-ui, sans-serif;
+  --font-mono: "JetBrains Mono Variable", "JetBrains Mono", ui-monospace, monospace;
+  --font-label: "IBM Plex Mono", var(--font-mono);
+  --font-read:"Source Serif 4 Variable", "Source Serif 4", Georgia, "Times New Roman", serif;
+  --text-size: clamp(1.1875rem, 1.1rem + .3vw, 1.375rem); /* 19px, a little larger on big screens */
+  --line-height: 1.7;
+  --measure: min(100%, clamp(39rem, 55vw, 72rem)); /* follows the screen width; at least about 55 characters per line */
+  --radius: 8px;
+  --radius-card: 14px;
+  --tap: 44px; /* minimum touch target */
+  --header-h: 3.4rem; /* height of the sticky site header */
+}
+
+/* --- Standard theme (textbook) ------------------------------------------------------ */
+:root {
+  color-scheme: light;
+  --primary: #00519e; --primary-hover: #003f7d; --primary-light: #eef3fa; --primary-text: #003f7d;
+  --accent: #00519e; --accent-light: #eef3fa; --accent-text: #003f7d;
+  --warning: #e0533d; --warning-light: #fcece9; --warning-text: #b93a26; /* red: error, wrong, danger */
+  --caution: #c98a00; --caution-light: #fdf3d3; --caution-text: #7a5200; /* yellow: important, careful */
+  --ok: #2f7d4f; --ok-light: #e6f4ea; --ok-text: #1f6b3e; /* green: correct, success */
+  --text: #1c2333; --text-secondary: #3b4458; --text-muted: #5b6478;
+  --bg: #ffffff; --surface: #f6f8fb; --border: #d9dfea;
+  --code-bg: #172033; --code-text: #e6eaf5;
+  /* derived */
+  --on-primary: #ffffff;
+  --link: var(--primary);
+  --line: #9aa6c2; /* connecting lines of the decision guide */
+  --bar: var(--primary); --bar-stripe: var(--accent); --bar-stripe-h: 3px; --bar-gap: 0px;
+  --focus: var(--primary); --focus-offset: 2px;
+  --badge-bg: var(--primary); --badge-text: #ffffff;
+  --done-bg: var(--accent-light); --done-text: var(--accent-text); --done-border: var(--accent-text);
+  --chip-bg: var(--primary-light); --chip-text: var(--primary-text); --chip-border: transparent;
+  --table-head-bg: var(--primary); --table-head-text: #ffffff; --table-stripe: var(--surface);
+  --code-border: transparent;
+  --code-keyword: #c9a7ff; --code-name: #8ec5ff; --code-string: #9ee6b5; --code-number: #ffc38a;
+  --code-comment: #8c96ad; --code-operator: #ff9e8f;
+  --wrong: var(--warning-text); --wrong-bg: var(--warning-light);
+  --right: var(--ok-text); --right-bg: var(--ok-light);
+  --image-filter: none;
+  /* teal tint of the placeholder illustrations on guide cards */
+  --tint-teal-bg: #e6f6f5; --tint-teal-fg: #0e7c74;
+  /* text styles picked by authors (classes c-*, h-*, f-*) */
+  --tx-blue: #2f4fd0; --tx-teal: #0e7c74; --tx-coral: #b93a26; --tx-violet: #6b3fb5; --tx-gray: #5b6478;
+  --hl-yellow: #fdf0b8; --hl-teal: #d2f1ee; --hl-blue: #dfe6fb; --hl-pink: #fbdce3;
+}
+
+/* Dark mode of the standard look: chosen explicitly, or following the operating system */
+:root[data-mode="dark"] {
+  color-scheme: dark;
+  --primary: #7c95ff; --primary-hover: #9aaeff; --primary-light: #1c2547; --primary-text: #b4c3ff;
+  --accent: #7c95ff; --accent-light: #1c2547; --accent-text: #b4c3ff;
+  --warning: #f07a66; --warning-light: #3a1a15; --warning-text: #ff9f8e;
+  --caution: #e0b13a; --caution-light: #3a2f12; --caution-text: #f2cf74;
+  --ok: #5fc08a; --ok-light: #12301f; --ok-text: #8fdcae;
+  --text: #e6e9f2; --text-secondary: #c3c9d6; --text-muted: #9aa3b5;
+  --bg: #0f1422; --surface: #161c2d; --border: #2a3247;
+  --code-bg: #0a0e18; --code-text: #e6eaf5; --code-border: #2a3247;
+  --on-primary: #0f1422; --line: #4a5878; --badge-text: #0f1422; --table-head-text: #0f1422;
+  --tx-blue: #9db0ff; --tx-teal: #5fd9cd; --tx-coral: #ff9f8e; --tx-violet: #c3a6ff; --tx-gray: #aab3c5;
+  --hl-yellow: #4a4116; --hl-teal: #124240; --hl-blue: #22305f; --hl-pink: #4a2430;
+  --tint-teal-bg: #10302e; --tint-teal-fg: #5fd9cd;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-mode="light"]):not([data-mode="dark"]) {
+    color-scheme: dark;
+    --primary: #7c95ff; --primary-hover: #9aaeff; --primary-light: #1c2547; --primary-text: #b4c3ff;
+    --accent: #7c95ff; --accent-light: #1c2547; --accent-text: #b4c3ff;
+    --warning: #f07a66; --warning-light: #3a1a15; --warning-text: #ff9f8e;
+    --caution: #e0b13a; --caution-light: #3a2f12; --caution-text: #f2cf74;
+    --ok: #5fc08a; --ok-light: #12301f; --ok-text: #8fdcae;
+    --text: #e6e9f2; --text-secondary: #c3c9d6; --text-muted: #9aa3b5;
+    --bg: #0f1422; --surface: #161c2d; --border: #2a3247;
+    --code-bg: #0a0e18; --code-text: #e6eaf5; --code-border: #2a3247;
+    --on-primary: #0f1422; --line: #4a5878; --badge-text: #0f1422; --table-head-text: #0f1422;
+    --tx-blue: #9db0ff; --tx-teal: #5fd9cd; --tx-coral: #ff9f8e; --tx-violet: #c3a6ff; --tx-gray: #aab3c5;
+    --hl-yellow: #4a4116; --hl-teal: #124240; --hl-blue: #22305f; --hl-pink: #4a2430;
+  --tint-teal-bg: #10302e; --tint-teal-fg: #5fd9cd;
+  }
+}
+
+/* --- Things every theme shares ---------------------------------------------------- */
+/* Safety net for what authors bring in: emoji and colours in guide text and comments,
+   embedded PDFs and document previews are shown in grayscale too. */
+:where(a, button, input, select, textarea, summary, [tabindex]):focus-visible {
+  outline: 2px solid var(--focus);
+  outline-offset: var(--focus-offset);
+}

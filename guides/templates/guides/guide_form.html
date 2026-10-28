@@ -1,0 +1,27 @@
+{% extends "base.html" %}
+{% block title %}{% if is_new %}New guide{% else %}Edit {{ guide.title }}{% endif %}{% endblock %}
+{% block content %}
+  <h1>{% if is_new %}Create a guide{% else %}Edit “{{ guide.title }}”{% endif %}</h1>
+
+  <form method="post" class="stack">
+    {% csrf_token %}
+    {{ form.non_field_errors }}
+    {{ form.as_div }}
+
+    <h2>Steps</h2>
+    <p class="muted">Content may use Markdown (<code>**bold**</code>, <code>`code`</code>, lists, code blocks).
+      The number sets the order. Tick “Delete” to remove a step.</p>
+    {{ formset.management_form }}
+    {{ formset.non_form_errors }}
+    {% for step_form in formset %}
+      <fieldset>
+        <legend>Step {{ forloop.counter }}</legend>
+        {{ step_form.as_div }}
+      </fieldset>
+    {% endfor %}
+    <p class="muted">More steps? Save – an empty field appears again afterwards.</p>
+
+    <p><button type="submit" class="button">Save</button>
+      <a href="{% if is_new %}{% url 'guides:home' %}{% else %}{{ guide.get_absolute_url }}{% endif %}">Cancel</a></p>
+  </form>
+{% endblock %}

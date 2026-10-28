@@ -1,0 +1,41 @@
+{% extends "base.html" %}
+{% load guide_extras %}
+{% block title %}{{ guide.title }}{% endblock %}
+{% block description %}{{ guide.summary|default:guide.title|truncatechars:155 }}{% endblock %}
+{% block head %}
+  <script type="application/ld+json">{{ jsonld|safe }}</script>
+{% endblock %}
+{% block content %}
+  <nav aria-label="Breadcrumbs" class="crumbs">
+    <a href="{% url 'guides:home' %}">Home</a>
+    {% if guide.category %} › <a href="{{ guide.category.get_absolute_url }}">{{ guide.category.name }}</a>{% endif %}
+  </nav>
+
+  <article>
+    <h1>{{ guide.title }}</h1>
+    {% if guide.summary %}<p class="lead">{{ guide.summary }}</p>{% endif %}
+
+    <p class="actions">
+      <a class="button" href="{% url 'guides:pdf' guide.slug %}">Download PDF</a>
+      <a href="{% url 'guides:edit' guide.slug %}">Edit</a>
+      <a href="{% url 'guides:history' guide.slug %}">History</a>
+    </p>
+
+    {% if steps %}
+      <ol class="steps">
+        {% for step in steps %}
+          <li>
+            <h2>{{ step.title }}</h2>
+            {{ step.body|render_markdown }}
+          </li>
+        {% endfor %}
+      </ol>
+    {% else %}
+      <p class="muted">This guide has no steps yet.</p>
+    {% endif %}
+    <p class="muted">
+      License: <a href="https://creativecommons.org/licenses/by-sa/4.0/" rel="license">CC BY-SA 4.0</a>.
+      The authors are listed in the <a href="{% url 'guides:history' guide.slug %}">History</a>.
+    </p>
+  </article>
+{% endblock %}

@@ -1,0 +1,3 @@
+# Zusätzlich für den Betrieb auf einem Linux-Server (gunicorn läuft nicht unter Windows)
+-r requirements.txt
+gunicorn==26.2.0

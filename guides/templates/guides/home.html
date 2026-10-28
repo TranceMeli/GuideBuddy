@@ -1,0 +1,24 @@
+{% extends "base.html" %}
+{% block title %}{% if category %}{{ category.name }}{% else %}Home{% endif %}{% endblock %}
+{% block content %}
+  <h1>{% if category %}Category: {{ category.name }}{% else %}Discover guides{% endif %}</h1>
+
+  <form method="get" action="{{ request.path }}" role="search" class="search">
+    <label for="q">Search</label>
+    <input type="search" id="q" name="q" value="{{ q }}" placeholder="Guide, step or keyword …"
+           hx-get="{{ request.path }}" hx-trigger="input changed delay:300ms, search"
+           hx-target="#guide-list" hx-push-url="false">
+    <noscript><button type="submit">Search</button></noscript>
+  </form>
+
+  <nav aria-label="Categories" class="chips">
+    <a href="{% url 'guides:home' %}"{% if not category %} aria-current="page"{% endif %}>All</a>
+    {% for c in categories %}
+      <a href="{{ c.get_absolute_url }}"{% if category and category.pk == c.pk %} aria-current="page"{% endif %}>{{ c.name }}</a>
+    {% endfor %}
+  </nav>
+
+  <div id="guide-list" aria-live="polite">
+    {% include "guides/_guide_list.html" %}
+  </div>
+{% endblock %}

@@ -1,0 +1,68 @@
+{% load guide_extras %}<!doctype html>
+<html lang="{{ guide.language|default:'en' }}">
+<head>
+  <meta charset="utf-8">
+  <title>{{ guide.title }}</title>
+  <style>
+    @page {
+      size: A4;
+      margin: 2cm 2cm 2.2cm;
+      @bottom-right { content: "Page " counter(page) " of " counter(pages); font-size: 9pt; color: #555; }
+      @bottom-left { content: "GuideBuddy"; font-size: 9pt; color: #555; }
+    }
+    body { font-family: "DejaVu Sans", Arial, sans-serif; font-size: 10.5pt; line-height: 1.5; color: #111; }
+    h1 { font-size: 22pt; margin: 0 0 .3em; }
+    .lead { font-size: 12pt; color: #333; }
+    .meta { color: #555; font-size: 9pt; margin-bottom: 1.5em; }
+    ol.steps { padding-left: 1.4em; }
+    ol.steps > li { margin-bottom: 1.2em; break-inside: avoid-page; }
+    ol.steps h2 { font-size: 13pt; margin: 0 0 .3em; }
+    .box { border-left: 4px solid #999; padding: .4em .8em; margin: .8em 0; break-inside: avoid-page; }
+    .box strong { display: block; font-size: 8.5pt; text-transform: uppercase; letter-spacing: .08em; }
+    .box-important { border-color: #c98a00; background: #fdf3d3; } .box-error { border-color: #e0533d; background: #fcece9; } .box-result { border-color: #2f7d4f; background: #e6f4ea; }
+    blockquote { margin: .8em 0; padding-left: 1em; border-left: 3px solid #999; color: #333; }
+    pre { background: #f3f3f3; padding: .6em; font-size: 9pt; white-space: pre-wrap; word-wrap: break-word; }
+    code { font-family: "DejaVu Sans Mono", monospace; font-size: 9pt; background: #f3f3f3; }
+    pre code { background: none; }
+    .codehilite { background: #f3f3f3; }
+    .codehilite pre { background: none; }
+    .codehilite .k, .codehilite .kc, .codehilite .kd, .codehilite .kn, .codehilite .kp, .codehilite .kr, .codehilite .kt { color: #8250df; }
+    .codehilite .nf, .codehilite .fm, .codehilite .nc, .codehilite .nn { color: #0550ae; }
+    .codehilite .s, .codehilite .sa, .codehilite .sb, .codehilite .sc, .codehilite .dl, .codehilite .sd, .codehilite .s2, .codehilite .se, .codehilite .sh, .codehilite .si, .codehilite .sx, .codehilite .sr, .codehilite .s1, .codehilite .ss { color: #116329; }
+    .codehilite .m, .codehilite .mb, .codehilite .mf, .codehilite .mh, .codehilite .mi, .codehilite .mo { color: #953800; }
+    .codehilite .c, .codehilite .ch, .codehilite .cm, .codehilite .c1, .codehilite .cs { color: #6e7781; }
+    .codehilite .o, .codehilite .ow { color: #cf222e; }
+    table { border-collapse: collapse; } th, td { border: 1px solid #999; padding: 3px 6px; }
+    /* text styles chosen by authors (class names, see guides/templatetags/guide_extras.py) */
+    .c-blue { color: #2f4fd0; } .c-teal { color: #0e7c74; } .c-coral { color: #b93a26; } .c-violet { color: #6b3fb5; } .c-gray { color: #5b6478; }
+    .h-yellow { background-color: #fdf0b8; } .h-teal { background-color: #d2f1ee; } .h-blue { background-color: #dfe6fb; } .h-pink { background-color: #fbdce3; }
+    .f-serif { font-family: "DejaVu Serif", serif; } .f-hand { font-style: italic; font-size: 1.1em; } .f-code { font-family: "DejaVu Sans Mono", monospace; font-size: .92em; }
+  </style>
+</head>
+<body>
+  <h1>{{ guide.title }}</h1>
+  {% if guide.summary %}<p class="lead">{{ guide.summary }}</p>{% endif %}
+  <p class="meta">
+    {% if guide.category %}Category: {{ guide.category.name }} · {% endif %}
+    Updated: {{ guide.updated_at|date:"Y-m-d" }} ·
+    Online: {{ frontend_url }}/guides/{{ guide.slug }}
+  </p>
+  {% if elements_html %}
+    {{ elements_html }}
+  {% else %}
+  <ol class="steps">
+    {% for step in steps %}
+      <li>
+        <h2>{{ step.title }}</h2>
+        {{ step.body|render_markdown }}
+      </li>
+    {% endfor %}
+  </ol>
+  {% endif %}
+  <p class="meta" style="margin-top: 2em; border-top: 1px solid #999; padding-top: .6em;">
+    This guide is licensed under CC BY-SA 4.0 (https://creativecommons.org/licenses/by-sa/4.0/).
+    You may share and adapt it if you credit the authors (see the history of the online version)
+    and share your changes under the same license.
+  </p>
+</body>
+</html>

@@ -1,0 +1,12 @@
+Django==6.1.1
+djangorestframework==3.18.1
+djangorestframework-simplejwt==5.5.1
+django-cors-headers==4.9.0
+django-simple-history==3.13.0
+Markdown==3.11
+mammoth==1.13.0
+Pygments==2.19.2
+nh3==0.3.7
+weasyprint==70.0
+xhtml2pdf==0.2.21
+whitenoise==6.12.0

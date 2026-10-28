@@ -1,0 +1,55 @@
+{% load guide_extras %}<!doctype html>
+<html lang="{{ guide.language|default:'en' }}">
+<head>
+  <meta charset="utf-8">
+  <title>{{ guide.title }}</title>
+  <style>
+    @page { size: A4; margin: 2cm 2cm 2.4cm 2cm;
+      @frame footer { -pdf-frame-content: footer; bottom: 1cm; margin-left: 2cm; margin-right: 2cm; height: 0.8cm; }
+    }
+    body { font-family: Helvetica, Arial, sans-serif; font-size: 10.5pt; line-height: 1.4; color: #111; }
+    h1 { font-size: 22pt; margin: 0 0 6pt; }
+    h2 { font-size: 13pt; margin: 14pt 0 4pt; }
+    .lead { font-size: 12pt; color: #333; }
+    .meta { color: #555; font-size: 9pt; }
+    pre { background-color: #f3f3f3; padding: 6pt; font-family: Courier; font-size: 9pt; }
+    code { font-family: Courier; font-size: 9pt; background-color: #f3f3f3; }
+    .codehilite { background-color: #f3f3f3; }
+    /* text styles chosen by authors (class names, see guides/templatetags/guide_extras.py) */
+    .c-blue { color: #2f4fd0; } .c-teal { color: #0e7c74; } .c-coral { color: #b93a26; } .c-violet { color: #6b3fb5; } .c-gray { color: #5b6478; }
+    .h-yellow { background-color: #fdf0b8; } .h-teal { background-color: #d2f1ee; } .h-blue { background-color: #dfe6fb; } .h-pink { background-color: #fbdce3; }
+    .f-serif { font-family: Times, serif; } .f-hand { font-style: italic; font-size: 1.1em; } .f-code { font-family: Courier; font-size: .92em; }
+    .codehilite .k, .codehilite .kc, .codehilite .kd, .codehilite .kn, .codehilite .kp, .codehilite .kr, .codehilite .kt { color: #8250df; }
+    .codehilite .nf, .codehilite .fm, .codehilite .nc, .codehilite .nn { color: #0550ae; }
+    .codehilite .s, .codehilite .sa, .codehilite .sb, .codehilite .sc, .codehilite .dl, .codehilite .sd, .codehilite .s2, .codehilite .se, .codehilite .sh, .codehilite .si, .codehilite .sx, .codehilite .sr, .codehilite .s1, .codehilite .ss { color: #116329; }
+    .codehilite .m, .codehilite .mb, .codehilite .mf, .codehilite .mh, .codehilite .mi, .codehilite .mo { color: #953800; }
+    .codehilite .c, .codehilite .ch, .codehilite .cm, .codehilite .c1, .codehilite .cs { color: #6e7781; }
+    .codehilite .o, .codehilite .ow { color: #cf222e; }
+    table { border: 1px solid #999; } th, td { border: 1px solid #999; padding: 3pt; }
+  </style>
+</head>
+<body>
+  <h1>{{ guide.title }}</h1>
+  {% if guide.summary %}<p class="lead">{{ guide.summary }}</p>{% endif %}
+  <p class="meta">
+    {% if guide.category %}Category: {{ guide.category.name }} | {% endif %}
+    Updated: {{ guide.updated_at|date:"Y-m-d" }} |
+    Online: {{ frontend_url }}/guides/{{ guide.slug }}
+  </p>
+  {% if elements_html %}
+    {{ elements_html }}
+  {% else %}
+  {% for step in steps %}
+    <h2>{{ forloop.counter }}. {{ step.title }}</h2>
+    {{ step.body|render_markdown }}
+  {% endfor %}
+  {% endif %}
+  <hr>
+  <p class="meta">
+    This guide is licensed under CC BY-SA 4.0 (https://creativecommons.org/licenses/by-sa/4.0/).
+    You may share and adapt it if you credit the authors (see the history of the online version)
+    and share your changes under the same license.
+  </p>
+  <div id="footer" class="meta">GuideBuddy &ndash; page <pdf:pagenumber> of <pdf:pagecount></div>
+</body>
+</html>

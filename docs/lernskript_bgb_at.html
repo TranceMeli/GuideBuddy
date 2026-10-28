@@ -1,0 +1,1351 @@
+<!doctype html>
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Lernskript BGB Allgemeiner Teil</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<meta name="generator" content="lernbau shell 1">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=Source+Serif+4:ital,opsz,wght@0,8..60,400;0,8..60,600;0,8..60,700;1,8..60,400&display=swap">
+<style>
+:root { --col: 37rem; }
+/* Layout: eine Lesespalte (ca. 65 Zeichen), Randnummern (Rn.) im Text, Abbildungen mit Bildunterschrift, feste Leiste oben und unten wie im BGB-AT-Skript. */
+
+:root {
+  --bg: #fbfcfd;
+  --panel: #eef2f7;
+  --fg: #171a1f;
+  --muted: #5f6874;
+  --rule: #d3dae3;
+  --accent: #00519e;
+  --ok: #2f6b45;
+  --bad: #a3302f;
+  --serif: "Source Serif 4", Georgia, "Times New Roman", serif;
+  --mono: "IBM Plex Mono", ui-monospace, Menlo, Consolas, monospace;
+  --fs: 19px;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg: #12161b; --panel: #1a2028; --fg: #e6ebf1; --muted: #98a3b1; --rule: #323b46;
+    --accent: #7fb4ea; --ok: #7fc79a; --bad: #ef8f8c; color-scheme: dark;
+  }
+}
+
+:root[data-theme="dark"] {
+  --bg: #12161b; --panel: #1a2028; --fg: #e6ebf1; --muted: #98a3b1; --rule: #323b46;
+  --accent: #7fb4ea; --ok: #7fc79a; --bad: #ef8f8c; color-scheme: dark;
+}
+
+* { box-sizing: border-box; }
+
+html { scroll-behavior: smooth; scroll-padding-top: 5rem; }
+
+body {
+  background: var(--bg); color: var(--fg);
+  font-family: var(--serif); font-size: var(--fs); line-height: 1.6;
+  padding-block: 0 4.5rem;
+  padding-left: max(16px, env(safe-area-inset-left, 0px));
+  padding-right: max(16px, env(safe-area-inset-right, 0px));
+  counter-reset: rn sec abb;
+}
+
+body::before { content: ""; position: fixed; inset: 0 0 auto; height: env(safe-area-inset-top, 0px); z-index: 10; background: var(--bg); }
+
+@media (prefers-reduced-motion: reduce) { html { scroll-behavior: auto; } }
+
+/* Kopfleiste */
+
+.bar {
+  position: sticky; top: env(safe-area-inset-top, 0px); z-index: 9;
+  background: var(--bg); border-bottom: 1px solid var(--rule);
+  margin-inline: calc(-1 * max(16px, env(safe-area-inset-left, 0px)));
+  padding: .6rem max(16px, env(safe-area-inset-right, 0px)) .6rem max(16px, env(safe-area-inset-left, 0px));
+}
+
+.bar-in { max-width: var(--col); margin: 0 auto; display: flex; align-items: center; gap: .75rem; }
+
+.bar-title { font: 400 .72rem/1.3 var(--mono); color: var(--muted); flex: 1; min-width: 0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+
+.btns { display: flex; gap: .4rem; flex-shrink: 0; }
+
+button, .btn {
+  font: 400 .72rem/1 var(--mono); color: var(--fg); background: var(--bg);
+  border: 1px solid var(--rule); border-radius: 3px; padding: .5rem .6rem; cursor: pointer;
+}
+
+button:hover { border-color: var(--fg); }
+
+button:focus-visible, a:focus-visible, input:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+
+.prog { position: absolute; left: 0; bottom: -1px; height: 2px; background: var(--accent); width: 0; }
+
+main { max-width: var(--col); margin: 0 auto; padding-top: 2.5rem; }
+
+h1 { font-size: 2.1rem; line-height: 1.15; margin: 0 0 .8rem; text-wrap: balance; font-weight: 700; }
+
+h2 { font-size: 1.65rem; line-height: 1.2; margin: 0 0 .5rem; text-wrap: balance; font-weight: 700; padding-bottom: .6rem; border-bottom: 1px solid var(--fg); }
+
+h2::before { counter-increment: sec; content: "Abschnitt " counter(sec); display: block; font: 400 .72rem/1 var(--mono); color: var(--accent); letter-spacing: .08em; text-transform: uppercase; margin-bottom: .6rem; }
+
+h3 { font-size: 1.05rem; margin: 1.8rem 0 .5rem; font-weight: 700; text-wrap: balance; }
+
+section { padding-top: 3.2rem; }
+
+p { margin: 0 0 .9rem; text-align: left; hyphens: auto; -webkit-hyphens: auto; }
+
+.lead { font-size: 1.12em; color: var(--fg); }
+
+.ref { font: 400 .7rem/1.4 var(--mono); color: var(--muted); margin: 0 0 1.4rem; }
+
+.rn::before { counter-increment: rn; content: "Rn. " counter(rn) "\00a0"; font: 400 .72em var(--mono); color: var(--muted); }
+
+em.bsp { font-style: italic; }
+
+code, .m { font-family: var(--mono); font-size: .82em; }
+
+ul, ol { margin: 0 0 1rem; padding-left: 1.3rem; }
+
+li { margin-bottom: .3rem; }
+
+strong { font-weight: 600; }
+
+/* Kästen */
+
+.fall, .merke, .schema, .reg {
+  margin: 1.2rem 0 1.4rem; border-top: 1px solid var(--rule); border-bottom: 1px solid var(--rule); padding: .9rem 0;
+}
+
+.fall { background: var(--panel); border: 0; padding: .9rem 1rem; border-radius: 3px; }
+
+.tag { display: block; font: 500 .68rem/1 var(--mono); letter-spacing: .1em; text-transform: uppercase; color: var(--accent); margin-bottom: .55rem; }
+
+.merke { border-top: 2px solid var(--fg); border-bottom: 2px solid var(--fg); }
+
+.merke p:last-child, .fall p:last-child { margin-bottom: 0; }
+
+/* Falsch / Richtig */
+
+.fr { width: 100%; border-collapse: collapse; margin: 1rem 0 1.4rem; font-size: .92em; }
+
+.fr td { padding: .5rem .6rem .5rem 0; border-top: 1px solid var(--rule); vertical-align: top; }
+
+.fr tr:last-child td { border-bottom: 1px solid var(--rule); }
+
+.fr td:last-child { width: 4.6rem; text-align: right; padding-right: 0; }
+
+.ok, .bad { font: 500 .68rem/1.4 var(--mono); letter-spacing: .06em; text-transform: uppercase; }
+
+.ok { color: var(--ok); }
+
+.bad { color: var(--bad); }
+
+.tw { overflow-x: auto; }
+
+/* Schema-Tabelle */
+
+.schema { display: grid; grid-template-columns: 8.2rem minmax(0, 1fr); gap: .35rem 1rem; font-size: .93em; }
+
+.schema dt { font: 500 .72rem/1.7 var(--mono); color: var(--accent); text-transform: uppercase; letter-spacing: .05em; }
+
+.schema dd { margin: 0; }
+
+@media (max-width: 30rem) { .schema { grid-template-columns: 1fr; gap: 0; } .schema dd { margin-bottom: .7rem; } }
+
+/* Abbildungen */
+
+figure { margin: 1.6rem 0; overflow-x: auto; }
+
+figure svg { display: block; width: 100%; min-width: 34rem; height: auto; }
+
+figcaption { position: sticky; left: 0; }
+
+figcaption { font: 400 .7rem/1.5 var(--mono); color: var(--muted); text-align: center; margin-top: .5rem; }
+
+figcaption::before { counter-increment: abb; content: "Abb. " counter(abb) " · "; }
+
+.svgbox { fill: var(--panel); stroke: var(--fg); stroke-width: 1.4; }
+
+.svgbox.hl { fill: var(--bg); stroke: var(--accent); stroke-width: 2; }
+
+.svgt { fill: var(--fg); font: 400 13px var(--serif); }
+
+.svgm { fill: var(--muted); font: 400 11px var(--mono); }
+
+.svga { fill: var(--accent); font: 500 11px var(--mono); letter-spacing: .06em; }
+
+.svgl { stroke: var(--fg); stroke-width: 1.4; fill: none; }
+
+.svgac { stroke: var(--accent); stroke-width: 1.8; fill: none; }
+
+.svgah { fill: var(--fg); }
+
+.svgahc { fill: var(--accent); }
+
+/* Teile */
+
+.teil { margin-top: 4.5rem; padding: 1.6rem 0 .4rem; border-top: 3px double var(--fg); }
+
+.teil .tag { margin-bottom: .8rem; }
+
+.teil-t { font-size: 2rem; line-height: 1.15; font-weight: 700; margin: 0 0 .6rem; text-wrap: balance; }
+
+.toc li.grp { counter-increment: none; font: 500 .68rem/1.3 var(--mono); letter-spacing: .08em; text-transform: uppercase; color: var(--accent); padding: .7rem 0 .2rem; }
+
+.toc li.grp:first-child { padding-top: 0; }
+
+.mono { font-family: var(--mono); font-size: .82em; }
+
+pre.code { font: 400 .82rem/1.65 var(--mono); background: var(--panel); border: 1px solid var(--rule); border-radius: 3px; padding: .8rem 1rem; margin: .6rem 0 1rem; overflow-x: auto; white-space: pre; color: var(--fg); }
+
+.fall pre.code { background: var(--bg); margin-bottom: 0; }
+
+pre.code .k { color: var(--accent); font-weight: 500; }
+
+pre.code .s { color: var(--ok); }
+
+pre.code .c { color: var(--muted); font-style: italic; }
+
+.cm { margin: 0 0 .6rem; }
+
+.cm label { display: flex; gap: .6rem; align-items: baseline; font: 400 .8rem/1.5 var(--mono); padding: .3rem 0; border-top: 1px solid var(--rule); cursor: pointer; }
+
+.cm label:last-child { border-bottom: 1px solid var(--rule); }
+
+.cm input { accent-color: var(--accent); }
+
+/* Inhaltsverzeichnis */
+
+.toc { position: fixed; z-index: 20; top: calc(env(safe-area-inset-top, 0px) + 3.2rem); right: max(16px, env(safe-area-inset-right, 0px)); width: min(22rem, calc(100vw - 32px)); max-height: 70vh; overflow-y: auto; background: var(--bg); border: 1px solid var(--fg); border-radius: 3px; padding: .7rem .9rem; }
+
+.toc ol { list-style: none; padding: 0; margin: 0; counter-reset: t; }
+
+.toc li { counter-increment: t; margin: 0; }
+
+.toc a { display: flex; gap: .7rem; padding: .4rem 0; font-size: .85rem; line-height: 1.35; color: var(--fg); text-decoration: none; border-bottom: 1px solid var(--rule); }
+
+.toc li:last-child a { border-bottom: 0; }
+
+.toc a::before { content: counter(t); font: 400 .72rem/1.6 var(--mono); color: var(--muted); min-width: 1.4rem; }
+
+.toc a:hover { color: var(--accent); }
+
+.toc a.cur { color: var(--accent); }
+
+/* Statusleiste unten */
+
+.status { position: fixed; z-index: 9; left: 0; right: 0; bottom: 0; background: var(--bg); border-top: 1px solid var(--rule); padding: .55rem max(16px, env(safe-area-inset-right, 0px)) calc(.55rem + env(safe-area-inset-bottom, 0px)) max(16px, env(safe-area-inset-left, 0px)); }
+
+.status-in { max-width: var(--col); margin: 0 auto; display: flex; justify-content: space-between; gap: 1rem; font: 400 .72rem/1.3 var(--mono); color: var(--muted); }
+
+.status-in span:first-child { min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+
+/* Übungen */
+
+.kit { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: .7rem 1rem; margin-bottom: 1rem; }
+
+.kit label { display: block; font: 400 .68rem/1.3 var(--mono); color: var(--muted); text-transform: uppercase; letter-spacing: .06em; margin-bottom: .25rem; }
+
+.kit input { width: 100%; font: 400 .95rem var(--serif); color: var(--fg); background: var(--bg); border: 1px solid var(--rule); border-radius: 3px; padding: .5rem .6rem; }
+
+@media (max-width: 30rem) { .kit { grid-template-columns: 1fr; } }
+
+.out { font-size: 1.05em; padding: .8rem 1rem; border: 1px solid var(--accent); border-radius: 3px; margin: 0 0 .4rem; }
+
+.quiz { list-style: none; padding: 0; margin: 0; counter-reset: q; }
+
+.quiz li { counter-increment: q; border-top: 1px solid var(--rule); padding: .9rem 0; margin: 0; }
+
+.quiz li:last-child { border-bottom: 1px solid var(--rule); }
+
+.quiz .s::before { content: counter(q) ". "; font-family: var(--mono); font-size: .8em; color: var(--muted); }
+
+.quiz .row { display: flex; gap: .5rem; margin-top: .6rem; }
+
+.quiz .fb { margin: .6rem 0 0; font-size: .92em; }
+
+.quiz button[aria-pressed="true"] { border-color: var(--fg); background: var(--panel); }
+
+.score { font: 400 .75rem/1.4 var(--mono); color: var(--muted); margin-top: .8rem; }
+
+footer { max-width: var(--col); margin: 3rem auto 0; font: 400 .7rem/1.5 var(--mono); color: var(--muted); border-top: 1px solid var(--rule); padding-top: .8rem; }
+
+/* Darstellung: Schrift und Überschriftenfarbe */
+
+h1, h2, h3, .teil-t { color: var(--hc, var(--fg)); }
+
+.stylep { position: fixed; z-index: 20; top: calc(env(safe-area-inset-top, 0px) + 3.2rem); right: max(16px, env(safe-area-inset-right, 0px)); width: min(20rem, calc(100vw - 32px)); max-height: 75vh; overflow-y: auto; background: var(--bg); border: 1px solid var(--fg); border-radius: 3px; padding: .8rem .9rem; }
+
+.stylep h4 { font: 500 .66rem/1 var(--mono); letter-spacing: .1em; text-transform: uppercase; color: var(--muted); margin: 0 0 .5rem; }
+
+.stylep h4 + div { margin-bottom: 1rem; }
+
+.stylep .opts { display: flex; flex-wrap: wrap; gap: .4rem; }
+
+.stylep .opts button[aria-pressed="true"] { border-color: var(--fg); background: var(--panel); font-weight: 500; }
+
+.stylep .sw { width: 1.9rem; height: 1.9rem; padding: 0; border-radius: 50%; border: 2px solid var(--rule); }
+
+.stylep .sw[aria-pressed="true"] { outline: 2px solid var(--fg); outline-offset: 2px; }
+
+.stylep .sw.std { background: linear-gradient(135deg, var(--fg) 50%, var(--bg) 50%); }
+
+/* Lesemodus (Papier, E-Ink): schmale Spalte, ruhige Flächen, mehr Zeilenabstand */
+
+html[data-reader] { scroll-behavior: auto; }
+
+html[data-reader] body { line-height: 1.85; }
+
+html[data-reader] main, html[data-reader] footer { max-width: 36rem; }
+
+html[data-reader] .bar-in, html[data-reader] .status-in { max-width: 36rem; }
+
+html[data-reader] p, html[data-reader] li { hyphens: auto; -webkit-hyphens: auto; }
+
+html[data-reader] section { padding-top: 2.6rem; }
+
+html[data-reader="eink"] svg, html[data-reader="eink"] pre.code span { filter: grayscale(1); }
+
+.quiz .row { flex-wrap: wrap; }
+
+/* Zeilenlänge, Brücke, Raten, Kurz-Check, Stufen, Schritt-Abbildungen, Häppchen */
+
+.tw { margin: 0 0 1rem; }
+
+.fr td:first-child { min-width: 7.5rem; }
+
+ol.how { margin-bottom: 0; }
+
+.bruecke { display: grid; grid-template-columns: 1fr 1.4rem 1fr; gap: .4rem .5rem; align-items: stretch; margin: 1rem 0 1.2rem; font-size: .92em; }
+
+.bruecke b, .raten b, .kc > b, .stufen .lb { display: block; font: 500 .66rem/1 var(--mono); letter-spacing: .1em; text-transform: uppercase; color: var(--accent); margin-bottom: .4rem; }
+
+.bk, .bn { border: 1px solid var(--rule); border-radius: 3px; padding: .6rem .75rem; }
+
+.bk { background: var(--bg); }
+
+.bn { background: var(--panel); border-color: var(--accent); }
+
+.ar { align-self: center; text-align: center; color: var(--accent); font-family: var(--mono); }
+
+.bt { grid-column: 1 / -1; }
+
+.bt .bl { display: block; font: 400 .72rem/1.4 var(--mono); color: var(--muted); margin-bottom: .4rem; }
+
+.chip { margin: 0 .4rem .4rem 0; font: 400 .78rem/1.2 var(--serif); border-radius: 99px; padding: .4rem .75rem; border-color: var(--accent); }
+
+.chip[aria-pressed="true"] { background: var(--panel); border-width: 2px; padding: calc(.4rem - 1px) calc(.75rem - 1px); }
+
+.bd { margin: .5rem 0 0; padding: .55rem .75rem; background: var(--panel); border-left: 3px solid var(--accent); font-size: .95em; }
+
+@media (max-width: 34rem) { .bruecke { grid-template-columns: 1fr; } .ar { transform: rotate(90deg); } }
+
+.raten { border: 1px dashed var(--accent); border-radius: 3px; padding: .75rem .9rem; margin: 1rem 0 1.2rem; }
+
+.raten p { margin: 0 0 .5rem; }
+
+.ropts { display: flex; flex-wrap: wrap; gap: .4rem; }
+
+.ropts button.pick { border-color: var(--fg); background: var(--panel); font-weight: 500; }
+
+.ropts button.right { border-color: var(--ok); border-width: 2px; color: var(--ok); }
+
+.rres { margin: .6rem 0 0; padding-top: .5rem; border-top: 1px solid var(--rule); font-size: .95em; }
+
+.rhint { font: 400 .7rem/1.4 var(--mono); color: var(--muted); margin: .5rem 0 0; }
+
+.kc { border-top: 2px solid var(--fg); border-bottom: 2px solid var(--fg); margin: 1.8rem 0 0; padding: .9rem 0; }
+
+.kq { padding: .5rem 0; border-top: 1px solid var(--rule); }
+
+.kq:first-of-type { border-top: 0; }
+
+.kqt { margin: 0 0 .4rem; }
+
+.ka { margin-top: .5rem; padding: .6rem .8rem; background: var(--panel); border-radius: 3px; }
+
+.ka p { margin: 0 0 .5rem; }
+
+.kr { display: flex; gap: .5rem; flex-wrap: wrap; }
+
+.kr button[aria-pressed="true"] { border-width: 2px; font-weight: 500; }
+
+.kr button[data-r="1"][aria-pressed="true"] { border-color: var(--ok); color: var(--ok); }
+
+.kr button[data-r="0"][aria-pressed="true"] { border-color: var(--bad); color: var(--bad); }
+
+.kvor { font: 400 .78rem/1.5 var(--mono); color: var(--muted); margin: .7rem 0 0; }
+
+.stufen { background: var(--panel); border-radius: 3px; padding: .9rem 1rem; margin: 1.2rem 0 1.4rem; }
+
+.sgsel { display: flex; gap: .4rem; flex-wrap: wrap; margin-bottom: .8rem; }
+
+.sgsel button[aria-pressed="true"] { border: 2px solid var(--accent); font-weight: 500; }
+
+.sfall { margin: 0 0 .6rem; }
+
+.sl1 { border-left: 3px solid var(--accent); padding-left: .8rem; }
+
+.sl1 p:last-child { margin-bottom: 0; }
+
+.lk { font: 400 .95em var(--serif); color: var(--fg); background: var(--bg); border: 0; border-bottom: 2px solid var(--accent); border-radius: 0; padding: .05rem .25rem; text-align: center; }
+
+.lk.right { border-bottom-color: var(--ok); color: var(--ok); }
+
+.lkh { font: 400 .7rem/1.3 var(--mono); color: var(--bad); margin-left: .3rem; }
+
+.own { width: 100%; font: 400 .95rem/1.5 var(--serif); color: var(--fg); background: var(--bg); border: 1px solid var(--rule); border-radius: 3px; padding: .5rem .6rem; margin: .4rem 0 .6rem; display: block; }
+
+.muster { margin-top: .7rem; padding: .6rem .8rem; background: var(--bg); border-left: 3px solid var(--ok); }
+
+.muster p:last-child { margin-bottom: 0; }
+
+.stepfig svg { min-width: 34rem; }
+
+.stepfig [data-s] { transition: opacity .15s; }
+
+.stepfig [data-s].dim { opacity: .3; }
+
+.stepfig .svgbox.on { fill: var(--bg); stroke: var(--accent); stroke-width: 2.8; }
+
+.sfc { display: flex; align-items: center; justify-content: space-between; gap: .6rem; position: sticky; left: 0; margin-top: .4rem; }
+
+.sfc button:disabled { opacity: .4; cursor: default; }
+
+.sf-n { font: 400 .72rem/1 var(--mono); color: var(--muted); }
+
+.sf-cap { position: sticky; left: 0; margin: .6rem 0 0; padding: .5rem .75rem; border-left: 3px solid var(--accent); background: var(--panel); font-size: .92em; }
+
+.hapnav { display: none; align-items: center; justify-content: space-between; gap: .6rem; margin: .6rem 0 1rem; }
+
+html[data-hap]:not([data-pages]) .hapnav { display: flex; }
+
+html[data-hap]:not([data-pages]) .hh { display: none; }
+
+.hapnav span { font: 400 .72rem/1 var(--mono); color: var(--muted); }
+
+.hapnav button:disabled { opacity: .4; cursor: default; }
+
+@media (max-width: 34rem) {
+  .tw { overflow-x: visible; }
+  table.fr { min-width: 0 !important; }
+  .fr, .fr tbody, .fr tr, .fr td { display: block; width: auto !important; min-width: 0 !important; text-align: left !important; }
+  .fr td { border-top: 0; padding: 0 0 .15rem; }
+  .fr td:first-child { padding-top: .6rem; border-top: 1px solid var(--rule); }
+  .fr td:last-child { padding-bottom: .6rem; }
+  .fr tr:last-child td:last-child { border-bottom: 1px solid var(--rule); }
+}
+
+#wdhList .kq { padding: .6rem 0; }
+
+#wdhReset { margin-top: .3rem; }
+
+/* Seitenansicht (Blättern wie im E-Reader) */
+
+html[data-pages], html[data-pages] body { overflow: hidden; }
+
+html[data-pages] body { height: 100vh; height: 100dvh; padding-bottom: 0; }
+
+html[data-pages] #pgview { overflow: hidden; width: var(--pw); height: var(--ph); margin: 0 auto; }
+
+html[data-pages] main { width: var(--pw); height: var(--ph); max-width: none; margin: 0; padding: 0; columns: var(--pw) auto; column-gap: var(--pg); column-fill: auto; }
+
+html[data-pages] footer { display: none; }
+
+html[data-pages] section, html[data-pages] .teil { break-before: column; padding-top: .8rem; margin-top: 0; }
+
+html[data-pages] main > :first-child { break-before: avoid; }
+
+html[data-pages] .fall, html[data-pages] .merke, html[data-pages] figure, html[data-pages] pre.code, html[data-pages] .tw, html[data-pages] .quiz li, html[data-pages] .drill, html[data-pages] .pg tr { break-inside: avoid; }
+
+html[data-pages] h2, html[data-pages] h3 { break-after: avoid; }
+
+html[data-pages] .status-in button { font-size: .72rem; }
+
+.status-in #pgPrev, .status-in #pgNext { flex-shrink: 0; }
+
+/* Glossar, Konzeptkarte, Links */
+a.btn { display: inline-block; text-decoration: none; }
+.term { border-bottom: 2px dotted var(--accent); cursor: help; }
+.term:hover, .term:focus-visible { background: var(--panel); outline: none; }
+#gpop { position: fixed; z-index: 30; width: min(19rem, calc(100vw - 16px)); background: var(--bg); color: var(--fg); border: 1px solid var(--fg); border-radius: 4px; padding: .75rem .9rem; box-shadow: 0 8px 24px rgba(0,0,0,.18); font-size: .9rem; line-height: 1.5; }
+#gpop b { display: block; font: 500 .68rem/1 var(--mono); letter-spacing: .1em; text-transform: uppercase; color: var(--accent); margin-bottom: .4rem; }
+#gpop p { margin: 0 0 .5rem; }
+#gpop a { font: 400 .72rem/1 var(--mono); color: var(--accent); }
+.cn { cursor: pointer; }
+.cn:hover .svgbox, .cn:focus .svgbox { stroke: var(--accent); stroke-width: 2.4; }
+.cn:focus { outline: none; }
+.cn .svgt { text-anchor: middle; font-size: 12.5px; }
+
+</style>
+</head>
+<body>
+<div class="bar">
+  <div class="bar-in">
+    <div class="bar-title" id="barTitle">BGB Allgemeiner Teil · Lernskript</div>
+    <div class="btns">
+      <button type="button" id="bTheme" aria-label="Darstellung wechseln">Dunkel</button>
+      <button type="button" id="bStyle" aria-expanded="false" aria-controls="stylePanel" aria-label="Schrift und Farben">Aa</button>
+      <button type="button" id="bToc" aria-expanded="false" aria-controls="toc">Inhalt</button>
+      <button type="button" id="bMinus" aria-label="Schrift kleiner">A–</button>
+      <button type="button" id="bPlus" aria-label="Schrift größer">A+</button>
+    </div>
+  </div>
+  <div class="prog" id="prog"></div>
+</div>
+<div id="gpop" role="dialog" aria-label="Begriff" hidden></div>
+<nav class="toc" id="toc" hidden aria-label="Inhaltsverzeichnis"><ol id="tocList"></ol></nav>
+<div class="stylep" id="stylePanel" hidden role="dialog" aria-label="Darstellung">
+  <h4>Lesemodus</h4><div class="opts" id="readList"></div>
+  <h4>Ansicht</h4><div class="opts" id="viewList"></div>
+  <div id="hapWrap" hidden><h4>Lesen in Häppchen</h4><div class="opts" id="hapList"></div></div>
+  <h4>Schrift</h4><div class="opts" id="fontList"></div>
+  <h4>Überschriften</h4><div class="opts" id="colList"></div>
+</div>
+
+<main>
+<h1>BGB Allgemeiner Teil als Lernskript</h1>
+<p class="lead">Der Allgemeine Teil des BGB (§§ 1 bis 240) enthält die Regeln, die für jeden Vertrag und jedes Rechtsgeschäft gelten: Wer kann handeln? Wann ist eine Erklärung wirksam? Was passiert bei Irrtum, Form- und Vertretungsfehlern? Wann verjährt ein Anspruch? Dieses Skript führt dich in elf Abschnitten durch diese Fragen und lässt dich dabei selbst aktiv werden.</p>
+<p class="ref">Eigene Zusammenfassung ohne Folienquelle. Paragrafen nach dem BGB, einzelne Stellen am Gesetzestext geprüft. Maßgeblich ist der Gesetzestext.</p>
+<div class="merke"><span class="tag">So arbeitest du mit dem Skript</span>
+<ol class="how">
+<li><strong>Vorwissen:</strong> Jeder Abschnitt beginnt mit einer Brücke: Was du schon kennst, was neu ist, dazu Begriffe vorab zum Antippen.</li>
+<li><strong>Raten:</strong> In manchen Abschnitten steht vorab eine Frage. Rate ruhig, der Versuch hilft beim Behalten.</li>
+<li><strong>Lesen in Häppchen:</strong> Unter „Aa“ kannst du Häppchen einschalten, dann siehst du immer nur einen Teil des Abschnitts.</li>
+<li><strong>Beispiele in Stufen:</strong> Erst ein gelöster Fall, dann einer mit Lücken, dann ein neuer zum Selbstlösen.</li>
+<li><strong>Abbildungen mit Schritten:</strong> Mit „Weiter“ wird jeweils ein Teil der Abbildung hervorgehoben.</li>
+<li><strong>Kurz-Check:</strong> Am Ende jedes Abschnitts prüfst du dich selbst. Was du nicht wusstest, taucht unter „Wiederholen“ wieder auf.</li>
+</ol></div>
+<section id="karte">
+<h2>Überblick: Konzeptkarte</h2>
+<p>Die Karte zeigt, wie die Abschnitte zusammenhängen. Tippe einen Kasten an, um zum Abschnitt zu springen.</p>
+<figure>
+<svg viewBox="0 0 560 516" role="img" aria-label="Konzeptkarte: Zusammenhang der Abschnitte"><path class="svgac" d="M280 50C280 73 140 73 140 96"/><path class="svgac" d="M280 50C280 73 420 73 420 96"/><path class="svgac" d="M420 134C420 157 140 157 140 180"/><path class="svgac" d="M205 199H355"/><path class="svgac" d="M420 218C420 241 140 241 140 264"/><path class="svgac" d="M420 218C420 241 420 241 420 264"/><path class="svgac" d="M140 302C140 325 140 325 140 348"/><path class="svgac" d="M420 302C420 325 140 325 140 348"/><path class="svgac" d="M205 367H355"/><path class="svgac" d="M420 386C420 409 140 409 140 432"/><path class="svgac" d="M420 386C420 409 420 409 420 432"/><a class="cn" href="#s1" tabindex="0" aria-label="Personen, Sachen"><rect class="svgbox" x="215" y="12" width="130" height="38" rx="3"/><text class="svgt" x="280" y="36">Personen, Sachen</text></a><a class="cn" href="#s2" tabindex="0" aria-label="Geschäftsfähigkeit"><rect class="svgbox" x="75" y="96" width="130" height="38" rx="3"/><text class="svgt" x="140" y="120">Geschäftsfähigkeit</text></a><a class="cn" href="#s3" tabindex="0" aria-label="Willenserklärung"><rect class="svgbox" x="355" y="96" width="130" height="38" rx="3"/><text class="svgt" x="420" y="120">Willenserklärung</text></a><a class="cn" href="#s4" tabindex="0" aria-label="Vertragsschluss"><rect class="svgbox" x="75" y="180" width="130" height="38" rx="3"/><text class="svgt" x="140" y="204">Vertragsschluss</text></a><a class="cn" href="#s5" tabindex="0" aria-label="Auslegung"><rect class="svgbox" x="355" y="180" width="130" height="38" rx="3"/><text class="svgt" x="420" y="204">Auslegung</text></a><a class="cn" href="#s6" tabindex="0" aria-label="Form"><rect class="svgbox" x="75" y="264" width="130" height="38" rx="3"/><text class="svgt" x="140" y="288">Form</text></a><a class="cn" href="#s7" tabindex="0" aria-label="Verbote"><rect class="svgbox" x="355" y="264" width="130" height="38" rx="3"/><text class="svgt" x="420" y="288">Verbote</text></a><a class="cn" href="#s8" tabindex="0" aria-label="Anfechtung"><rect class="svgbox" x="75" y="348" width="130" height="38" rx="3"/><text class="svgt" x="140" y="372">Anfechtung</text></a><a class="cn" href="#s9" tabindex="0" aria-label="Stellvertretung"><rect class="svgbox" x="355" y="348" width="130" height="38" rx="3"/><text class="svgt" x="420" y="372">Stellvertretung</text></a><a class="cn" href="#s10" tabindex="0" aria-label="Bedingung"><rect class="svgbox" x="75" y="432" width="130" height="38" rx="3"/><text class="svgt" x="140" y="456">Bedingung</text></a><a class="cn" href="#s11" tabindex="0" aria-label="Verjährung"><rect class="svgbox" x="355" y="432" width="130" height="38" rx="3"/><text class="svgt" x="420" y="456">Verjährung</text></a></svg>
+<figcaption>Konzeptkarte: Tippe einen Kasten an, um zum Abschnitt zu springen</figcaption>
+</figure>
+</section>
+<div class="teil" id="teil1"><span class="tag">Teil 1</span><div class="teil-t">Grundlagen</div><p class="ref">Personen, Sachen, Geschäftsfähigkeit, Willenserklärung</p><p>Zuerst klärst du, wer rechtlich handeln kann und was eine Willenserklärung ist. Alles Weitere baut darauf auf.</p></div>
+<section id="s1">
+<h2>Personen und Sachen</h2>
+<div class="bruecke"><div class="bk"><b>Du kennst schon</b>Im Alltag bist du „Person“, Käufer oder Verbraucher, ohne dass das so heißt.</div><div class="ar" aria-hidden="true">→</div><div class="bn"><b>Neu in diesem Abschnitt</b>Das BGB hat dafür genaue Begriffe: Wer ist Rechtssubjekt, und was kann Gegenstand eines Rechts sein?</div><div class="bt"><span class="bl">Begriffe vorab, antippen für die Kurzdefinition:</span><button type="button" class="chip" data-d="Die Fähigkeit, Träger von Rechten und Pflichten zu sein.">Rechtsfähigkeit</button><button type="button" class="chip" data-d="Natürliche Person, die ein Rechtsgeschäft überwiegend zu privaten Zwecken abschließt (§ 13).">Verbraucher</button><button type="button" class="chip" data-d="Körperlicher Gegenstand (§ 90).">Sache</button><p class="bd" hidden></p></div></div>
+<h3>Rechtssubjekte: natürliche und juristische Personen</h3>
+<p>Rechtsfähig ist, wer Träger von Rechten und Pflichten sein kann. Bei <strong>natürlichen Personen</strong> beginnt die Rechtsfähigkeit mit der Vollendung der Geburt (§ 1 BGB) und endet mit dem Tod. <strong>Juristische Personen</strong> sind zum Beispiel Vereine, Kapitalgesellschaften und Stiftungen. Sie sind als Organisation selbst rechtsfähig und handeln durch ihre Organe.</p>
+<p>Rechtsfähigkeit ist nicht dasselbe wie Geschäftsfähigkeit. Ein Neugeborenes kann Eigentümer eines Hauses sein (rechtsfähig), aber keine Verträge schließen (nicht geschäftsfähig). Das klärt der nächste Abschnitt.</p>
+<h3>Verbraucher und Unternehmer</h3>
+<div class="tw"><table class="fr" style="min-width:26rem"><tr><td><strong>Verbraucher (§ 13)</strong></td><td style="width:auto;text-align:left">Jede natürliche Person, die ein Rechtsgeschäft zu Zwecken abschließt, die überwiegend weder ihrer gewerblichen noch ihrer selbstständigen beruflichen Tätigkeit zugerechnet werden können.</td></tr><tr><td><strong>Unternehmer (§ 14)</strong></td><td style="width:auto;text-align:left">Natürliche oder juristische Person oder rechtsfähige Personengesellschaft, die bei Abschluss des Rechtsgeschäfts in Ausübung ihrer gewerblichen oder selbstständigen beruflichen Tätigkeit handelt.</td></tr></table></div>
+<p>Entscheidend ist der <em>Zweck</em> des Geschäfts, nicht die Person: Dieselbe Frau ist Verbraucherin, wenn sie privat ein Fahrrad kauft, und Unternehmerin, wenn sie es für ihre Firma kauft. Viele Schutzvorschriften gelten nur für Verbraucher.</p>
+<h3>Sachen</h3>
+<p><strong>Sachen</strong> sind nur körperliche Gegenstände (§ 90 BGB), also bewegliche wie ein Buch oder unbewegliche wie ein Grundstück. Tiere sind keine Sachen (§ 90a), aber die Vorschriften für Sachen gelten für sie entsprechend, soweit nichts anderes bestimmt ist. Forderungen und Rechte sind Gegenstände, aber keine Sachen.</p>
+<ul>
+<li><strong>Wesentliche Bestandteile</strong> (§ 93) lassen sich nicht ohne Zerstörung oder Wesensveränderung trennen und können nicht Gegenstand besonderer Rechte sein.</li>
+<li><strong>Zubehör</strong> (§ 97) sind bewegliche Sachen, die dem wirtschaftlichen Zweck einer Hauptsache dienen und in einem räumlichen Verhältnis zu ihr stehen.</li>
+<li><strong>Früchte</strong> (§ 99) sind die Erzeugnisse einer Sache oder eines Rechts und die Erträge, die sie bestimmungsgemäß liefern.</li>
+</ul>
+<div class="kc"><b>Kurz-Check · 3 Fragen · 1 Minute</b>
+<div class="kq" data-id="s1_1"><p class="kqt">1. Wann beginnt die Rechtsfähigkeit eines Menschen?</p><button type="button" class="ans">▸ Antwort zeigen</button><div class="ka" hidden><p>Mit der Vollendung der Geburt (§ 1 BGB).</p><div class="kr"><button type="button" data-r="1" aria-pressed="false">Gewusst</button><button type="button" data-r="0" aria-pressed="false">Noch nicht</button></div></div></div>
+<div class="kq" data-id="s1_2"><p class="kqt">2. Woran unterscheidest du Verbraucher und Unternehmer?</p><button type="button" class="ans">▸ Antwort zeigen</button><div class="ka" hidden><p>Am Zweck des Geschäfts: überwiegend privat (Verbraucher, § 13) oder in Ausübung einer gewerblichen oder selbstständigen beruflichen Tätigkeit (Unternehmer, § 14).</p><div class="kr"><button type="button" data-r="1" aria-pressed="false">Gewusst</button><button type="button" data-r="0" aria-pressed="false">Noch nicht</button></div></div></div>
+<div class="kq" data-id="s1_3"><p class="kqt">3. Sind Tiere Sachen?</p><button type="button" class="ans">▸ Antwort zeigen</button><div class="ka" hidden><p>Nein (§ 90a). Auf sie sind die Vorschriften für Sachen aber entsprechend anzuwenden, soweit nichts anderes bestimmt ist.</p><div class="kr"><button type="button" data-r="1" aria-pressed="false">Gewusst</button><button type="button" data-r="0" aria-pressed="false">Noch nicht</button></div></div></div>
+<p class="kvor" data-for="s1" hidden></p></div>
+</section>
+<section id="s2">
+<h2>Geschäftsfähigkeit</h2>
+<div class="bruecke"><div class="bk"><b>Du kennst schon</b>Rechtsfähig ist jeder Mensch ab der Geburt.</div><div class="ar" aria-hidden="true">→</div><div class="bn"><b>Neu in diesem Abschnitt</b>Aber nicht jeder kann wirksam Verträge schließen. Wann ist ein Kind oder Jugendlicher gebunden, und wer entscheidet?</div><div class="bt"><span class="bl">Begriffe vorab, antippen für die Kurzdefinition:</span><button type="button" class="chip" data-d="Die Fähigkeit, Rechtsgeschäfte wirksam selbst vorzunehmen.">Geschäftsfähigkeit</button><button type="button" class="chip" data-d="Vorherige Zustimmung (§ 183).">Einwilligung</button><button type="button" class="chip" data-d="Nachträgliche Zustimmung (§ 184).">Genehmigung</button><button type="button" class="chip" data-d="Weder wirksam noch endgültig nichtig, es hängt von einer Genehmigung ab.">schwebend unwirksam</button><p class="bd" hidden></p></div></div>
+<div class="raten" data-id="s2" data-ok="1" data-expl="Richtig ist: schwebend unwirksam. Die Eltern können nach § 108 genehmigen oder verweigern, bis dahin ist der Vertrag in der Schwebe."><b>Vorab · rate ruhig</b><p>Ein Vertrag eines 16-Jährigen, den die Eltern nicht kennen: Was gilt?</p><div class="ropts"><button type="button">Er ist von Anfang an nichtig</button><button type="button">Er ist zunächst in der Schwebe, die Eltern entscheiden</button><button type="button">Er ist wirksam, weil der Jugendliche ja 16 ist</button></div><p class="rres" hidden></p><p class="rhint">Der Versuch zählt, auch wenn er falsch ist. Überspringen ist erlaubt.</p></div>
+<h3>Die drei Stufen</h3>
+<div class="tw"><table class="fr" style="min-width:26rem"><tr><td><strong>Geschäftsunfähig</strong></td><td style="width:auto;text-align:left">Kinder unter sieben Jahren und Menschen in einem dauerhaften, die freie Willensbestimmung ausschließenden Zustand krankhafter Störung der Geistestätigkeit (§ 104). Ihre Willenserklärung ist <strong>nichtig</strong> (§ 105 Abs. 1). Nichtig ist auch eine Erklärung im Zustand der Bewusstlosigkeit oder vorübergehender Störung (§ 105 Abs. 2).</td></tr><tr><td><strong>Beschränkt geschäftsfähig</strong></td><td style="width:auto;text-align:left">Minderjährige ab sieben Jahren bis zur Volljährigkeit (§ 106). Volljährig ist man mit 18 (§ 2).</td></tr><tr><td><strong>Voll geschäftsfähig</strong></td><td style="width:auto;text-align:left">Volljährige, sofern nicht nach § 104 Nr. 2 geschäftsunfähig.</td></tr></table></div>
+<h3>Beschränkt Geschäftsfähige</h3>
+<p>Ein Minderjähriger braucht für eine Willenserklärung, durch die er nicht lediglich einen rechtlichen Vorteil erlangt, die <strong>Einwilligung</strong> seines gesetzlichen Vertreters (§ 107). Meist sind das die Eltern. Ein <strong>lediglich rechtlicher Vorteil</strong> liegt zum Beispiel bei einer Schenkung vor, die ihn nichts kostet und nicht mit Pflichten verbunden ist. Es zählt der rechtliche, nicht der wirtschaftliche Vorteil.</p>
+<p>Schließt er einen Vertrag ohne Einwilligung, hängt dessen Wirksamkeit von der <strong>Genehmigung</strong> des Vertreters ab (§ 108 Abs. 1). Bis dahin ist der Vertrag <strong>schwebend unwirksam</strong>. Genehmigen die Eltern, ist er von Anfang an wirksam. Verweigern sie, ist er endgültig unwirksam. Der Vertragspartner kann die Eltern auffordern, sich zu erklären, sie haben dann zwei Wochen Zeit (§ 108 Abs. 2). Bis zur Genehmigung darf er den Vertrag widerrufen, wenn er die Minderjährigkeit nicht kannte (§ 109).</p>
+<h3>Der Taschengeldparagraf</h3>
+<p>Nach § 110 gilt ein ohne Zustimmung geschlossener Vertrag als von Anfang an wirksam, wenn der Minderjährige die vertragsmäßige Leistung <em>mit Mitteln bewirkt</em>, die ihm zu diesem Zweck oder zu freier Verfügung überlassen wurden. Die Leistung muss vollständig erbracht sein, bei Ratenzahlung greift § 110 deshalb nicht, solange noch Raten offen sind. Für einseitige Rechtsgeschäfte, etwa eine Kündigung, gilt § 111: ohne Einwilligung unwirksam.</p>
+<div class="stufen"><span class="tag">Beispiel in drei Stufen</span><div class="sgsel"></div>
+<div class="sst" data-s="1"><p class="sfall"><b>Fall:</b> Mia (16) kauft ohne Wissen ihrer Eltern ein Smartphone für 600 Euro auf Raten. Der Verkäufer V bestand nicht auf einer Zustimmung. Ist der Kaufvertrag wirksam?</p><div class="sl1"><b class="lb">Lösung, ganz durchgerechnet</b><p>Mia und V haben einen Kaufvertrag (§ 433) geschlossen. Mia ist 16, also <strong>beschränkt geschäftsfähig</strong> (§ 106). Der Vertrag verpflichtet sie zur Kaufpreiszahlung, bringt ihr also nicht lediglich einen rechtlichen Vorteil. Sie brauchte die <strong>Einwilligung</strong> ihrer Eltern (§ 107). Die liegt nicht vor.</p><p>§ 110 hilft nicht: Die Leistung ist bei Ratenzahlung noch nicht vollständig mit Taschengeld bewirkt. Der Vertrag ist daher <strong>schwebend unwirksam</strong> (§ 108 Abs. 1). Genehmigen die Eltern, ist er von Anfang an wirksam. Verweigern sie, ist er endgültig unwirksam.</p></div></div>
+<div class="sst" data-s="2" hidden><p class="sfall"><b>Fall:</b> Mia (16) kauft ohne Wissen ihrer Eltern ein Smartphone für 600 Euro auf Raten. Ist der Kaufvertrag wirksam?</p><div class="sl1"><b class="lb">Lösung mit Lücken, tippe die Wörter ein</b><p>Mia ist 16 und damit <input class="lk" size="20" data-a="beschränkt geschäftsfähig" data-h="Zwischen sieben und 18 Jahren" aria-label="Lücke" autocomplete="off" spellcheck="false"> (§ 106). Der Vertrag verpflichtet sie, bringt ihr also nicht lediglich einen rechtlichen Vorteil. Ohne vorherige <input class="lk" size="12" data-a="Einwilligung" data-h="Vorherige Zustimmung der Eltern, § 107" aria-label="Lücke" autocomplete="off" spellcheck="false"> der Eltern ist der Vertrag <input class="lk" size="18" data-a="schwebend unwirksam" data-h="Weder wirksam noch endgültig nichtig, § 108" aria-label="Lücke" autocomplete="off" spellcheck="false">, bis die Eltern ihn genehmigen oder verweigern. § 110 greift nicht, weil die Raten noch offen sind.</p></div></div>
+<div class="sst" data-s="3" hidden><p class="sfall"><b>Neuer Fall:</b> Ben (15) bekommt von seiner Tante ein Fahrrad geschenkt und nimmt es an. Seine Eltern wissen nichts davon.</p><p><b>Frage:</b> Ist die Annahme der Schenkung ohne Zustimmung der Eltern wirksam?</p><textarea class="own" rows="3" placeholder="Eigene Stichpunkte (werden nicht gespeichert)" aria-label="Eigene Stichpunkte"></textarea><button type="button" class="mbtn">▸ Musterlösung zeigen</button><div class="muster" hidden><p>Ja. Ben ist beschränkt geschäftsfähig (§ 106). Die Annahme der Schenkung bringt ihm <strong>lediglich einen rechtlichen Vorteil</strong>, er geht keine Pflicht ein. Deshalb braucht er nach § 107 keine Einwilligung. Der Vertrag ist von Anfang an wirksam. Der Unterschied zu Mia: Dort musste ein Kaufpreis gezahlt werden.</p></div></div></div>
+<div class="kc"><b>Kurz-Check · 3 Fragen · 1 Minute</b>
+<div class="kq" data-id="s2_1"><p class="kqt">1. Ab welchem Alter ist man beschränkt geschäftsfähig, und was ist die Folge für eine Erklärung eines Geschäftsunfähigen?</p><button type="button" class="ans">▸ Antwort zeigen</button><div class="ka" hidden><p>Ab sieben Jahren bis zur Volljährigkeit (§ 106). Die Willenserklärung eines Geschäftsunfähigen ist nichtig (§ 105 Abs. 1).</p><div class="kr"><button type="button" data-r="1" aria-pressed="false">Gewusst</button><button type="button" data-r="0" aria-pressed="false">Noch nicht</button></div></div></div>
+<div class="kq" data-id="s2_2"><p class="kqt">2. Wann braucht ein Minderjähriger keine Einwilligung?</p><button type="button" class="ans">▸ Antwort zeigen</button><div class="ka" hidden><p>Wenn er lediglich einen rechtlichen Vorteil erlangt (§ 107), zum Beispiel bei einer Schenkung ohne Pflichten. Außerdem beim Taschengeldgeschäft, wenn die Leistung vollständig mit überlassenen Mitteln bewirkt ist (§ 110).</p><div class="kr"><button type="button" data-r="1" aria-pressed="false">Gewusst</button><button type="button" data-r="0" aria-pressed="false">Noch nicht</button></div></div></div>
+<div class="kq" data-id="s2_3"><p class="kqt">3. Was bedeutet „schwebend unwirksam“?</p><button type="button" class="ans">▸ Antwort zeigen</button><div class="ka" hidden><p>Der Vertrag ist weder wirksam noch endgültig nichtig. Er hängt von der Genehmigung des gesetzlichen Vertreters ab (§ 108 Abs. 1). Mit Genehmigung wirkt er von Anfang an, ohne endet er endgültig.</p><div class="kr"><button type="button" data-r="1" aria-pressed="false">Gewusst</button><button type="button" data-r="0" aria-pressed="false">Noch nicht</button></div></div></div>
+<p class="kvor" data-for="s2" hidden></p></div>
+</section>
+<section id="s3">
+<h2>Willenserklärung und Rechtsgeschäft</h2>
+<div class="bruecke"><div class="bk"><b>Du kennst schon</b>Du weißt, wer handeln kann.</div><div class="ar" aria-hidden="true">→</div><div class="bn"><b>Neu in diesem Abschnitt</b>Jetzt: Was ist eine Willenserklärung, wann wird sie wirksam, und wie hängt sie mit dem Rechtsgeschäft zusammen?</div><div class="bt"><span class="bl">Begriffe vorab, antippen für die Kurzdefinition:</span><button type="button" class="chip" data-d="Äußerung eines Willens, die auf eine Rechtsfolge gerichtet ist.">Willenserklärung</button><button type="button" class="chip" data-d="Die Erklärung gelangt so in den Machtbereich des Empfängers, dass er sie unter gewöhnlichen Umständen zur Kenntnis nehmen kann.">Zugang</button><button type="button" class="chip" data-d="Tatbestand aus mindestens einer Willenserklärung, an den das Recht die gewollte Rechtsfolge knüpft.">Rechtsgeschäft</button><p class="bd" hidden></p></div></div>
+<div class="raten" data-id="s3" data-ok="1" data-expl="Richtig ist der Zugang (§ 130 Abs. 1). Nicht die Abgabe zur Post und nicht die tatsächliche Kenntnisnahme sind entscheidend."><b>Vorab · rate ruhig</b><p>Wann wird eine Kündigung per Brief wirksam?</p><div class="ropts"><button type="button">Sobald der Brief zur Post gegeben wurde</button><button type="button">Sobald er dem Empfänger zugeht</button><button type="button">Erst wenn der Empfänger ihn tatsächlich gelesen hat</button></div><p class="rres" hidden></p><p class="rhint">Der Versuch zählt, auch wenn er falsch ist. Überspringen ist erlaubt.</p></div>
+<h3>Was ist eine Willenserklärung?</h3>
+<p>Eine <strong>Willenserklärung</strong> ist die Äußerung eines Willens, die auf einen rechtlichen Erfolg gerichtet ist: Etwas soll rechtlich gelten, weil du es willst. Sie hat einen äußeren Tatbestand (die Erklärung, etwa durch Worte, Schreiben oder schlüssiges Verhalten) und einen inneren (Handlungswille, Erklärungsbewusstsein, Geschäftswille). Fehlt innen etwas, ist die Erklärung nicht automatisch unwirksam, oft bleibt nur die Anfechtung (Abschnitt 8).</p>
+<p><strong>Schweigen</strong> ist grundsätzlich keine Willenserklärung. Wer nicht antwortet, hat meist weder zugestimmt noch abgelehnt, außer das Gesetz oder eine Vereinbarung gibt dem Schweigen ausnahmsweise Bedeutung.</p>
+<h3>Zugang</h3>
+<p>Eine Willenserklärung, die einem anderen gegenüber abzugeben ist, wird nach § 130 Abs. 1 in dem Zeitpunkt wirksam, in dem sie ihm <strong>zugeht</strong>. Zugegangen ist sie, wenn sie so in seinen Machtbereich gelangt, dass er unter gewöhnlichen Umständen davon Kenntnis nehmen kann. Der Brief im Briefkasten geht am selben Tag zu, wenn die Leerung normalerweise noch zu erwarten ist, sonst am nächsten Tag. Ob der Empfänger ihn wirklich liest, ist unerheblich.</p>
+<p>Ein <strong>Widerruf</strong> ist nur wirksam, wenn er dem Empfänger vorher oder gleichzeitig zugeht (§ 130 Abs. 1 S. 2). Stirbt der Erklärende nach der Abgabe oder wird er geschäftsunfähig, bleibt die Erklärung wirksam (§ 130 Abs. 2).</p>
+<h3>Rechtsgeschäft, Verpflichtung und Verfügung</h3>
+<p>Ein <strong>Rechtsgeschäft</strong> besteht aus mindestens einer Willenserklärung. Einseitig ist es zum Beispiel bei der Kündigung, zwei- oder mehrseitig beim Vertrag. Das BGB trennt außerdem zwei Ebenen:</p>
+<div class="tw"><table class="fr" style="min-width:26rem"><tr><td><strong>Verpflichtungsgeschäft</strong></td><td style="width:auto;text-align:left">Begründet eine Pflicht, zum Beispiel der Kaufvertrag (§ 433): Der Verkäufer muss übereignen, der Käufer zahlen.</td></tr><tr><td><strong>Verfügungsgeschäft</strong></td><td style="width:auto;text-align:left">Ändert unmittelbar ein Recht, zum Beispiel die Übereignung der Kaufsache.</td></tr></table></div>
+<p>Beide sind rechtlich getrennt (<strong>Trennungsprinzip</strong>), und die Wirksamkeit des einen hängt nicht automatisch von der des anderen ab (<strong>Abstraktionsprinzip</strong>). Ein unwirksamer Kaufvertrag macht die Übereignung also nicht von selbst unwirksam. Das spielt im Sachenrecht und Bereicherungsrecht eine große Rolle.</p>
+<figure class="stepfig" data-t="[&quot;Schritt 1: Gibt es überhaupt einen Vertrag? Antrag und Annahme müssen übereinstimmen (Abschnitt 4).&quot;, &quot;Schritt 2: Waren die Beteiligten geschäftsfähig? Sonst nichtig oder schwebend unwirksam (Abschnitt 2).&quot;, &quot;Schritt 3: Ist die Form eingehalten, und verstößt der Vertrag gegen ein Verbot oder die guten Sitten? (Abschnitte 6 und 7)&quot;, &quot;Schritt 4: Wurde die Erklärung angefochten? Dann ist sie rückwirkend nichtig (Abschnitt 8).&quot;]">
+<svg viewBox="0 0 560 120" role="img" aria-label="Vier Schritte der Wirksamkeitsprüfung: Vertrag zustande gekommen, Geschäftsfähigkeit, Form und Verbot, Anfechtung"><path class="svgl" d="M138 50H150M278 50H290M418 50H430"/><rect class="svgbox" data-s="1" x="10" y="26" width="128" height="48" rx="3"/><text class="svgt" x="74" y="55" text-anchor="middle">1 Vertrag da?</text><rect class="svgbox" data-s="2" x="150" y="26" width="128" height="48" rx="3"/><text class="svgt" x="214" y="55" text-anchor="middle">2 Fähigkeit?</text><rect class="svgbox" data-s="3" x="290" y="26" width="128" height="48" rx="3"/><text class="svgt" x="354" y="55" text-anchor="middle">3 Form, Verbot?</text><rect class="svgbox" data-s="4" x="430" y="26" width="120" height="48" rx="3"/><text class="svgt" x="490" y="55" text-anchor="middle">4 Anfechtung?</text><text class="svgm" x="74" y="98" text-anchor="middle">§§ 145 ff.</text><text class="svgm" x="214" y="98" text-anchor="middle">§§ 104 ff.</text><text class="svgm" x="354" y="98" text-anchor="middle">§§ 125, 134, 138</text><text class="svgm" x="490" y="98" text-anchor="middle">§§ 119 ff.</text></svg>
+<div class="sfc"><button type="button" class="sf-prev">← Zurück</button><span class="sf-n"></span><button type="button" class="sf-next">Weiter →</button></div><p class="sf-cap"></p>
+<figcaption>Die Wirksamkeit eines Vertrags prüfst du in dieser Reihenfolge</figcaption>
+</figure>
+<div class="kc"><b>Kurz-Check · 3 Fragen · 1 Minute</b>
+<div class="kq" data-id="s3_1"><p class="kqt">1. Wann wird eine empfangsbedürftige Willenserklärung unter Abwesenden wirksam?</p><button type="button" class="ans">▸ Antwort zeigen</button><div class="ka" hidden><p>Mit Zugang (§ 130 Abs. 1): wenn sie so in den Machtbereich des Empfängers gelangt, dass er unter gewöhnlichen Umständen Kenntnis nehmen kann.</p><div class="kr"><button type="button" data-r="1" aria-pressed="false">Gewusst</button><button type="button" data-r="0" aria-pressed="false">Noch nicht</button></div></div></div>
+<div class="kq" data-id="s3_2"><p class="kqt">2. Bis wann kann man eine Willenserklärung wirksam widerrufen?</p><button type="button" class="ans">▸ Antwort zeigen</button><div class="ka" hidden><p>Nur wenn der Widerruf dem Empfänger vorher oder gleichzeitig mit der Erklärung zugeht (§ 130 Abs. 1 S. 2).</p><div class="kr"><button type="button" data-r="1" aria-pressed="false">Gewusst</button><button type="button" data-r="0" aria-pressed="false">Noch nicht</button></div></div></div>
+<div class="kq" data-id="s3_3"><p class="kqt">3. Was besagt das Trennungsprinzip?</p><button type="button" class="ans">▸ Antwort zeigen</button><div class="ka" hidden><p>Verpflichtungsgeschäft (zum Beispiel Kaufvertrag) und Verfügungsgeschäft (zum Beispiel Übereignung) sind rechtlich getrennt. Nach dem Abstraktionsprinzip hängt die Wirksamkeit des einen nicht automatisch von der des anderen ab.</p><div class="kr"><button type="button" data-r="1" aria-pressed="false">Gewusst</button><button type="button" data-r="0" aria-pressed="false">Noch nicht</button></div></div></div>
+<p class="kvor" data-for="s3" hidden></p></div>
+</section>
+<div class="teil" id="teil2"><span class="tag">Teil 2</span><div class="teil-t">Der Vertrag</div><p class="ref">Zustandekommen, Auslegung, Form, Verbote</p><p>Ein Vertrag entsteht durch Angebot und Annahme. Dann fragt sich, was die Parteien gemeint haben, ob sie eine Form einhalten mussten und ob der Vertrag erlaubt ist.</p></div>
+<section id="s4">
+<h2>Vertragsschluss: Antrag und Annahme</h2>
+<div class="bruecke"><div class="bk"><b>Du kennst schon</b>Eine Willenserklärung wird mit Zugang wirksam.</div><div class="ar" aria-hidden="true">→</div><div class="bn"><b>Neu in diesem Abschnitt</b>Ein Vertrag besteht aus zwei sich deckenden Willenserklärungen. Wer macht den Antrag, wann kann man annehmen, und was passiert bei Verspätung?</div><div class="bt"><span class="bl">Begriffe vorab, antippen für die Kurzdefinition:</span><button type="button" class="chip" data-d="Das Angebot, mit dem man einem anderen den Vertragsschluss so anträgt, dass nur noch ein „Ja“ fehlt.">Antrag</button><button type="button" class="chip" data-d="Die Zustimmung zum Antrag.">Annahme</button><button type="button" class="chip" data-d="Die Parteien sind sich nicht einig.">Dissens</button><p class="bd" hidden></p></div></div>
+<div class="raten" data-id="s4" data-ok="1" data-expl="Richtig ist: Aufforderung zur Abgabe eines Angebots. Erst die Kundin macht den Antrag, der Händler nimmt an."><b>Vorab · rate ruhig</b><p>Die Auslage im Schaufenster mit Preisschild ist rechtlich:</p><div class="ropts"><button type="button">Ein bindender Antrag des Händlers</button><button type="button">Eine Aufforderung an die Kunden, ihrerseits ein Angebot abzugeben</button><button type="button">Schon der fertige Vertrag</button></div><p class="rres" hidden></p><p class="rhint">Der Versuch zählt, auch wenn er falsch ist. Überspringen ist erlaubt.</p></div>
+<h3>Antrag</h3>
+<p>Der <strong>Antrag</strong> (§ 145) ist ein Angebot, das so bestimmt ist, dass der andere nur noch „Ja“ sagen muss. Er enthält die wesentlichen Punkte, beim Kauf: Parteien, Kaufsache, Preis. Wer einen Antrag macht, ist daran gebunden, es sei denn, er hat die Bindung ausgeschlossen („freibleibend“).</p>
+<p>Kein Antrag ist die Schaufensterauslage oder der Katalog. Das ist nur die Aufforderung, selbst ein Angebot abzugeben (<em>invitatio ad offerendum</em>). Erst die Kundin macht den Antrag, der Händler nimmt an.</p>
+<h3>Annahme und Fristen</h3>
+<p>Die <strong>Annahme</strong> ist die uneingeschränkte Zustimmung zum Antrag. Wann sie möglich ist, regeln die §§ 146 bis 148:</p>
+<div class="tw"><table class="fr" style="min-width:26rem"><tr><td><strong>Unter Anwesenden (§ 147 Abs. 1)</strong></td><td style="width:auto;text-align:left">Sofort. Das gilt auch für Telefon und Videoanruf.</td></tr><tr><td><strong>Unter Abwesenden (§ 147 Abs. 2)</strong></td><td style="width:auto;text-align:left">Bis zu dem Zeitpunkt, in dem der Antragende die Antwort unter regelmäßigen Umständen erwarten darf.</td></tr><tr><td><strong>Bestimmte Frist (§ 148)</strong></td><td style="width:auto;text-align:left">Wer eine Frist setzt, kann nur innerhalb dieser Frist angenommen werden.</td></tr><tr><td><strong>Erlöschen (§ 146)</strong></td><td style="width:auto;text-align:left">Der Antrag erlischt durch Ablehnung oder durch Fristablauf.</td></tr></table></div>
+<h3>Verspätung, Änderung, stilles Annehmen</h3>
+<ul>
+<li>Eine <strong>verspätete Annahme</strong> gilt als neuer Antrag (§ 150 Abs. 1).</li>
+<li>Eine Annahme <strong>unter Erweiterungen oder Einschränkungen</strong> gilt als Ablehnung verbunden mit einem neuen Antrag (§ 150 Abs. 2).</li>
+<li>Ausnahmsweise braucht die Annahme dem Antragenden <strong>nicht zuzugehen</strong>, wenn das nach der Verkehrssitte nicht zu erwarten ist oder er darauf verzichtet hat (§ 151). Beispiel: Du bestellst ein Buch und bekommst es zugeschickt.</li>
+</ul>
+<h3>Wenn man sich nicht einig ist</h3>
+<p>Fehlt die Einigung über einen Punkt, über den eine Einigung erzielt werden sollte, liegt ein <strong>Dissens</strong> vor. Beim offenen Einigungsmangel wissen es beide (§ 154), beim versteckten Dissens meinen beide, sich geeinigt zu haben (§ 155). Im Zweifel ist der Vertrag dann nicht geschlossen.</p>
+<figure class="stepfig" data-t="[&quot;Schritt 1: Der Antrag bindet den Antragenden (§ 145), er kann ihn nicht einfach zurücknehmen.&quot;, &quot;Schritt 2: Die Annahme muss rechtzeitig (§§ 147, 148) und ohne Änderung (§ 150) kommen.&quot;, &quot;Schritt 3: Decken sich Antrag und Annahme, ist der Vertrag zustande gekommen.&quot;]">
+<svg viewBox="0 0 560 130" role="img" aria-label="Vertragsschluss in drei Schritten: Antrag, Annahme, Vertrag"><path class="svgac" d="M162 55H198"/><path class="svgahc" d="M200 55l-9-5v10z"/><path class="svgac" d="M358 55H394"/><path class="svgahc" d="M396 55l-9-5v10z"/><rect class="svgbox" data-s="1" x="10" y="28" width="152" height="54" rx="3"/><text class="svgt" x="86" y="60" text-anchor="middle">Antrag</text><rect class="svgbox" data-s="2" x="204" y="28" width="152" height="54" rx="3"/><text class="svgt" x="280" y="60" text-anchor="middle">Annahme</text><rect class="svgbox" data-s="3" x="398" y="28" width="152" height="54" rx="3"/><text class="svgt" x="474" y="60" text-anchor="middle">Vertrag</text><text class="svgm" x="86" y="108" text-anchor="middle">§ 145</text><text class="svgm" x="280" y="108" text-anchor="middle">§§ 147 bis 151</text><text class="svgm" x="474" y="108" text-anchor="middle">Einigung</text></svg>
+<div class="sfc"><button type="button" class="sf-prev">← Zurück</button><span class="sf-n"></span><button type="button" class="sf-next">Weiter →</button></div><p class="sf-cap"></p>
+<figcaption>Vertragsschluss durch Antrag und Annahme</figcaption>
+</figure>
+<div class="fall"><span class="tag">Fall: Zu späte Annahme</span><p>Anna bietet Bernd per E-Mail ihr Fahrrad für 300 Euro an, „gültig bis Freitag“. Bernd antwortet am Samstag: „Ich nehme es.“ Besteht ein Vertrag?</p><p><strong>Lösung:</strong> Anna hat eine Frist gesetzt (§ 148). Bernds Annahme kam nach Fristablauf, der Antrag war erloschen (§ 146). Die verspätete Annahme gilt nach § 150 Abs. 1 als neuer Antrag. Ein Vertrag entsteht erst, wenn Anna diesen neuen Antrag annimmt.</p></div>
+<div class="kc"><b>Kurz-Check · 3 Fragen · 1 Minute</b>
+<div class="kq" data-id="s4_1"><p class="kqt">1. Warum ist die Schaufensterauslage kein Antrag?</p><button type="button" class="ans">▸ Antwort zeigen</button><div class="ka" hidden><p>Sie ist nur eine Aufforderung zur Abgabe eines Angebots (invitatio ad offerendum). Der Händler will nicht an jeden Interessenten gebunden sein, erst die Kundin macht den Antrag.</p><div class="kr"><button type="button" data-r="1" aria-pressed="false">Gewusst</button><button type="button" data-r="0" aria-pressed="false">Noch nicht</button></div></div></div>
+<div class="kq" data-id="s4_2"><p class="kqt">2. Wann kann ein Antrag unter Abwesenden angenommen werden?</p><button type="button" class="ans">▸ Antwort zeigen</button><div class="ka" hidden><p>Bis zu dem Zeitpunkt, in dem der Antragende die Antwort unter regelmäßigen Umständen erwarten darf (§ 147 Abs. 2). Hat er eine Frist gesetzt, nur innerhalb dieser Frist (§ 148).</p><div class="kr"><button type="button" data-r="1" aria-pressed="false">Gewusst</button><button type="button" data-r="0" aria-pressed="false">Noch nicht</button></div></div></div>
+<div class="kq" data-id="s4_3"><p class="kqt">3. Was ist eine verspätete oder geänderte Annahme?</p><button type="button" class="ans">▸ Antwort zeigen</button><div class="ka" hidden><p>Eine verspätete Annahme gilt als neuer Antrag (§ 150 Abs. 1). Eine Annahme mit Änderungen gilt als Ablehnung verbunden mit einem neuen Antrag (§ 150 Abs. 2).</p><div class="kr"><button type="button" data-r="1" aria-pressed="false">Gewusst</button><button type="button" data-r="0" aria-pressed="false">Noch nicht</button></div></div></div>
+<p class="kvor" data-for="s4" hidden></p></div>
+</section>
+<section id="s5">
+<h2>Auslegung</h2>
+<div class="bruecke"><div class="bk"><b>Du kennst schon</b>Antrag und Annahme sind Willenserklärungen.</div><div class="ar" aria-hidden="true">→</div><div class="bn"><b>Neu in diesem Abschnitt</b>Oft ist unklar, was jemand damit eigentlich gemeint hat. Wie findet man den Inhalt heraus?</div><div class="bt"><span class="bl">Begriffe vorab, antippen für die Kurzdefinition:</span><button type="button" class="chip" data-d="Ermittlung des Inhalts einer Willenserklärung.">Auslegung</button><button type="button" class="chip" data-d="Maßstab: Wie durfte der Empfänger die Erklärung bei verständiger Würdigung verstehen?">objektiver Empfängerhorizont</button><button type="button" class="chip" data-d="Maßstab von Fairness und Redlichkeit, § 157.">Treu und Glauben</button><p class="bd" hidden></p></div></div>
+<h3>Die beiden Normen</h3>
+<div class="tw"><table class="fr" style="min-width:26rem"><tr><td><strong>§ 133</strong></td><td style="width:auto;text-align:left">Bei der Auslegung einer Willenserklärung ist der wirkliche Wille zu erforschen. Man haftet nicht am buchstäblichen Sinn des Ausdrucks.</td></tr><tr><td><strong>§ 157</strong></td><td style="width:auto;text-align:left">Verträge sind so auszulegen, wie Treu und Glauben mit Rücksicht auf die Verkehrssitte es erfordern.</td></tr></table></div>
+<h3>Wessen Sicht zählt?</h3>
+<p>Bei <strong>empfangsbedürftigen</strong> Willenserklärungen (zum Beispiel Antrag, Kündigung) kommt es darauf an, wie ein vernünftiger Empfänger sie unter den konkreten Umständen verstehen durfte (<strong>objektiver Empfängerhorizont</strong>). Der Empfänger soll sich auf das Verstehbare verlassen können. Bei nicht empfangsbedürftigen Erklärungen (zum Beispiel einem Testament) steht dagegen der wirkliche Wille im Vordergrund.</p>
+<h3>Wenn beide dasselbe meinen</h3>
+<p>Haben beide Parteien übereinstimmend etwas anderes gemeint, als sie gesagt haben, gilt das Gemeinte. <em>Falsa demonstratio non nocet</em>: Eine falsche Bezeichnung schadet nicht. Beispiel: Beide meinen das Auto mit dem Kennzeichen X, bezeichnen es aber im Vertrag versehentlich mit dem Kennzeichen Y. Verkauft ist das Auto X.</p>
+<h3>Lücken im Vertrag</h3>
+<p>Fehlt im Vertrag eine Regelung, die die Parteien bei Bedenken des Punktes getroffen hätten, füllt die <strong>ergänzende Vertragsauslegung</strong> die Lücke. Maßstab ist, was redliche Parteien vereinbart hätten.</p>
+<div class="merke"><span class="tag">Merke</span><p>Zuerst prüfst du, ob beide dasselbe gemeint haben (dann gilt das). Sonst entscheidet der objektive Empfängerhorizont, mit § 133 und § 157 als Grundlage.</p></div>
+<div class="kc"><b>Kurz-Check · 3 Fragen · 1 Minute</b>
+<div class="kq" data-id="s5_1"><p class="kqt">1. Welche zwei Paragrafen regeln die Auslegung?</p><button type="button" class="ans">▸ Antwort zeigen</button><div class="ka" hidden><p>§ 133 (wirklicher Wille erforschen, nicht am Wortlaut haften) und § 157 (Verträge nach Treu und Glauben mit Rücksicht auf die Verkehrssitte).</p><div class="kr"><button type="button" data-r="1" aria-pressed="false">Gewusst</button><button type="button" data-r="0" aria-pressed="false">Noch nicht</button></div></div></div>
+<div class="kq" data-id="s5_2"><p class="kqt">2. Wessen Verständnis zählt bei einer empfangsbedürftigen Willenserklärung?</p><button type="button" class="ans">▸ Antwort zeigen</button><div class="ka" hidden><p>Das eines vernünftigen Empfängers in der konkreten Situation (objektiver Empfängerhorizont).</p><div class="kr"><button type="button" data-r="1" aria-pressed="false">Gewusst</button><button type="button" data-r="0" aria-pressed="false">Noch nicht</button></div></div></div>
+<div class="kq" data-id="s5_3"><p class="kqt">3. Was besagt „falsa demonstratio non nocet“?</p><button type="button" class="ans">▸ Antwort zeigen</button><div class="ka" hidden><p>Haben beide Parteien übereinstimmend etwas anderes gemeint, als sie bezeichnet haben, gilt das Gemeinte. Eine falsche Bezeichnung schadet nicht.</p><div class="kr"><button type="button" data-r="1" aria-pressed="false">Gewusst</button><button type="button" data-r="0" aria-pressed="false">Noch nicht</button></div></div></div>
+<p class="kvor" data-for="s5" hidden></p></div>
+</section>
+<section id="s6">
+<h2>Form</h2>
+<div class="bruecke"><div class="bk"><b>Du kennst schon</b>Verträge sind grundsätzlich formfrei, ein Handschlag genügt.</div><div class="ar" aria-hidden="true">→</div><div class="bn"><b>Neu in diesem Abschnitt</b>Für bestimmte Geschäfte verlangt das Gesetz eine Form. Welche gibt es, und was passiert bei Verstößen?</div><div class="bt"><span class="bl">Begriffe vorab, antippen für die Kurzdefinition:</span><button type="button" class="chip" data-d="Eigenhändige Unterschrift auf einer Urkunde (§ 126).">Schriftform</button><button type="button" class="chip" data-d="Lesbare Erklärung auf dauerhaftem Datenträger (§ 126b).">Textform</button><button type="button" class="chip" data-d="Notarielle Form (§ 128).">Beurkundung</button><p class="bd" hidden></p></div></div>
+<h3>Grundsatz Formfreiheit, Ausnahmen aus gutem Grund</h3>
+<p>Im Grundsatz gilt <strong>Formfreiheit</strong>. Das Gesetz schreibt eine Form nur dort vor, wo sie einen Zweck erfüllt: Sie <em>warnt</em> vor übereilten Entscheidungen, <em>beweist</em>, was vereinbart wurde, und ermöglicht <em>Beratung</em> (beim Notar).</p>
+<h3>Die Formen</h3>
+<div class="tw"><table class="fr" style="min-width:26rem"><tr><td><strong>Schriftform (§ 126)</strong></td><td style="width:auto;text-align:left">Urkunde, eigenhändig mit Namen oder notariell beglaubigtem Handzeichen unterschrieben.</td></tr><tr><td><strong>Elektronische Form (§ 126a)</strong></td><td style="width:auto;text-align:left">Mit qualifizierter elektronischer Signatur. Sie kann die Schriftform ersetzen.</td></tr><tr><td><strong>Textform (§ 126b)</strong></td><td style="width:auto;text-align:left">Lesbare Erklärung, die die Person nennt und auf einem dauerhaften Datenträger abgegeben ist, zum Beispiel E-Mail. Eine Unterschrift ist nicht nötig.</td></tr><tr><td><strong>Notarielle Beurkundung (§ 128)</strong></td><td style="width:auto;text-align:left">Der Notar beurkundet die Erklärungen. Sie ersetzt Schriftform und ist das strengste Mittel.</td></tr></table></div>
+<h3>Typische Formvorschriften</h3>
+<ul>
+<li><strong>Grundstückskaufvertrag:</strong> notarielle Beurkundung (§ 311b Abs. 1 S. 1).</li>
+<li><strong>Schenkungsversprechen:</strong> notarielle Beurkundung (§ 518 Abs. 1).</li>
+</ul>
+<h3>Rechtsfolge bei Formmangel</h3>
+<p>Ein Rechtsgeschäft, das der gesetzlich vorgeschriebenen Form nicht entspricht, ist <strong>nichtig</strong> (§ 125 S. 1). Bei einer rechtsgeschäftlich vereinbarten Form ist das im Zweifel genauso (§ 125 S. 2). Manche Formmängel werden <strong>geheilt</strong>. Ein formnichtiger Grundstückskaufvertrag wird nach § 311b Abs. 1 S. 2 gültig, wenn Auflassung und Eintragung im Grundbuch erfolgen.</p>
+<div class="fall"><span class="tag">Fall: Handschlag beim Hauskauf</span><p>Karl und Lena einigen sich mündlich per Handschlag, dass Lena Karls Haus für 400.000 Euro kauft. Später will Karl nicht mehr verkaufen. Kann Lena die Übereignung verlangen?</p><p><strong>Lösung:</strong> Der Grundstückskaufvertrag braucht notarielle Beurkundung (§ 311b Abs. 1 S. 1). Sie fehlt, der Vertrag ist nach § 125 S. 1 nichtig. Lena kann deshalb keine Erfüllung verlangen. Eine Heilung nach § 311b Abs. 1 S. 2 setzt Auflassung und Eintragung voraus, die es noch nicht gibt.</p></div>
+<div class="kc"><b>Kurz-Check · 3 Fragen · 1 Minute</b>
+<div class="kq" data-id="s6_1"><p class="kqt">1. Welche Zwecke erfüllt eine Formvorschrift?</p><button type="button" class="ans">▸ Antwort zeigen</button><div class="ka" hidden><p>Warnung vor Übereilung, Beweis und Beratung (zum Beispiel durch den Notar).</p><div class="kr"><button type="button" data-r="1" aria-pressed="false">Gewusst</button><button type="button" data-r="0" aria-pressed="false">Noch nicht</button></div></div></div>
+<div class="kq" data-id="s6_2"><p class="kqt">2. Was ist der Unterschied zwischen Schriftform und Textform?</p><button type="button" class="ans">▸ Antwort zeigen</button><div class="ka" hidden><p>Schriftform verlangt eine eigenhändig unterschriebene Urkunde (§ 126). Textform genügt als lesbare Erklärung auf dauerhaftem Datenträger ohne Unterschrift, zum Beispiel per E-Mail (§ 126b).</p><div class="kr"><button type="button" data-r="1" aria-pressed="false">Gewusst</button><button type="button" data-r="0" aria-pressed="false">Noch nicht</button></div></div></div>
+<div class="kq" data-id="s6_3"><p class="kqt">3. Was ist die Folge eines Formmangels, und wann wird er geheilt?</p><button type="button" class="ans">▸ Antwort zeigen</button><div class="ka" hidden><p>Nichtigkeit (§ 125). Heilung gibt es nur in bestimmten Fällen, etwa beim Grundstückskauf durch Auflassung und Eintragung (§ 311b Abs. 1 S. 2).</p><div class="kr"><button type="button" data-r="1" aria-pressed="false">Gewusst</button><button type="button" data-r="0" aria-pressed="false">Noch nicht</button></div></div></div>
+<p class="kvor" data-for="s6" hidden></p></div>
+</section>
+<section id="s7">
+<h2>Verbotsgesetz und Sittenwidrigkeit</h2>
+<div class="bruecke"><div class="bk"><b>Du kennst schon</b>Formfehler machen ein Rechtsgeschäft nichtig.</div><div class="ar" aria-hidden="true">→</div><div class="bn"><b>Neu in diesem Abschnitt</b>Auch der Inhalt kann es unwirksam machen: wenn er gegen ein Gesetz oder die guten Sitten verstößt.</div><div class="bt"><span class="bl">Begriffe vorab, antippen für die Kurzdefinition:</span><button type="button" class="chip" data-d="Gesetz, das ein Rechtsgeschäft verbietet.">Verbotsgesetz</button><button type="button" class="chip" data-d="Verstoß gegen das Anstandsgefühl aller billig und gerecht Denkenden.">Sittenwidrigkeit</button><button type="button" class="chip" data-d="Auffälliges Missverhältnis plus Ausbeutung einer Schwächelage.">Wucher</button><p class="bd" hidden></p></div></div>
+<h3>Gesetzliches Verbot, § 134</h3>
+<p>Ein Rechtsgeschäft, das gegen ein gesetzliches Verbot verstößt, ist <strong>nichtig</strong>, wenn sich aus dem Gesetz nicht ein anderes ergibt (§ 134). Ob ein Verbot wirklich die Nichtigkeit nach sich zieht, entscheidet der <em>Zweck der Verbotsnorm</em>. Ein Kaufvertrag über verbotene Betäubungsmittel ist zum Beispiel nichtig.</p>
+<h3>Sittenwidrigkeit, § 138</h3>
+<p>Nach § 138 Abs. 1 ist ein Rechtsgeschäft nichtig, das gegen die <strong>guten Sitten</strong> verstößt. Maßstab ist das Anstandsgefühl aller billig und gerecht Denkenden. Es kommt auf Inhalt, Beweggrund und Zweck des Geschäfts in der Gesamtschau an.</p>
+<p><strong>Wucher</strong> ist der in § 138 Abs. 2 geregelte Sonderfall: Jemand beutet die Zwangslage, Unerfahrenheit, den Mangel an Urteilsvermögen oder erhebliche Willensschwäche eines anderen aus und lässt sich für eine Leistung Vorteile versprechen, die in einem auffälligen Missverhältnis zur Leistung stehen.</p>
+<h3>Wenn nur ein Teil betroffen ist</h3>
+<div class="tw"><table class="fr" style="min-width:26rem"><tr><td><strong>Teilnichtigkeit (§ 139)</strong></td><td style="width:auto;text-align:left">Ist ein Teil nichtig, ist im Zweifel das ganze Rechtsgeschäft nichtig, es sei denn, es wäre auch ohne den nichtigen Teil vorgenommen worden.</td></tr><tr><td><strong>Umdeutung (§ 140)</strong></td><td style="width:auto;text-align:left">Entspricht ein nichtiges Rechtsgeschäft den Erfordernissen eines anderen, gilt dieses, wenn anzunehmen ist, dass es bei Kenntnis der Nichtigkeit gewollt wäre.</td></tr><tr><td><strong>Bestätigung (§ 141)</strong></td><td style="width:auto;text-align:left">Wird ein nichtiges Rechtsgeschäft bestätigt, gilt die Bestätigung als erneute Vornahme.</td></tr></table></div>
+<div class="kc"><b>Kurz-Check · 3 Fragen · 1 Minute</b>
+<div class="kq" data-id="s7_1"><p class="kqt">1. Wann ist ein Rechtsgeschäft nach § 134 nichtig?</p><button type="button" class="ans">▸ Antwort zeigen</button><div class="ka" hidden><p>Wenn es gegen ein gesetzliches Verbot verstößt und sich aus dem Gesetz nichts anderes ergibt. Entscheidend ist der Zweck der Verbotsnorm.</p><div class="kr"><button type="button" data-r="1" aria-pressed="false">Gewusst</button><button type="button" data-r="0" aria-pressed="false">Noch nicht</button></div></div></div>
+<div class="kq" data-id="s7_2"><p class="kqt">2. Was ist Wucher nach § 138 Abs. 2?</p><button type="button" class="ans">▸ Antwort zeigen</button><div class="ka" hidden><p>Ausbeutung einer Zwangslage, Unerfahrenheit, eines Mangels an Urteilsvermögen oder erheblicher Willensschwäche mit einem auffälligen Missverhältnis von Leistung und Gegenleistung.</p><div class="kr"><button type="button" data-r="1" aria-pressed="false">Gewusst</button><button type="button" data-r="0" aria-pressed="false">Noch nicht</button></div></div></div>
+<div class="kq" data-id="s7_3"><p class="kqt">3. Was sagt § 139 zur Teilnichtigkeit?</p><button type="button" class="ans">▸ Antwort zeigen</button><div class="ka" hidden><p>Ist ein Teil nichtig, ist im Zweifel das ganze Rechtsgeschäft nichtig, außer es wäre auch ohne den nichtigen Teil vorgenommen worden.</p><div class="kr"><button type="button" data-r="1" aria-pressed="false">Gewusst</button><button type="button" data-r="0" aria-pressed="false">Noch nicht</button></div></div></div>
+<p class="kvor" data-for="s7" hidden></p></div>
+</section>
+<div class="teil" id="teil3"><span class="tag">Teil 3</span><div class="teil-t">Fehler, Vertretung, Zeit</div><p class="ref">Anfechtung, Stellvertretung, Bedingung, Verjährung</p><p>Hier geht es um die Fälle, in denen ein Geschäft zunächst da ist, aber angreifbar, von anderen abgeschlossen oder zeitlich begrenzt wird.</p></div>
+<section id="s8">
+<h2>Anfechtung</h2>
+<div class="bruecke"><div class="bk"><b>Du kennst schon</b>Du hast gesehen, wann ein Vertrag nichtig oder schwebend unwirksam ist.</div><div class="ar" aria-hidden="true">→</div><div class="bn"><b>Neu in diesem Abschnitt</b>Auch ein wirksamer Vertrag kann angreifbar sein, wenn der Wille falsch gebildet oder falsch geäußert wurde. Die Anfechtung beseitigt ihn nachträglich.</div><div class="bt"><span class="bl">Begriffe vorab, antippen für die Kurzdefinition:</span><button type="button" class="chip" data-d="Erklärung, mit der eine Willenserklärung rückwirkend vernichtet wird.">Anfechtung</button><button type="button" class="chip" data-d="Fehlvorstellung über Inhalt oder Erklärung.">Irrtum</button><button type="button" class="chip" data-d="Schaden, weil man auf die Gültigkeit vertraut hat.">Vertrauensschaden</button><p class="bd" hidden></p></div></div>
+<div class="raten" data-id="s8" data-ok="1" data-expl="Richtig ist: rückwirkend (§ 142 Abs. 1). Die Anfechtung wirkt durch eine Erklärung gegenüber dem Gegner, ein Gericht ist nicht nötig."><b>Vorab · rate ruhig</b><p>Die Anfechtung einer Willenserklärung wirkt:</p><div class="ropts"><button type="button">Nur für die Zukunft</button><button type="button">Rückwirkend auf den Zeitpunkt der Erklärung</button><button type="button">Erst, wenn ein Gericht sie bestätigt</button></div><p class="rres" hidden></p><p class="rhint">Der Versuch zählt, auch wenn er falsch ist. Überspringen ist erlaubt.</p></div>
+<h3>Voraussetzungen im Überblick</h3>
+<ol>
+<li><strong>Anfechtungserklärung</strong> gegenüber dem Anfechtungsgegner (§ 143), meist dem Vertragspartner.</li>
+<li><strong>Anfechtungsgrund</strong> (siehe unten).</li>
+<li><strong>Frist</strong> eingehalten (§ 121 oder § 124).</li>
+<li><strong>Kausalität:</strong> Der Irrtum muss für die Erklärung ursächlich gewesen sein.</li>
+</ol>
+<p><strong>Rechtsfolge:</strong> Die angefochtene Willenserklärung ist von Anfang an nichtig (§ 142 Abs. 1). Wer die Anfechtbarkeit kannte oder kennen musste, wird behandelt, als hätte er die Nichtigkeit gekannt (§ 142 Abs. 2).</p>
+<h3>Die Anfechtungsgründe</h3>
+<div class="tw"><table class="fr" style="min-width:26rem"><tr><td><strong>Inhaltsirrtum (§ 119 Abs. 1 Alt. 1)</strong></td><td style="width:auto;text-align:left">Du irrst über die Bedeutung deiner Erklärung. Beispiel: Du bestellst „10 Gros“ und denkst, das seien zehn Stück (ein Gros sind 144).</td></tr><tr><td><strong>Erklärungsirrtum (§ 119 Abs. 1 Alt. 2)</strong></td><td style="width:auto;text-align:left">Du äußerst etwas anderes, als du wolltest: Verschreiben, Versprechen, Vertippen.</td></tr><tr><td><strong>Eigenschaftsirrtum (§ 119 Abs. 2)</strong></td><td style="width:auto;text-align:left">Du irrst über eine verkehrswesentliche Eigenschaft einer Person oder Sache. Beispiel: Das „echte“ Gemälde ist eine Fälschung.</td></tr><tr><td><strong>Übermittlungsirrtum (§ 120)</strong></td><td style="width:auto;text-align:left">Eine Erklärung wurde durch den Boten oder die Anstalt unrichtig übermittelt.</td></tr><tr><td><strong>Täuschung, Drohung (§ 123)</strong></td><td style="width:auto;text-align:left">Du wurdest arglistig getäuscht oder widerrechtlich bedroht.</td></tr></table></div>
+<p>Ein bloßer <strong>Motivirrtum</strong>, also ein Irrtum über den Beweggrund, berechtigt grundsätzlich nicht zur Anfechtung. Bei § 119 Abs. 1 muss außerdem gelten: Du hättest die Erklärung bei Kenntnis der Sachlage und verständiger Würdigung des Falles nicht abgegeben.</p>
+<h3>Fristen</h3>
+<div class="tw"><table class="fr" style="min-width:26rem"><tr><td><strong>Irrtum, § 121</strong></td><td style="width:auto;text-align:left">Unverzüglich (ohne schuldhaftes Zögern) nach Kenntnis des Grundes. Spätestens zehn Jahre nach Abgabe der Erklärung.</td></tr><tr><td><strong>Täuschung, Drohung, § 124</strong></td><td style="width:auto;text-align:left">Ein Jahr ab Entdeckung der Täuschung oder Ende der Zwangslage. Spätestens zehn Jahre nach Abgabe.</td></tr></table></div>
+<h3>Schadensersatz bei Anfechtung, § 122</h3>
+<p>Wer wegen Irrtums nach §§ 119, 120 anficht, muss dem Gegner den <strong>Vertrauensschaden</strong> ersetzen, den er dadurch erleidet, dass er auf die Gültigkeit vertraute (§ 122 Abs. 1), allerdings höchstens bis zur Höhe des Erfüllungsinteresses. Die Pflicht entfällt, wenn der Gegner den Grund kannte oder kennen musste (§ 122 Abs. 2). Bei Täuschung oder Drohung (§ 123) gibt es keinen solchen Anspruch gegen den Anfechtenden.</p>
+<div class="stufen"><span class="tag">Beispiel in drei Stufen</span><div class="sgsel"></div>
+<div class="sst" data-s="1"><p class="sfall"><b>Fall:</b> Verkäufer Veit will sein Fahrrad für 800 Euro anbieten und tippt im Angebot per E-Mail „80 Euro“. Käufer Kai nimmt sofort an. Veit bemerkt den Fehler am nächsten Tag und erklärt Kai sofort die Anfechtung. Wirksam?</p><div class="sl1"><b class="lb">Lösung, ganz durchgerechnet</b><p>Veits Erklärung lautete über 80 Euro, gewollt waren 800. Er hat sich vertippt: <strong>Erklärungsirrtum</strong> nach § 119 Abs. 1 Alt. 2. Bei verständiger Würdigung hätte er mit 80 Euro nicht angeboten, die Kausalität ist gegeben. Er erklärt die Anfechtung sofort, also <strong>unverzüglich</strong> nach § 121. Der Vertrag ist rückwirkend nichtig (§ 142 Abs. 1). Veit muss Kai aber den <strong>Vertrauensschaden</strong> nach § 122 ersetzen, zum Beispiel nutzlose Aufwendungen für die Abholung.</p></div></div>
+<div class="sst" data-s="2" hidden><p class="sfall"><b>Fall:</b> Veit will sein Fahrrad für 800 Euro anbieten und tippt im Angebot „80 Euro“. Kai nimmt an. Veit erklärt sofort die Anfechtung.</p><div class="sl1"><b class="lb">Lösung mit Lücken, tippe die Wörter ein</b><p>Veit hat sich vertippt, das ist ein <input class="lk" size="18" data-a="Erklärungsirrtum" data-h="Verschreiben: § 119 Abs. 1 Alt. 2 BGB" aria-label="Lücke" autocomplete="off" spellcheck="false"> nach § 119 Abs. 1 Alt. 2. Er ficht <input class="lk" size="14" data-a="unverzüglich" data-h="ohne schuldhaftes Zögern, § 121" aria-label="Lücke" autocomplete="off" spellcheck="false"> an. Der Vertrag ist rückwirkend <input class="lk" size="10" data-a="nichtig" data-h="§ 142 Abs. 1" aria-label="Lücke" autocomplete="off" spellcheck="false">. Kai kann aber nach § 122 Ersatz seines <input class="lk" size="20" data-a="Vertrauensschadens" data-h="Schaden, weil er auf die Gültigkeit vertraute" aria-label="Lücke" autocomplete="off" spellcheck="false"> verlangen.</p></div></div>
+<div class="sst" data-s="3" hidden><p class="sfall"><b>Neuer Fall:</b> Händler Hans verkauft Greta ein Gemälde. Er behauptet wahrheitswidrig, es sei ein echter Original-Maler, obwohl er weiß, dass es eine Kopie ist. Greta bemerkt die Täuschung nach vier Monaten.</p><p><b>Frage:</b> Kann Greta anfechten? In welcher Frist? Muss sie Hans etwas ersetzen?</p><textarea class="own" rows="3" placeholder="Eigene Stichpunkte (werden nicht gespeichert)" aria-label="Eigene Stichpunkte"></textarea><button type="button" class="mbtn">▸ Musterlösung zeigen</button><div class="muster" hidden><p>Ja. Hans hat sie <strong>arglistig getäuscht</strong>, Anfechtungsgrund nach § 123 Abs. 1. Greta muss die Anfechtung gegenüber Hans erklären (§ 143) und die <strong>Jahresfrist</strong> des § 124 beachten, sie beginnt mit der Entdeckung und ist nach vier Monaten noch offen. Der Vertrag ist rückwirkend nichtig (§ 142 Abs. 1). Einen Anspruch auf Ersatz des Vertrauensschadens nach § 122 hat Hans nicht, denn § 122 gilt nur bei Irrtum (§§ 119, 120).</p></div></div></div>
+<div class="kc"><b>Kurz-Check · 3 Fragen · 1 Minute</b>
+<div class="kq" data-id="s8_1"><p class="kqt">1. Nenne die Anfechtungsgründe des BGB.</p><button type="button" class="ans">▸ Antwort zeigen</button><div class="ka" hidden><p>§ 119 Abs. 1 (Inhalts- und Erklärungsirrtum), § 119 Abs. 2 (Eigenschaftsirrtum), § 120 (Übermittlungsirrtum), § 123 (arglistige Täuschung, widerrechtliche Drohung).</p><div class="kr"><button type="button" data-r="1" aria-pressed="false">Gewusst</button><button type="button" data-r="0" aria-pressed="false">Noch nicht</button></div></div></div>
+<div class="kq" data-id="s8_2"><p class="kqt">2. Welche Fristen gelten bei Irrtum und bei Täuschung?</p><button type="button" class="ans">▸ Antwort zeigen</button><div class="ka" hidden><p>Irrtum: unverzüglich nach Kenntnis (§ 121). Täuschung oder Drohung: ein Jahr ab Entdeckung (§ 124). Beide absolut zehn Jahre.</p><div class="kr"><button type="button" data-r="1" aria-pressed="false">Gewusst</button><button type="button" data-r="0" aria-pressed="false">Noch nicht</button></div></div></div>
+<div class="kq" data-id="s8_3"><p class="kqt">3. Was ist die Rechtsfolge der Anfechtung, und wer zahlt nach § 122?</p><button type="button" class="ans">▸ Antwort zeigen</button><div class="ka" hidden><p>Rückwirkende Nichtigkeit (§ 142 Abs. 1). Bei Irrtum ersetzt der Anfechtende dem Gegner den Vertrauensschaden (§ 122), bei Täuschung oder Drohung nicht.</p><div class="kr"><button type="button" data-r="1" aria-pressed="false">Gewusst</button><button type="button" data-r="0" aria-pressed="false">Noch nicht</button></div></div></div>
+<p class="kvor" data-for="s8" hidden></p></div>
+</section>
+<section id="s9">
+<h2>Stellvertretung</h2>
+<div class="bruecke"><div class="bk"><b>Du kennst schon</b>Normalerweise schließt du Verträge selbst.</div><div class="ar" aria-hidden="true">→</div><div class="bn"><b>Neu in diesem Abschnitt</b>Du kannst auch andere für dich handeln lassen. Dann entsteht ein Dreieck: Vertretener, Vertreter, Dritter. Wen trifft die Wirkung?</div><div class="bt"><span class="bl">Begriffe vorab, antippen für die Kurzdefinition:</span><button type="button" class="chip" data-d="Die Befugnis, für einen anderen wirksam zu handeln.">Vertretungsmacht</button><button type="button" class="chip" data-d="Rechtsgeschäftlich erteilte Vertretungsmacht (§ 166 Abs. 2).">Vollmacht</button><button type="button" class="chip" data-d="Der Vertreter muss erkennbar im fremden Namen handeln.">Offenkundigkeit</button><button type="button" class="chip" data-d="Übermittelt nur eine fremde Erklärung, gibt keine eigene ab.">Bote</button><p class="bd" hidden></p></div></div>
+<div class="raten" data-id="s9" data-ok="1" data-expl="Richtig ist der Vertretene (§ 164 Abs. 1). Der Vertreter gibt nur seine eigene Erklärung ab und wird nicht Vertragspartei."><b>Vorab · rate ruhig</b><p>Wer wird aus einem Vertrag berechtigt, den ein bevollmächtigter Vertreter im Namen des Vertretenen schließt?</p><div class="ropts"><button type="button">Der Vertreter</button><button type="button">Der Vertretene</button><button type="button">Beide gemeinsam</button></div><p class="rres" hidden></p><p class="rhint">Der Versuch zählt, auch wenn er falsch ist. Überspringen ist erlaubt.</p></div>
+<h3>Voraussetzungen, § 164</h3>
+<p>Eine Willenserklärung, die jemand innerhalb seiner Vertretungsmacht im Namen des Vertretenen abgibt, wirkt <strong>unmittelbar für und gegen den Vertretenen</strong> (§ 164 Abs. 1). Du prüfst drei Dinge:</p>
+<ol>
+<li>Der Vertreter gibt <strong>eine eigene Willenserklärung</strong> ab.</li>
+<li>Er handelt <strong>im fremden Namen</strong> (Offenkundigkeitsprinzip). Das kann sich auch aus den Umständen ergeben (§ 164 Abs. 1 S. 2).</li>
+<li>Er hat <strong>Vertretungsmacht</strong>.</li>
+</ol>
+<p>Der <strong>Bote</strong> unterscheidet sich vom Vertreter: Er überbringt nur eine fremde Erklärung, der Vertreter gibt eine eigene ab und hat dabei Entscheidungsspielraum.</p>
+<h3>Woher kommt die Vertretungsmacht?</h3>
+<ul>
+<li><strong>Gesetzlich</strong>, zum Beispiel die Eltern für ihr Kind.</li>
+<li><strong>Organschaftlich</strong>, zum Beispiel der Geschäftsführer für die GmbH.</li>
+<li><strong>Rechtsgeschäftlich</strong> durch <strong>Vollmacht</strong> (§ 166 Abs. 2).</li>
+</ul>
+<p>Die Vollmacht wird durch Erklärung gegenüber dem Vertreter (<em>Innenvollmacht</em>) oder dem Dritten (<em>Außenvollmacht</em>) erteilt (§ 167 Abs. 1). Sie ist grundsätzlich <strong>formfrei</strong>, auch wenn das Geschäft selbst eine Form verlangt (§ 167 Abs. 2). Sie erlischt mit dem zugrunde liegenden Rechtsverhältnis und ist widerruflich (§ 168).</p>
+<h3>Weitere Regeln</h3>
+<ul>
+<li>Auch ein beschränkt Geschäftsfähiger kann Vertreter sein (§ 165).</li>
+<li>Kenntnis oder Kennenmüssen des <em>Vertreters</em> wird dem Vertretenen zugerechnet (§ 166 Abs. 1).</li>
+<li><strong>Selbstkontrahieren</strong> und Mehrfachvertretung sind verboten, außer es ist gestattet oder das Geschäft erfüllt nur eine Verbindlichkeit (§ 181).</li>
+</ul>
+<figure class="stepfig" data-t="[&quot;Schritt 1: Der Vertretene erteilt dem Vertreter Vollmacht (§ 167). Ohne sie fehlt die Vertretungsmacht.&quot;, &quot;Schritt 2: Der Vertreter gibt gegenüber dem Dritten eine eigene Erklärung im fremden Namen ab (Offenkundigkeit).&quot;, &quot;Schritt 3: Die Wirkung tritt unmittelbar beim Vertretenen ein (§ 164 Abs. 1). Der Vertreter wird nicht Vertragspartei.&quot;]">
+<svg viewBox="0 0 560 230" role="img" aria-label="Stellvertretung: Der Vertretene bevollmächtigt den Vertreter, der Vertreter gibt im fremden Namen eine Erklärung gegenüber dem Dritten ab, die Wirkung tritt beim Vertretenen ein"><path class="svgl" data-s="1" d="M245 52L130 158"/><path class="svgl" data-s="2" d="M172 180H388"/><path class="svgl" data-s="3" d="M315 52L430 158"/><text class="svgm" x="150" y="100" text-anchor="middle">Vollmacht</text><text class="svgm" x="280" y="172" text-anchor="middle">Erklärung im fremden Namen</text><text class="svgm" x="415" y="100" text-anchor="middle">Wirkung</text><rect class="svgbox" data-s="1,3" x="215" y="10" width="130" height="42" rx="3"/><text class="svgt" x="280" y="36" text-anchor="middle">Vertretener</text><rect class="svgbox" data-s="1,2" x="40" y="160" width="130" height="42" rx="3"/><text class="svgt" x="105" y="186" text-anchor="middle">Vertreter</text><rect class="svgbox" data-s="2,3" x="390" y="160" width="130" height="42" rx="3"/><text class="svgt" x="455" y="186" text-anchor="middle">Dritter</text></svg>
+<div class="sfc"><button type="button" class="sf-prev">← Zurück</button><span class="sf-n"></span><button type="button" class="sf-next">Weiter →</button></div><p class="sf-cap"></p>
+<figcaption>Das Dreieck der Stellvertretung</figcaption>
+</figure>
+<h3>Vertreter ohne Vertretungsmacht</h3>
+<p>Schließt jemand im fremden Namen ohne Vertretungsmacht einen Vertrag, hängt dessen Wirksamkeit von der <strong>Genehmigung</strong> des Vertretenen ab (§ 177 Abs. 1). Bis dahin ist er schwebend unwirksam. Der Dritte kann bis zur Genehmigung widerrufen, wenn er den Mangel nicht kannte (§ 178). Wird die Genehmigung verweigert, haftet der falsche Vertreter dem Dritten nach dessen Wahl auf <strong>Erfüllung oder Schadensersatz</strong> (§ 179 Abs. 1). Kannte er den Mangel nicht, schuldet er nur den Vertrauensschaden (§ 179 Abs. 2). Keine Haftung gibt es, wenn der Dritte den Mangel kannte oder kennen musste oder der Vertreter beschränkt geschäftsfähig war (§ 179 Abs. 3).</p>
+<div class="stufen"><span class="tag">Beispiel in drei Stufen</span><div class="sgsel"></div>
+<div class="sst" data-s="1"><p class="sfall"><b>Fall:</b> Praktikantin Pia bestellt im Namen ihrer Chefin Clara beim Möbelhändler Max Büromöbel für 4.000 Euro. Clara hatte Pia dazu nicht bevollmächtigt und verweigert die Genehmigung. Max kannte das nicht. Was kann Max tun?</p><div class="sl1"><b class="lb">Lösung, ganz durchgerechnet</b><p>Pia hat eine eigene Erklärung im fremden Namen abgegeben (§ 164 Abs. 1), aber <strong>ohne Vertretungsmacht</strong>. Der Vertrag mit Clara ist daher schwebend unwirksam (§ 177 Abs. 1). Clara verweigert die Genehmigung, er ist endgültig unwirksam.</p><p>Max kann Pia nach § 179 Abs. 1 <strong>nach seiner Wahl auf Erfüllung oder Schadensersatz</strong> in Anspruch nehmen. Er kannte den Mangel nicht, die Ausnahme des § 179 Abs. 3 greift nicht.</p></div></div>
+<div class="sst" data-s="2" hidden><p class="sfall"><b>Fall:</b> Praktikantin Pia bestellt im Namen ihrer Chefin Clara Büromöbel für 4.000 Euro, ohne Vollmacht. Clara verweigert die Genehmigung.</p><div class="sl1"><b class="lb">Lösung mit Lücken, tippe die Wörter ein</b><p>Pia handelt im <input class="lk" size="14" data-a="fremden Namen" data-h="Offenkundigkeit: Pia gibt sich als Vertreterin zu erkennen" aria-label="Lücke" autocomplete="off" spellcheck="false"> ohne <input class="lk" size="16" data-a="Vertretungsmacht" data-h="Befugnis, für Clara zu handeln" aria-label="Lücke" autocomplete="off" spellcheck="false">. Der Vertrag ist nach § 177 zunächst schwebend unwirksam und nach der Verweigerung endgültig unwirksam. Max kann Pia nach § <input class="lk" size="5" data-a="179" data-h="Haftung des Vertreters ohne Vertretungsmacht" aria-label="Lücke" autocomplete="off" spellcheck="false"> auf Erfüllung oder Schadensersatz in Anspruch nehmen.</p></div></div>
+<div class="sst" data-s="3" hidden><p class="sfall"><b>Neuer Fall:</b> Anna sagt zu ihrem Bruder Ben mündlich, er solle in ihrem Namen für sie ein gebrauchtes Auto kaufen. Ben kauft im Namen von Anna beim Händler Hugo.</p><p><b>Frage:</b> Wirkt der Kauf für und gegen Anna, obwohl die Vollmacht nur mündlich erteilt wurde?</p><textarea class="own" rows="3" placeholder="Eigene Stichpunkte (werden nicht gespeichert)" aria-label="Eigene Stichpunkte"></textarea><button type="button" class="mbtn">▸ Musterlösung zeigen</button><div class="muster" hidden><p>Ja. Ben hat eine eigene Erklärung im Namen von Anna abgegeben (§ 164 Abs. 1). Er hatte <strong>Vertretungsmacht</strong>, denn die Vollmacht kann nach § 167 Abs. 2 <strong>formlos</strong> erteilt werden. Dass sie mündlich war, schadet nicht. Der Kaufvertrag kommt mit Anna zustande. Ben haftet nicht.</p></div></div></div>
+<div class="kc"><b>Kurz-Check · 3 Fragen · 1 Minute</b>
+<div class="kq" data-id="s9_1"><p class="kqt">1. Nenne die drei Voraussetzungen der Stellvertretung nach § 164.</p><button type="button" class="ans">▸ Antwort zeigen</button><div class="ka" hidden><p>Eigene Willenserklärung des Vertreters, im fremden Namen (Offenkundigkeit), mit Vertretungsmacht.</p><div class="kr"><button type="button" data-r="1" aria-pressed="false">Gewusst</button><button type="button" data-r="0" aria-pressed="false">Noch nicht</button></div></div></div>
+<div class="kq" data-id="s9_2"><p class="kqt">2. Braucht eine Vollmacht eine bestimmte Form?</p><button type="button" class="ans">▸ Antwort zeigen</button><div class="ka" hidden><p>Grundsätzlich nicht, auch wenn das Geschäft selbst formbedürftig ist (§ 167 Abs. 2).</p><div class="kr"><button type="button" data-r="1" aria-pressed="false">Gewusst</button><button type="button" data-r="0" aria-pressed="false">Noch nicht</button></div></div></div>
+<div class="kq" data-id="s9_3"><p class="kqt">3. Wie haftet der Vertreter ohne Vertretungsmacht, der den Mangel kannte?</p><button type="button" class="ans">▸ Antwort zeigen</button><div class="ka" hidden><p>Nach Wahl des Dritten auf Erfüllung oder Schadensersatz (§ 179 Abs. 1), solange der Dritte den Mangel nicht kannte oder kennen musste.</p><div class="kr"><button type="button" data-r="1" aria-pressed="false">Gewusst</button><button type="button" data-r="0" aria-pressed="false">Noch nicht</button></div></div></div>
+<p class="kvor" data-for="s9" hidden></p></div>
+</section>
+<section id="s10">
+<h2>Bedingung und Befristung</h2>
+<div class="bruecke"><div class="bk"><b>Du kennst schon</b>Rechtsgeschäfte gelten normalerweise sofort und unbegrenzt.</div><div class="ar" aria-hidden="true">→</div><div class="bn"><b>Neu in diesem Abschnitt</b>Man kann sie aber an ein Ereignis knüpfen (Bedingung) oder zeitlich begrenzen (Befristung).</div><div class="bt"><span class="bl">Begriffe vorab, antippen für die Kurzdefinition:</span><button type="button" class="chip" data-d="Rechtsfolge hängt von einem ungewissen künftigen Ereignis ab.">Bedingung</button><button type="button" class="chip" data-d="Wirkt erst mit Eintritt der Bedingung.">aufschiebend</button><button type="button" class="chip" data-d="Endet mit Eintritt der Bedingung.">auflösend</button><p class="bd" hidden></p></div></div>
+<h3>Bedingung, §§ 158 bis 162</h3>
+<p>Eine <strong>Bedingung</strong> macht die Wirkung eines Rechtsgeschäfts von einem <em>ungewissen</em> künftigen Ereignis abhängig.</p>
+<div class="tw"><table class="fr" style="min-width:26rem"><tr><td><strong>Aufschiebend (§ 158 Abs. 1)</strong></td><td style="width:auto;text-align:left">Die Wirkung beginnt mit Eintritt der Bedingung. Beispiel: Du bekommst das Auto, wenn du die Prüfung bestehst.</td></tr><tr><td><strong>Auflösend (§ 158 Abs. 2)</strong></td><td style="width:auto;text-align:left">Mit Eintritt der Bedingung endet die Wirkung, der frühere Zustand tritt wieder ein.</td></tr></table></div>
+<p>Wer den Eintritt wider Treu und Glauben <strong>verhindert</strong>, bei dem gilt die Bedingung als eingetreten, wer ihn wider Treu und Glauben <strong>herbeiführt</strong>, bei dem gilt sie als nicht eingetreten (§ 162).</p>
+<p><strong>Eigentumsvorbehalt</strong> ist ein Beispiel: Der Verkäufer übereignet die Ware unter der aufschiebenden Bedingung der vollständigen Kaufpreiszahlung. Manche Geschäfte vertragen keine Bedingung, etwa die Auflassung eines Grundstücks (§ 925 Abs. 2).</p>
+<h3>Befristung, § 163</h3>
+<p>Eine <strong>Befristung</strong> bestimmt einen Anfangs- oder Endtermin. Anders als bei der Bedingung ist das Ereignis <em>gewiss</em>, es steht nur nicht fest, wann es eintritt oder ob der Termin gilt. Für den Anfangstermin gelten die Regeln der aufschiebenden Bedingung entsprechend, für den Endtermin die der auflösenden.</p>
+<div class="merke"><span class="tag">Merke</span><p>Bedingung: Ereignis <em>ungewiss</em>. Befristung: Termin <em>gewiss</em>. Aufschiebend: Wirkung beginnt. Auflösend: Wirkung endet.</p></div>
+<div class="kc"><b>Kurz-Check · 3 Fragen · 1 Minute</b>
+<div class="kq" data-id="s10_1"><p class="kqt">1. Was unterscheidet Bedingung und Befristung?</p><button type="button" class="ans">▸ Antwort zeigen</button><div class="ka" hidden><p>Bei der Bedingung ist das Ereignis ungewiss (§ 158), bei der Befristung gewiss (§ 163).</p><div class="kr"><button type="button" data-r="1" aria-pressed="false">Gewusst</button><button type="button" data-r="0" aria-pressed="false">Noch nicht</button></div></div></div>
+<div class="kq" data-id="s10_2"><p class="kqt">2. Was ist der Unterschied zwischen aufschiebender und auflösender Bedingung?</p><button type="button" class="ans">▸ Antwort zeigen</button><div class="ka" hidden><p>Aufschiebend: Die Wirkung beginnt erst mit Eintritt. Auflösend: Die Wirkung endet mit Eintritt (§ 158 Abs. 1 und 2).</p><div class="kr"><button type="button" data-r="1" aria-pressed="false">Gewusst</button><button type="button" data-r="0" aria-pressed="false">Noch nicht</button></div></div></div>
+<div class="kq" data-id="s10_3"><p class="kqt">3. Was regelt § 162?</p><button type="button" class="ans">▸ Antwort zeigen</button><div class="ka" hidden><p>Wer den Eintritt einer Bedingung wider Treu und Glauben verhindert, bei dem gilt sie als eingetreten. Wer ihn wider Treu und Glauben herbeiführt, bei dem gilt sie als nicht eingetreten.</p><div class="kr"><button type="button" data-r="1" aria-pressed="false">Gewusst</button><button type="button" data-r="0" aria-pressed="false">Noch nicht</button></div></div></div>
+<p class="kvor" data-for="s10" hidden></p></div>
+</section>
+<section id="s11">
+<h2>Fristen und Verjährung</h2>
+<div class="bruecke"><div class="bk"><b>Du kennst schon</b>Ansprüche bestehen, solange sie nicht erfüllt sind.</div><div class="ar" aria-hidden="true">→</div><div class="bn"><b>Neu in diesem Abschnitt</b>Nach einer gewissen Zeit kann der Schuldner die Leistung verweigern. Wie lange, ab wann, und was hält die Uhr an?</div><div class="bt"><span class="bl">Begriffe vorab, antippen für die Kurzdefinition:</span><button type="button" class="chip" data-d="Nach Fristablauf kann der Schuldner die Leistung verweigern.">Verjährung</button><button type="button" class="chip" data-d="Ein Recht, das der Schuldner geltend machen muss, damit es wirkt.">Einrede</button><button type="button" class="chip" data-d="Die Verjährung steht still, die Zeit zählt nicht mit.">Hemmung</button><p class="bd" hidden></p></div></div>
+<div class="raten" data-id="s11" data-ok="1" data-expl="Richtig ist Ende 2026: Die drei Jahre beginnen mit dem Schluss des Jahres der Entstehung (§§ 195, 199 Abs. 1)."><b>Vorab · rate ruhig</b><p>Ein Anspruch ist 2023 entstanden. Wann endet die regelmäßige Verjährung bei sofortiger Kenntnis?</p><div class="ropts"><button type="button">Ende 2025, drei Jahre nach Entstehung im Mai</button><button type="button">Ende 2026, drei Jahre ab Schluss des Entstehungsjahres</button><button type="button">Erst nach 30 Jahren</button></div><p class="rres" hidden></p><p class="rhint">Der Versuch zählt, auch wenn er falsch ist. Überspringen ist erlaubt.</p></div>
+<h3>Berechnung von Fristen, §§ 187 bis 193</h3>
+<p>Ist der Anfang eines <em>Ereignisses</em> oder Tages maßgeblich, wird der Tag des Ereignisses nicht mitgerechnet (§ 187 Abs. 1). Eine Frist nach Tagen endet mit Ablauf des letzten Tages (§ 188 Abs. 1), eine nach Wochen, Monaten oder Jahren mit Ablauf des Tages, der durch seine Benennung oder Zahl dem Ausgangstag entspricht (§ 188 Abs. 2). Fällt das Ende auf einen Samstag, Sonntag oder gesetzlichen Feiertag, endet die Frist am nächsten Werktag (§ 193).</p>
+<h3>Was verjährt und was ist die Folge?</h3>
+<p>Der <strong>Anspruch</strong> unterliegt der Verjährung (§ 194 Abs. 1), also das Recht, von einem anderen ein Tun oder Unterlassen zu verlangen. Nach Ablauf der Frist darf der Schuldner die Leistung <strong>verweigern</strong> (§ 214 Abs. 1). Das ist eine <em>Einrede</em>: Das Gericht beachtet sie nur, wenn der Schuldner sie erhebt. Leistet er trotzdem, kann er das Geleistete nicht zurückfordern (§ 214 Abs. 2).</p>
+<h3>Die regelmäßige Verjährung</h3>
+<div class="tw"><table class="fr" style="min-width:26rem"><tr><td><strong>Frist (§ 195)</strong></td><td style="width:auto;text-align:left">Drei Jahre.</td></tr><tr><td><strong>Beginn (§ 199 Abs. 1)</strong></td><td style="width:auto;text-align:left">Mit dem Schluss des Jahres, in dem der Anspruch entstanden ist und der Gläubiger Kenntnis von den anspruchsbegründenden Umständen und der Person des Schuldners erlangt hat oder ohne grobe Fahrlässigkeit hätte erlangen müssen.</td></tr><tr><td><strong>Höchstfristen (§ 199 Abs. 2 bis 4)</strong></td><td style="width:auto;text-align:left">Je nach Anspruch zehn oder 30 Jahre unabhängig von der Kenntnis. Schadensersatz wegen Verletzung von Leben, Körper, Gesundheit oder Freiheit verjährt in 30 Jahren.</td></tr></table></div>
+<h3>Hemmung, Neubeginn</h3>
+<ul>
+<li><strong>Hemmung</strong> (zum Beispiel durch Verhandlungen, § 203, oder durch Klageerhebung, § 204): Der Zeitraum der Hemmung wird in die Frist nicht eingerechnet (§ 209).</li>
+<li><strong>Neubeginn</strong> (§ 212): Die Frist beginnt von vorn, zum Beispiel wenn der Schuldner den Anspruch anerkennt oder eine Vollstreckungshandlung vorgenommen wird.</li>
+</ul>
+<div class="fall"><span class="tag">Fall: Verjährung der Kaufpreisforderung</span><p>Verkäuferin Vera hat Ben im Mai 2023 ein Sofa verkauft und geliefert. Der Kaufpreis von 900 Euro ist noch offen. Vera kennt Ben und die Umstände von Anfang an. Wann verjährt ihr Anspruch?</p><p><strong>Lösung:</strong> Der Anspruch ist 2023 entstanden, und Vera kannte alle Umstände. Die regelmäßige Frist von drei Jahren (§ 195) beginnt nach § 199 Abs. 1 mit dem <em>Schluss des Jahres 2023</em>, also mit Ablauf des 31.12.2023. Sie endet drei Jahre später mit Ablauf des <strong>31.12.2026</strong>. Danach kann Ben die Zahlung verweigern, wenn er sich auf die Verjährung beruft (§ 214 Abs. 1). Verhandeln Vera und Ben bis dahin über die Zahlung, ist die Frist nach § 203 gehemmt.</p></div>
+<div class="kc"><b>Kurz-Check · 3 Fragen · 1 Minute</b>
+<div class="kq" data-id="s11_1"><p class="kqt">1. Wie lang ist die regelmäßige Verjährungsfrist, und wann beginnt sie?</p><button type="button" class="ans">▸ Antwort zeigen</button><div class="ka" hidden><p>Drei Jahre (§ 195). Sie beginnt mit dem Schluss des Jahres, in dem der Anspruch entstanden ist und der Gläubiger Kenntnis erlangt hat oder hätte erlangen müssen (§ 199 Abs. 1).</p><div class="kr"><button type="button" data-r="1" aria-pressed="false">Gewusst</button><button type="button" data-r="0" aria-pressed="false">Noch nicht</button></div></div></div>
+<div class="kq" data-id="s11_2"><p class="kqt">2. Was bewirkt die Verjährung, und muss das Gericht sie von sich aus beachten?</p><button type="button" class="ans">▸ Antwort zeigen</button><div class="ka" hidden><p>Der Schuldner darf die Leistung verweigern (§ 214 Abs. 1). Nein, es ist eine Einrede, sie wirkt nur, wenn der Schuldner sie erhebt.</p><div class="kr"><button type="button" data-r="1" aria-pressed="false">Gewusst</button><button type="button" data-r="0" aria-pressed="false">Noch nicht</button></div></div></div>
+<div class="kq" data-id="s11_3"><p class="kqt">3. Was unterscheidet Hemmung und Neubeginn?</p><button type="button" class="ans">▸ Antwort zeigen</button><div class="ka" hidden><p>Bei Hemmung zählt der Zeitraum nicht mit (§§ 203, 204, 209). Bei Neubeginn beginnt die Frist von vorn, etwa durch Anerkenntnis (§ 212).</p><div class="kr"><button type="button" data-r="1" aria-pressed="false">Gewusst</button><button type="button" data-r="0" aria-pressed="false">Noch nicht</button></div></div></div>
+<p class="kvor" data-for="s11" hidden></p></div>
+</section>
+<section id="wdh">
+<h2>Wiederholen</h2>
+<p>Hier erscheinen die Kurz-Check-Fragen, die du mit „Noch nicht“ markiert hast. Antworten zeigst du auf Tipp. Der Stand wird nur in diesem Browser gespeichert.</p>
+<div id="wdhList"></div>
+<p class="ref" id="wdhEmpty">Noch nichts zu wiederholen. Markiere in den Kurz-Checks, was du noch nicht wusstest.</p>
+<p><button type="button" id="wdhReset">Alle Markierungen zurücksetzen</button></p>
+</section>
+
+<section id="glossar">
+<h2>Glossar</h2>
+<p class="ref">Fachbegriffe in eigenen Worten. Im Text sind sie beim ersten Auftreten je Abschnitt gepunktet unterstrichen. Antippen zeigt die Erklärung.</p>
+<dl class="schema"><dt>Abstraktionsprinzip</dt><dd>Die Wirksamkeit des Verfügungsgeschäfts hängt nicht automatisch von der des Verpflichtungsgeschäfts ab.</dd><dt>Anfechtung</dt><dd>Erklärung, mit der eine Willenserklärung rückwirkend beseitigt wird (§§ 142, 143).</dd><dt>Annahme</dt><dd>Uneingeschränkte Zustimmung zum Antrag (§§ 147 bis 151).</dd><dt>Antrag</dt><dd>Angebot zum Vertragsschluss, bei dem nur noch ein „Ja“ fehlt (§ 145).</dd><dt>Auslegung</dt><dd>Ermittlung des Inhalts einer Erklärung (§§ 133, 157).</dd><dt>Bedingung</dt><dd>Rechtsfolge hängt von einem ungewissen künftigen Ereignis ab (§ 158).</dd><dt>Befristung</dt><dd>Bestimmung eines Anfangs- oder Endtermins (§ 163).</dd><dt>Beurkundung</dt><dd>Notarielle Form (§ 128).</dd><dt>Bote</dt><dd>Überbringt nur eine fremde Erklärung und gibt keine eigene ab.</dd><dt>Dissens</dt><dd>Die Parteien sind sich über einen regelungsbedürftigen Punkt nicht einig (§§ 154, 155).</dd><dt>Eigenschaftsirrtum</dt><dd>Irrtum über eine verkehrswesentliche Eigenschaft von Person oder Sache (§ 119 Abs. 2).</dd><dt>Einrede</dt><dd>Recht des Schuldners, das nur wirkt, wenn er sich darauf beruft.</dd><dt>Einwilligung</dt><dd>Vorherige Zustimmung (§ 183).</dd><dt>Erklärungsirrtum</dt><dd>Man äußert etwas anderes, als man wollte (§ 119 Abs. 1 Alt. 2).</dd><dt>Genehmigung</dt><dd>Nachträgliche Zustimmung (§ 184).</dd><dt>Geschäftsfähigkeit</dt><dd>Fähigkeit, Rechtsgeschäfte wirksam selbst vorzunehmen (§§ 104 ff.).</dd><dt>Hemmung</dt><dd>Während der Hemmung läuft die Verjährungsfrist nicht (§ 209).</dd><dt>Inhaltsirrtum</dt><dd>Irrtum über die Bedeutung der eigenen Erklärung (§ 119 Abs. 1 Alt. 1).</dd><dt>Motivirrtum</dt><dd>Irrtum über den Beweggrund. Berechtigt grundsätzlich nicht zur Anfechtung.</dd><dt>nichtig</dt><dd>Von Anfang an ohne Rechtswirkung.</dd><dt>objektiver Empfängerhorizont</dt><dd>Maßstab: Wie durfte ein vernünftiger Empfänger die Erklärung verstehen?</dd><dt>Offenkundigkeitsprinzip</dt><dd>Der Vertreter muss erkennbar im fremden Namen handeln.</dd><dt>Rechtsfähigkeit</dt><dd>Fähigkeit, Träger von Rechten und Pflichten zu sein. Beginnt beim Menschen mit Vollendung der Geburt (§ 1).</dd><dt>Rechtsgeschäft</dt><dd>Tatbestand aus mindestens einer Willenserklärung, an den das Recht die gewollte Rechtsfolge knüpft.</dd><dt>Schriftform</dt><dd>Urkunde mit eigenhändiger Unterschrift (§ 126).</dd><dt>schwebend unwirksam</dt><dd>Weder wirksam noch endgültig nichtig: Die Wirksamkeit hängt von einer Genehmigung ab.</dd><dt>Stellvertretung</dt><dd>Eine Person gibt eine eigene Erklärung im Namen eines anderen ab, die für und gegen diesen wirkt (§ 164).</dd><dt>Textform</dt><dd>Lesbare Erklärung auf einem dauerhaften Datenträger, ohne Unterschrift (§ 126b).</dd><dt>Trennungsprinzip</dt><dd>Verpflichtungs- und Verfügungsgeschäft sind rechtlich getrennte Geschäfte.</dd><dt>Unternehmer</dt><dd>Wer bei Abschluss eines Rechtsgeschäfts in Ausübung einer gewerblichen oder selbstständigen beruflichen Tätigkeit handelt (§ 14).</dd><dt>Verbraucher</dt><dd>Natürliche Person, die ein Rechtsgeschäft überwiegend zu privaten Zwecken abschließt (§ 13).</dd><dt>Verjährung</dt><dd>Nach Fristablauf kann der Schuldner die Leistung verweigern (§ 214).</dd><dt>Vertrauensschaden</dt><dd>Schaden, den jemand erleidet, weil er auf die Gültigkeit einer Erklärung vertraut hat (§ 122).</dd><dt>Vollmacht</dt><dd>Rechtsgeschäftlich erteilte Vertretungsmacht (§ 166 Abs. 2).</dd><dt>Willenserklärung</dt><dd>Äußerung eines Willens, die auf eine Rechtsfolge gerichtet ist.</dd><dt>Wucher</dt><dd>Sittenwidriges Geschäft wegen Ausbeutung einer Schwächelage bei auffälligem Missverhältnis (§ 138 Abs. 2).</dd><dt>Zugang</dt><dd>Eine Willenserklärung geht zu, wenn sie so in den Machtbereich des Empfängers gelangt, dass er unter gewöhnlichen Umständen davon Kenntnis nehmen kann (§ 130).</dd></dl>
+</section>
+<section id="s13">
+<h2>Merkzettel</h2>
+<p class="ref">Alles auf einen Blick</p>
+<dl class="schema">
+  <dt>Rechtsfähigkeit</dt><dd>Beginnt mit Vollendung der Geburt (§ 1). Juristische Personen sind als Organisation rechtsfähig.</dd>
+  <dt>Verbraucher / Unternehmer</dt><dd>Entscheidend ist der Zweck des Geschäfts: privat oder gewerblich/selbstständig beruflich (§§ 13, 14).</dd>
+  <dt>Sache</dt><dd>Nur körperliche Gegenstände (§ 90). Tiere: § 90a.</dd>
+  <dt>Geschäftsfähigkeit</dt><dd>Unter 7: nichtig (§§ 104, 105). 7 bis 17: Einwilligung oder Genehmigung (§§ 106 bis 108), Ausnahmen § 107 (rechtlicher Vorteil), § 110 (Taschengeld).</dd>
+  <dt>Willenserklärung</dt><dd>Wirksam mit Zugang (§ 130). Widerruf nur vorher oder gleichzeitig.</dd>
+  <dt>Vertrag</dt><dd>Antrag (§ 145) und Annahme (§§ 147 bis 151). Verspätet oder geändert: neuer Antrag (§ 150).</dd>
+  <dt>Auslegung</dt><dd>Wirklicher Wille (§ 133), Treu und Glauben, Verkehrssitte (§ 157). Empfangsbedürftige: objektiver Empfängerhorizont.</dd>
+  <dt>Form</dt><dd>Schrift (§ 126), elektronisch (§ 126a), Text (§ 126b), Beurkundung (§ 128). Formmangel: nichtig (§ 125). Grundstück: § 311b.</dd>
+  <dt>Verbot, Sitten</dt><dd>§ 134 (Verbot, nichtig soweit nichts anderes), § 138 (Sittenwidrigkeit, Wucher). § 139 Teilnichtigkeit.</dd>
+  <dt>Anfechtung</dt><dd>Erklärung (§ 143), Grund (§§ 119, 120, 123), Frist (§§ 121, 124). Folge: rückwirkend nichtig (§ 142). Vertrauensschaden § 122.</dd>
+  <dt>Stellvertretung</dt><dd>Eigene Erklärung, fremder Name, Vertretungsmacht (§ 164). Vollmacht formfrei (§ 167 Abs. 2). Ohne Macht: § 177 (Genehmigung), § 179 (Haftung).</dd>
+  <dt>Bedingung / Befristung</dt><dd>Bedingung ungewiss (§ 158), Befristung gewiss (§ 163). Aufschiebend oder auflösend.</dd>
+  <dt>Verjährung</dt><dd>Regelfrist drei Jahre (§ 195), Beginn Jahresende mit Kenntnis (§ 199). Einrede (§ 214). Hemmung (§ 203, 204), Neubeginn (§ 212).</dd>
+</dl>
+</section>
+<section id="ueben">
+<h2>Weiter üben</h2>
+<p>Die Übungen stehen in einer eigenen Datei, damit dieses Skript übersichtlich bleibt.</p>
+<p><a class="btn" href="lernskript_bgb_at_uebungen.html">Zu den Übungen →</a></p>
+<p class="ref">Lege beide Dateien in denselben Ordner, damit der Link funktioniert.</p>
+</section>
+
+</main>
+
+<footer>Eigene Zusammenfassung zum Allgemeinen Teil des BGB, ohne Folienvorlage. Paragrafen nach dem BGB, einzelne Stellen (§§ 110, 179, 199) am Gesetzestext geprüft, alle anderen aus eigener Kenntnis, nicht gegen die aktuelle Fassung geprüft. Das ist keine Rechtsberatung. Maßgeblich ist der Gesetzestext.</footer>
+
+<div class="status"><div class="status-in"><span id="stSec">Einleitung</span><span id="stPct">0 %</span></div></div>
+
+<script>
+(function () {
+  var root = document.documentElement;
+  function ls(k, v) { try { if (v === undefined) return localStorage.getItem(k); localStorage.setItem(k, v); } catch (e) {} return null; }
+
+  /* Theme */
+  var bTheme = document.getElementById('bTheme');
+  function isDark() {
+    var t = root.getAttribute('data-theme');
+    if (t) return t === 'dark';
+    return window.matchMedia && matchMedia('(prefers-color-scheme: dark)').matches;
+  }
+  function labelTheme() { bTheme.textContent = isDark() ? 'Hell' : 'Dunkel'; }
+  var saved = ls('bgb-theme');
+  if (saved === 'dark' || saved === 'light') root.setAttribute('data-theme', saved);
+  labelTheme();
+  bTheme.addEventListener('click', function () {
+    var n = isDark() ? 'light' : 'dark';
+    root.setAttribute('data-theme', n); ls('bgb-theme', n); labelTheme();
+  });
+
+  /* Schriftgröße */
+  var fs = parseInt(ls('bgb-fs'), 10); if (!(fs >= 15 && fs <= 26)) fs = 19;
+  function applyFs() { root.style.setProperty('--fs', fs + 'px'); ls('bgb-fs', String(fs)); }
+  applyFs();
+  document.getElementById('bMinus').addEventListener('click', function () { if (fs > 15) { fs -= 1; applyFs(); } });
+  document.getElementById('bPlus').addEventListener('click', function () { if (fs < 26) { fs += 1; applyFs(); } });
+
+  /* Inhaltsverzeichnis */
+  var secs = Array.prototype.slice.call(document.querySelectorAll('main section'));
+  var list = document.getElementById('tocList'), toc = document.getElementById('toc'), bToc = document.getElementById('bToc');
+  var nodes = Array.prototype.slice.call(document.querySelectorAll('main .teil, main section'));
+  nodes.forEach(function (s) {
+    var li = document.createElement('li');
+    if (s.classList.contains('teil')) {
+      li.className = 'grp'; li.textContent = s.querySelector('.tag').textContent + ' · ' + s.querySelector('.teil-t').textContent;
+      list.appendChild(li); return;
+    }
+    var a = document.createElement('a');
+    a.href = '#' + s.id; a.textContent = s.querySelector('h2').textContent; a.dataset.id = s.id;
+    a.addEventListener('click', function (e) {
+      e.preventDefault(); s.scrollIntoView(); closeToc();
+    });
+    li.appendChild(a); list.appendChild(li);
+  });
+  function closeToc() { toc.hidden = true; bToc.setAttribute('aria-expanded', 'false'); }
+  bToc.addEventListener('click', function (e) {
+    e.stopPropagation();
+    var open = toc.hidden; toc.hidden = !open; bToc.setAttribute('aria-expanded', String(open));
+  });
+  document.addEventListener('click', function (e) { if (!toc.hidden && !toc.contains(e.target)) closeToc(); });
+  document.addEventListener('keydown', function (e) { if (e.key === 'Escape') closeToc(); });
+
+  /* Fortschritt */
+  var prog = document.getElementById('prog'), stSec = document.getElementById('stSec'), stPct = document.getElementById('stPct');
+  var links = list.querySelectorAll('a'), ticking = false;
+  function update() {
+    ticking = false;
+    var h = document.documentElement.scrollHeight - window.innerHeight;
+    var p = h > 0 ? Math.min(100, Math.max(0, Math.round(window.scrollY / h * 100))) : 0;
+    prog.style.width = p + '%'; stPct.textContent = p + ' %';
+    var cur = -1;
+    secs.forEach(function (s, i) { if (s.getBoundingClientRect().top <= 140) cur = i; });
+    stSec.textContent = cur < 0 ? 'Einleitung' : 'Abschnitt ' + (cur + 1) + ' von ' + secs.length + ' · ' + secs[cur].querySelector('h2').textContent;
+    Array.prototype.forEach.call(links, function (a, i) { a.classList.toggle('cur', i === cur); });
+  }
+  window.addEventListener('scroll', function () { if (!ticking) { ticking = true; requestAnimationFrame(update); } }, { passive: true });
+  window.addEventListener('resize', update);
+  update();
+
+  /* Kurz-Check */
+  var BK = 'bgb';
+  function kcRating(id) { return ls(BK + '-kc-' + id); }
+  function kcSummary(box) {
+    var qs = box.querySelectorAll('.kq'), n = 0, ok = 0, v = box.querySelector('.kvor');
+    Array.prototype.forEach.call(qs, function (q) { var r = kcRating(q.dataset.id); if (r === '1' || r === '0') n++; if (r === '1') ok++; });
+    if (!v) return;
+    if (n === qs.length) { v.hidden = false; v.textContent = ok + ' von ' + qs.length + ' gewusst.' + (ok < qs.length ? ' Das Übrige findest du unter „Wiederholen“.' : ' Weiter zum nächsten Abschnitt.'); }
+    else v.hidden = true;
+  }
+  function kcPaint(q) {
+    var r = kcRating(q.dataset.id);
+    Array.prototype.forEach.call(q.querySelectorAll('.kr button'), function (b) { b.setAttribute('aria-pressed', String(r === b.dataset.r)); });
+  }
+  Array.prototype.forEach.call(document.querySelectorAll('.kq'), function (q) {
+    var ans = q.querySelector('.ans'), ka = q.querySelector('.ka');
+    ans.addEventListener('click', function () { ka.hidden = !ka.hidden; ans.textContent = ka.hidden ? '▸ Antwort zeigen' : '▾ Antwort verbergen'; });
+    Array.prototype.forEach.call(q.querySelectorAll('.kr button'), function (b) {
+      b.addEventListener('click', function () { ls(BK + '-kc-' + q.dataset.id, b.dataset.r); kcPaint(q); kcSummary(q.closest('.kc')); renderWdh(); });
+    });
+    kcPaint(q);
+  });
+  Array.prototype.forEach.call(document.querySelectorAll('.kc'), kcSummary);
+
+  /* Wiederholen */
+  function renderWdh() {
+    var box = document.getElementById('wdhList'), empty = document.getElementById('wdhEmpty'); if (!box) return;
+    box.textContent = ''; var n = 0;
+    Array.prototype.forEach.call(document.querySelectorAll('main section .kq'), function (q) {
+      if (kcRating(q.dataset.id) !== '0') return;
+      n++;
+      var d = document.createElement('div'); d.className = 'kq';
+      var p = document.createElement('p'); p.className = 'kqt'; p.textContent = q.querySelector('.kqt').textContent; d.appendChild(p);
+      var a = document.createElement('div'); a.className = 'ka'; a.hidden = true; a.innerHTML = q.querySelector('.ka p').outerHTML;
+      var row = document.createElement('div'); row.className = 'kr';
+      var b2 = document.createElement('button'); b2.type = 'button'; b2.textContent = 'Jetzt gewusst';
+      b2.addEventListener('click', function () { ls(BK + '-kc-' + q.dataset.id, '1'); kcPaint(q); kcSummary(q.closest('.kc')); renderWdh(); });
+      row.appendChild(b2); a.appendChild(row);
+      var b1 = document.createElement('button'); b1.type = 'button'; b1.className = 'ans'; b1.textContent = '▸ Antwort zeigen';
+      b1.addEventListener('click', function () { a.hidden = !a.hidden; b1.textContent = a.hidden ? '▸ Antwort zeigen' : '▾ Antwort verbergen'; });
+      d.appendChild(b1); d.appendChild(a); box.appendChild(d);
+    });
+    if (empty) empty.hidden = n > 0;
+  }
+  var wr = document.getElementById('wdhReset');
+  if (wr) wr.addEventListener('click', function () {
+    Array.prototype.forEach.call(document.querySelectorAll('.kq'), function (q) { try { localStorage.removeItem(BK + '-kc-' + q.dataset.id); } catch (e) {} kcPaint(q); });
+    Array.prototype.forEach.call(document.querySelectorAll('.kc'), kcSummary); renderWdh();
+  });
+  renderWdh();
+
+  /* Raten vorab */
+  Array.prototype.forEach.call(document.querySelectorAll('.raten'), function (r) {
+    var btns = r.querySelectorAll('.ropts button'), res = r.querySelector('.rres'), ok = +r.dataset.ok, done = false;
+    Array.prototype.forEach.call(btns, function (b, i) {
+      b.addEventListener('click', function () {
+        if (done) return; done = true;
+        b.classList.add('pick'); btns[ok].classList.add('right');
+        res.hidden = false;
+        res.textContent = (i === ok ? 'Treffer. ' : 'Dein Tipp: „' + b.textContent + '“. ') + r.dataset.expl;
+        Array.prototype.forEach.call(btns, function (x) { x.disabled = true; });
+      });
+    });
+  });
+
+  /* Begriffe vorab */
+  Array.prototype.forEach.call(document.querySelectorAll('.bruecke'), function (br) {
+    var d = br.querySelector('.bd'), cur = null;
+    Array.prototype.forEach.call(br.querySelectorAll('.chip'), function (c) {
+      c.setAttribute('aria-pressed', 'false');
+      c.addEventListener('click', function () {
+        if (cur === c) { d.hidden = true; c.setAttribute('aria-pressed', 'false'); cur = null; return; }
+        if (cur) cur.setAttribute('aria-pressed', 'false');
+        cur = c; c.setAttribute('aria-pressed', 'true'); d.hidden = false; d.textContent = c.textContent + ': ' + c.dataset.d;
+      });
+    });
+  });
+
+  /* Beispiel-Stufen */
+  function norm(t) { return t.toLowerCase().replace(/[\s.,;:!?§]+/g, ' ').trim(); }
+  Array.prototype.forEach.call(document.querySelectorAll('.stufen'), function (st) {
+    var sel = st.querySelector('.sgsel'), steps = st.querySelectorAll('.sst'), bs = [];
+    ['1 Gelöst', '2 Mit Lücken', '3 Selbst lösen'].forEach(function (t, i) {
+      var b = document.createElement('button'); b.type = 'button'; b.textContent = t; b.setAttribute('aria-pressed', String(i === 0));
+      b.addEventListener('click', function () {
+        Array.prototype.forEach.call(steps, function (x, k) { x.hidden = k !== i; });
+        bs.forEach(function (y, k) { y.setAttribute('aria-pressed', String(k === i)); });
+      });
+      sel.appendChild(b); bs.push(b);
+    });
+    Array.prototype.forEach.call(st.querySelectorAll('.lk'), function (inp) {
+      var hint = document.createElement('span'); hint.className = 'lkh'; hint.hidden = true; inp.insertAdjacentElement('afterend', hint);
+      function check() {
+        var v = norm(inp.value), a = norm(inp.dataset.a);
+        if (!v) { hint.hidden = true; return; }
+        if (v === a) { inp.classList.add('right'); inp.value = inp.dataset.a; inp.readOnly = true; hint.hidden = true; }
+        else { hint.hidden = false; hint.textContent = 'Hinweis: ' + inp.dataset.h; }
+      }
+      inp.addEventListener('change', check);
+      inp.addEventListener('keydown', function (e) { if (e.key === 'Enter') { e.preventDefault(); check(); } });
+    });
+    var s2 = st.querySelector('.sst[data-s="2"] .sl1');
+    if (s2) {
+      var sb = document.createElement('button'); sb.type = 'button'; sb.textContent = 'Lösung der Lücken zeigen';
+      sb.addEventListener('click', function () {
+        Array.prototype.forEach.call(s2.querySelectorAll('.lk'), function (i) { i.value = i.dataset.a; i.classList.add('right'); i.readOnly = true; });
+        Array.prototype.forEach.call(s2.querySelectorAll('.lkh'), function (h) { h.hidden = true; });
+      });
+      s2.appendChild(sb);
+    }
+    var mb = st.querySelector('.mbtn'), mu = st.querySelector('.muster');
+    mb.addEventListener('click', function () { mu.hidden = !mu.hidden; mb.textContent = mu.hidden ? '▸ Musterlösung zeigen' : '▾ Musterlösung verbergen'; });
+  });
+
+  /* Abbildung in Schritten */
+  Array.prototype.forEach.call(document.querySelectorAll('.stepfig'), function (f) {
+    var T = []; try { T = JSON.parse(f.dataset.t); } catch (e) {}
+    var i = 0, prev = f.querySelector('.sf-prev'), next = f.querySelector('.sf-next'), n = f.querySelector('.sf-n'), cap = f.querySelector('.sf-cap');
+    function paint() {
+      Array.prototype.forEach.call(f.querySelectorAll('[data-s]'), function (e) {
+        var on = e.dataset.s.split(',').indexOf(String(i + 1)) >= 0;
+        e.classList.toggle('dim', !on);
+        if (e.classList.contains('svgbox')) e.classList.toggle('on', on);
+      });
+      n.textContent = 'Schritt ' + (i + 1) + ' von ' + T.length; cap.textContent = T[i] || '';
+      prev.disabled = i === 0; next.disabled = i >= T.length - 1;
+    }
+    prev.addEventListener('click', function () { if (i > 0) { i--; paint(); } });
+    next.addEventListener('click', function () { if (i < T.length - 1) { i++; paint(); } });
+    paint();
+  });
+
+  /* Häppchen */
+  (function () {
+    var wrap = document.getElementById('hapWrap'), box = document.getElementById('hapList'); if (!wrap || !box) return;
+    wrap.hidden = false;
+    var on = ls(BK + '-hap') === '1', btns = [], states = [];
+    Array.prototype.forEach.call(document.querySelectorAll('main section'), function (sec) {
+      if (!sec.querySelector('.kc')) return;
+      var kids = Array.prototype.slice.call(sec.children).filter(function (e) { return e.tagName !== 'H2'; });
+      var chunks = [], cur = [];
+      kids.forEach(function (e) {
+        if ((e.tagName === 'H3' || e.classList.contains('kc')) && cur.length) { chunks.push(cur); cur = []; }
+        cur.push(e);
+      });
+      if (cur.length) chunks.push(cur);
+      if (chunks.length < 2) return;
+      var nav = document.createElement('div'); nav.className = 'hapnav';
+      var p = document.createElement('button'), q = document.createElement('button'), lab = document.createElement('span');
+      p.type = q.type = 'button'; p.textContent = '‹ Zurück'; q.textContent = 'Weiter ›';
+      nav.appendChild(p); nav.appendChild(lab); nav.appendChild(q);
+      sec.querySelector('h2').insertAdjacentElement('afterend', nav);
+      var st = { i: 0 };
+      function show() {
+        chunks.forEach(function (c, k) { c.forEach(function (e) { e.classList.toggle('hh', k !== st.i); }); });
+        lab.textContent = 'Teil ' + (st.i + 1) + ' von ' + chunks.length; p.disabled = st.i === 0; q.disabled = st.i === chunks.length - 1;
+      }
+      p.addEventListener('click', function () { if (st.i > 0) { st.i--; show(); nav.scrollIntoView({ block: 'start' }); } });
+      q.addEventListener('click', function () { if (st.i < chunks.length - 1) { st.i++; show(); nav.scrollIntoView({ block: 'start' }); } });
+      show(); states.push(show);
+    });
+    function paint() {
+      root.toggleAttribute('data-hap', on);
+      btns.forEach(function (b, k) { b.setAttribute('aria-pressed', String((k === 1) === on)); });
+      ls(BK + '-hap', on ? '1' : '0');
+    }
+    ['Alles auf einmal', 'In Häppchen'].forEach(function (t, k) {
+      var b = document.createElement('button'); b.type = 'button'; b.textContent = t;
+      b.addEventListener('click', function () { on = k === 1; paint(); });
+      box.appendChild(b); btns.push(b);
+    });
+    paint();
+  })();
+
+  /* Glossar */
+  var GLOSS = [{"t": "Rechtsfähigkeit", "m": ["Rechtsfähigkeit", "rechtsfähig"], "d": "Fähigkeit, Träger von Rechten und Pflichten zu sein. Beginnt beim Menschen mit Vollendung der Geburt (§ 1)."}, {"t": "Geschäftsfähigkeit", "m": ["Geschäftsfähigkeit", "geschäftsfähig", "Geschäftsunfähige", "Geschäftsunfähigen", "geschäftsunfähig"], "d": "Fähigkeit, Rechtsgeschäfte wirksam selbst vorzunehmen (§§ 104 ff.)."}, {"t": "Willenserklärung", "m": ["Willenserklärung", "Willenserklärungen"], "d": "Äußerung eines Willens, die auf eine Rechtsfolge gerichtet ist."}, {"t": "Rechtsgeschäft", "m": ["Rechtsgeschäft", "Rechtsgeschäfte"], "d": "Tatbestand aus mindestens einer Willenserklärung, an den das Recht die gewollte Rechtsfolge knüpft."}, {"t": "Verbraucher", "m": ["Verbraucher", "Verbraucherin"], "d": "Natürliche Person, die ein Rechtsgeschäft überwiegend zu privaten Zwecken abschließt (§ 13)."}, {"t": "Unternehmer", "m": ["Unternehmer", "Unternehmerin"], "d": "Wer bei Abschluss eines Rechtsgeschäfts in Ausübung einer gewerblichen oder selbstständigen beruflichen Tätigkeit handelt (§ 14)."}, {"t": "Einwilligung", "m": ["Einwilligung"], "d": "Vorherige Zustimmung (§ 183)."}, {"t": "Genehmigung", "m": ["Genehmigung"], "d": "Nachträgliche Zustimmung (§ 184)."}, {"t": "schwebend unwirksam", "m": ["schwebend unwirksam"], "d": "Weder wirksam noch endgültig nichtig: Die Wirksamkeit hängt von einer Genehmigung ab."}, {"t": "Zugang", "m": ["Zugang"], "d": "Eine Willenserklärung geht zu, wenn sie so in den Machtbereich des Empfängers gelangt, dass er unter gewöhnlichen Umständen davon Kenntnis nehmen kann (§ 130)."}, {"t": "Trennungsprinzip", "m": ["Trennungsprinzip"], "d": "Verpflichtungs- und Verfügungsgeschäft sind rechtlich getrennte Geschäfte."}, {"t": "Abstraktionsprinzip", "m": ["Abstraktionsprinzip"], "d": "Die Wirksamkeit des Verfügungsgeschäfts hängt nicht automatisch von der des Verpflichtungsgeschäfts ab."}, {"t": "Antrag", "m": ["Antrag"], "d": "Angebot zum Vertragsschluss, bei dem nur noch ein „Ja“ fehlt (§ 145)."}, {"t": "Annahme", "m": ["Annahme"], "d": "Uneingeschränkte Zustimmung zum Antrag (§§ 147 bis 151)."}, {"t": "Dissens", "m": ["Dissens"], "d": "Die Parteien sind sich über einen regelungsbedürftigen Punkt nicht einig (§§ 154, 155)."}, {"t": "Auslegung", "m": ["Auslegung"], "d": "Ermittlung des Inhalts einer Erklärung (§§ 133, 157)."}, {"t": "objektiver Empfängerhorizont", "m": ["objektiver Empfängerhorizont", "objektive Empfängerhorizont"], "d": "Maßstab: Wie durfte ein vernünftiger Empfänger die Erklärung verstehen?"}, {"t": "Schriftform", "m": ["Schriftform"], "d": "Urkunde mit eigenhändiger Unterschrift (§ 126)."}, {"t": "Textform", "m": ["Textform"], "d": "Lesbare Erklärung auf einem dauerhaften Datenträger, ohne Unterschrift (§ 126b)."}, {"t": "Beurkundung", "m": ["Beurkundung", "notarielle Beurkundung"], "d": "Notarielle Form (§ 128)."}, {"t": "nichtig", "m": ["nichtig", "Nichtigkeit"], "d": "Von Anfang an ohne Rechtswirkung."}, {"t": "Wucher", "m": ["Wucher"], "d": "Sittenwidriges Geschäft wegen Ausbeutung einer Schwächelage bei auffälligem Missverhältnis (§ 138 Abs. 2)."}, {"t": "Anfechtung", "m": ["Anfechtung", "anfechten", "Anfechtungserklärung"], "d": "Erklärung, mit der eine Willenserklärung rückwirkend beseitigt wird (§§ 142, 143)."}, {"t": "Inhaltsirrtum", "m": ["Inhaltsirrtum"], "d": "Irrtum über die Bedeutung der eigenen Erklärung (§ 119 Abs. 1 Alt. 1)."}, {"t": "Erklärungsirrtum", "m": ["Erklärungsirrtum"], "d": "Man äußert etwas anderes, als man wollte (§ 119 Abs. 1 Alt. 2)."}, {"t": "Eigenschaftsirrtum", "m": ["Eigenschaftsirrtum"], "d": "Irrtum über eine verkehrswesentliche Eigenschaft von Person oder Sache (§ 119 Abs. 2)."}, {"t": "Motivirrtum", "m": ["Motivirrtum"], "d": "Irrtum über den Beweggrund. Berechtigt grundsätzlich nicht zur Anfechtung."}, {"t": "Vertrauensschaden", "m": ["Vertrauensschaden"], "d": "Schaden, den jemand erleidet, weil er auf die Gültigkeit einer Erklärung vertraut hat (§ 122)."}, {"t": "Stellvertretung", "m": ["Stellvertretung"], "d": "Eine Person gibt eine eigene Erklärung im Namen eines anderen ab, die für und gegen diesen wirkt (§ 164)."}, {"t": "Vollmacht", "m": ["Vollmacht"], "d": "Rechtsgeschäftlich erteilte Vertretungsmacht (§ 166 Abs. 2)."}, {"t": "Offenkundigkeitsprinzip", "m": ["Offenkundigkeitsprinzip", "Offenkundigkeit"], "d": "Der Vertreter muss erkennbar im fremden Namen handeln."}, {"t": "Bote", "m": ["Bote"], "d": "Überbringt nur eine fremde Erklärung und gibt keine eigene ab."}, {"t": "Bedingung", "m": ["Bedingung", "Bedingungen"], "d": "Rechtsfolge hängt von einem ungewissen künftigen Ereignis ab (§ 158)."}, {"t": "Befristung", "m": ["Befristung"], "d": "Bestimmung eines Anfangs- oder Endtermins (§ 163)."}, {"t": "Verjährung", "m": ["Verjährung", "verjährt"], "d": "Nach Fristablauf kann der Schuldner die Leistung verweigern (§ 214)."}, {"t": "Einrede", "m": ["Einrede"], "d": "Recht des Schuldners, das nur wirkt, wenn er sich darauf beruft."}, {"t": "Hemmung", "m": ["Hemmung", "gehemmt"], "d": "Während der Hemmung läuft die Verjährungsfrist nicht (§ 209)."}];
+  (function () {
+    var pop = document.getElementById('gpop'); if (!pop) return;
+    var skip = 'pre,code,h1,h2,h3,h4,svg,button,input,select,textarea,a,.term,.tag,.ref,.teil-t,.mono,dt,label,figcaption,#gpop,.toc,.stylep,.bar,.status';
+    function esc(s) { return s.replace(/[.*+?^${}()|[\\]\\\\]/g, '\\\\$&'); }
+    var L = 'A-Za-z\\u00c4\\u00d6\\u00dc\\u00e4\\u00f6\\u00fc\\u00df', cur = null;
+    var items = [];
+    GLOSS.forEach(function (g, i) {
+      var alts = g.m.slice().sort(function (a, b) { return b.length - a.length; });
+      try { items.push({ i: i, len: alts[0].length, re: new RegExp('(?<![' + L + '])(' + alts.map(esc).join('|') + ')(?![' + L + '])') }); } catch (e) {}
+    });
+    items.sort(function (a, b) { return b.len - a.len; });
+    function nodesOf(sec) {
+      var out = [], w = document.createTreeWalker(sec, NodeFilter.SHOW_TEXT, null), n;
+      while ((n = w.nextNode())) { var p = n.parentElement; if (!p || p.closest(skip) || !n.nodeValue.trim()) continue; out.push(n); }
+      return out;
+    }
+    Array.prototype.forEach.call(document.querySelectorAll('main section'), function (sec) {
+      if (sec.id === 'glossar' || sec.id === 'karte' || sec.id === 'ueben' || sec.id === 'wdh') return;
+      items.forEach(function (it) {
+        var nodes = nodesOf(sec);
+        for (var k = 0; k < nodes.length; k++) {
+          var n = nodes[k], m = it.re.exec(n.nodeValue); if (!m) continue;
+          var r = document.createRange(); r.setStart(n, m.index); r.setEnd(n, m.index + m[0].length);
+          var sp = document.createElement('span'); sp.className = 'term'; sp.tabIndex = 0; sp.setAttribute('role', 'button'); sp.dataset.g = String(it.i);
+          r.surroundContents(sp); break;
+        }
+      });
+    });
+    function hide() { pop.hidden = true; cur = null; }
+    function show(el) {
+      var g = GLOSS[+el.dataset.g]; pop.textContent = '';
+      var b = document.createElement('b'); b.textContent = g.t;
+      var p = document.createElement('p'); p.textContent = g.d;
+      var a = document.createElement('a'); a.href = '#glossar'; a.textContent = 'Im Glossar';
+      a.addEventListener('click', function (e) { e.preventDefault(); hide(); var s = document.getElementById('glossar'); if (s) s.scrollIntoView(); });
+      pop.appendChild(b); pop.appendChild(p); pop.appendChild(a); pop.hidden = false;
+      var r = el.getBoundingClientRect(), left = Math.min(Math.max(8, r.left), window.innerWidth - pop.offsetWidth - 8), top = r.bottom + 8;
+      if (top + pop.offsetHeight > window.innerHeight - 50) top = Math.max(8, r.top - pop.offsetHeight - 8);
+      pop.style.left = left + 'px'; pop.style.top = top + 'px'; cur = el;
+    }
+    document.addEventListener('click', function (e) {
+      var t = e.target.closest && e.target.closest('.term');
+      if (t) { e.preventDefault(); if (cur === t) hide(); else show(t); } else if (!pop.contains(e.target)) hide();
+    });
+    document.addEventListener('keydown', function (e) {
+      if (e.key === 'Escape') hide();
+      var ae = document.activeElement;
+      if ((e.key === 'Enter' || e.key === ' ') && ae && ae.classList && ae.classList.contains('term')) { e.preventDefault(); show(ae); }
+    });
+    window.addEventListener('scroll', hide, { passive: true });
+    window.addEventListener('resize', hide);
+  })();
+  /* Schrift und Überschriftenfarbe */
+  (function () {
+    var KEY = 'bgb';
+    var fonts = [
+      ['Standard', null],
+      ['Georgia', 'Georgia, "Times New Roman", serif'],
+      ['Times', '"Times New Roman", Times, serif'],
+      ['Sans', 'system-ui, -apple-system, "Segoe UI", Roboto, Arial, sans-serif'],
+      ['Arial', 'Arial, Helvetica, sans-serif'],
+      ['Verdana', 'Verdana, Geneva, sans-serif']
+    ];
+    var cols = [
+      ['Schwarz', null, null],
+      ['Blau', '#00519e', '#7fb4ea'],
+      ['Bordeaux', '#8f3236', '#e08a8d'],
+      ['Grün', '#2f6b45', '#7fc79a'],
+      ['Violett', '#6a3fa0', '#c3a6f0'],
+      ['Orange', '#9a5b00', '#e3b25c'],
+      ['Petrol', '#0e6f78', '#6fcfd8']
+    ];
+    var fi = parseInt(ls(KEY + '-font'), 10), ci = parseInt(ls(KEY + '-hc'), 10);
+    if (!(fi >= 0 && fi < fonts.length)) fi = 0;
+    if (!(ci >= 0 && ci < cols.length)) ci = 0;
+    var panel = document.getElementById('stylePanel'), bStyle = document.getElementById('bStyle');
+    var fontBox = document.getElementById('fontList'), colBox = document.getElementById('colList');
+    var fBtns = [], cBtns = [];
+    function applyFont() {
+      if (fonts[fi][1]) root.style.setProperty('--serif', fonts[fi][1]); else root.style.removeProperty('--serif');
+      fBtns.forEach(function (b, i) { b.setAttribute('aria-pressed', String(i === fi)); });
+      ls(KEY + '-font', String(fi));
+    }
+    function applyCol() {
+      var c = cols[ci], v = isDark() ? c[2] : c[1];
+      if (v) {
+        root.style.setProperty('--hc', v); root.style.setProperty('--accent', v);
+        root.style.setProperty('--panel', 'color-mix(in srgb, ' + v + ' ' + (isDark() ? 14 : 8) + '%, var(--bg))');
+      } else {
+        root.style.removeProperty('--hc'); root.style.removeProperty('--accent'); root.style.removeProperty('--panel');
+      }
+      cBtns.forEach(function (b, i) {
+        b.setAttribute('aria-pressed', String(i === ci));
+        var cc = cols[i], vv = isDark() ? cc[2] : cc[1];
+        if (vv) b.style.background = vv;
+      });
+      ls(KEY + '-hc', String(ci));
+      applyReader();
+    }
+    fonts.forEach(function (f, i) {
+      var b = document.createElement('button'); b.type = 'button'; b.textContent = f[0];
+      if (f[1]) b.style.fontFamily = f[1];
+      b.addEventListener('click', function () { fi = i; applyFont(); });
+      fontBox.appendChild(b); fBtns.push(b);
+    });
+    cols.forEach(function (c, i) {
+      var b = document.createElement('button'); b.type = 'button'; b.className = 'sw' + (c[1] ? '' : ' std');
+      b.setAttribute('aria-label', 'Überschriften: ' + c[0]); b.title = c[0];
+      b.addEventListener('click', function () { ci = i; applyCol(); });
+      colBox.appendChild(b); cBtns.push(b);
+    });
+    function closeP() { panel.hidden = true; bStyle.setAttribute('aria-expanded', 'false'); }
+    bStyle.addEventListener('click', function (e) {
+      e.stopPropagation(); var open = panel.hidden; panel.hidden = !open; bStyle.setAttribute('aria-expanded', String(open));
+    });
+    document.addEventListener('click', function (e) { if (!panel.hidden && !panel.contains(e.target)) closeP(); });
+    document.addEventListener('keydown', function (e) { if (e.key === 'Escape') closeP(); });
+    document.getElementById('bTheme').addEventListener('click', applyCol);
+    if (window.matchMedia) { try { matchMedia('(prefers-color-scheme: dark)').addEventListener('change', applyCol); } catch (e) {} }
+
+    /* Lesemodus */
+    var reads = [['Aus', null], ['Papier', 'paper'], ['E-Ink', 'eink']];
+    var ri = parseInt(ls(KEY + '-read'), 10); if (!(ri >= 0 && ri < reads.length)) ri = 0;
+    var readBox = document.getElementById('readList'), rBtns = [];
+    var RV = {
+      paper: { l: ['#f3ead7', '#2d2a24', '#6e6553', '#d8cdb2', '#eaddc2'], d: ['#1d1a15', '#d8cfbc', '#a2977f', '#3a352b', '#26221b'] },
+      eink:  { l: ['#e9e8e3', '#1c1c1c', '#5c5c58', '#c9c8c2', '#deddd7'], d: ['#1a1a1a', '#d2d2ce', '#9a9a96', '#383836', '#232322'] }
+    };
+    function applyReader() {
+      var m = reads[ri][1], names = ['--bg', '--fg', '--muted', '--rule'];
+      rBtns.forEach(function (b, i) { b.setAttribute('aria-pressed', String(i === ri)); });
+      ls(KEY + '-read', String(ri));
+      if (!m) {
+        root.removeAttribute('data-reader');
+        names.forEach(function (n) { root.style.removeProperty(n); });
+        return;
+      }
+      var v = RV[m][isDark() ? 'd' : 'l'];
+      root.setAttribute('data-reader', m);
+      names.forEach(function (n, i) { root.style.setProperty(n, v[i]); });
+      if (cols[ci][1] === null) root.style.setProperty('--panel', v[4]);
+      if (m === 'eink') {
+        var g = isDark() ? '#d2d2ce' : '#2a2a2a';
+        root.style.setProperty('--accent', g); root.style.setProperty('--hc', g);
+      }
+    }
+    reads.forEach(function (r, i) {
+      var b = document.createElement('button'); b.type = 'button'; b.textContent = r[0];
+      b.addEventListener('click', function () { ri = i; applyCol(); });
+      readBox.appendChild(b); rBtns.push(b);
+    });
+
+    /* Seitenansicht */
+    var vi = parseInt(ls(KEY + '-view'), 10); if (!(vi === 0 || vi === 1)) vi = 0;
+    var viewBox = document.getElementById('viewList'), vBtns = [], pagesOn = false;
+    var mainEl = document.querySelector('main'), pgv = document.createElement('div');
+    pgv.id = 'pgview'; mainEl.parentNode.insertBefore(pgv, mainEl); pgv.appendChild(mainEl);
+    var barEl = document.querySelector('.bar'), stEl = document.querySelector('.status'), stIn = document.querySelector('.status-in');
+    var bPrev = document.createElement('button'), bNext = document.createElement('button');
+    bPrev.type = bNext.type = 'button'; bPrev.id = 'pgPrev'; bNext.id = 'pgNext';
+    bPrev.textContent = '‹ Zurück'; bNext.textContent = 'Weiter ›';
+    bPrev.setAttribute('aria-label', 'Vorherige Seite'); bNext.setAttribute('aria-label', 'Nächste Seite');
+    bPrev.hidden = bNext.hidden = true;
+    stIn.insertBefore(bPrev, stIn.firstChild); stIn.appendChild(bNext);
+    var PW = 0, PG = 48, STEP = 1, snapT = null;
+    function metrics() {
+      var cs = getComputedStyle(document.body);
+      var avail = document.body.clientWidth - parseFloat(cs.paddingLeft) - parseFloat(cs.paddingRight);
+      PW = Math.max(240, Math.min(640, Math.floor(avail)));
+      var ph = Math.max(240, window.innerHeight - barEl.offsetHeight - stEl.offsetHeight - 24);
+      STEP = PW + PG;
+      root.style.setProperty('--pw', PW + 'px'); root.style.setProperty('--pg', PG + 'px'); root.style.setProperty('--ph', ph + 'px');
+    }
+    function pageCount() { return Math.max(1, Math.round((pgv.scrollWidth + PG) / STEP)); }
+    function pageNow() { return Math.round(pgv.scrollLeft / STEP); }
+    function secAt() {
+      var left = pgv.getBoundingClientRect().left, idx = -1;
+      secs.forEach(function (s, i) {
+        var rs = s.getClientRects(); if (!rs.length) return;
+        if (rs[0].left - left + pgv.scrollLeft <= pgv.scrollLeft + 5) idx = i;
+      });
+      return idx;
+    }
+    function pageStatus() {
+      if (!pagesOn) return;
+      var n = pageCount(), c = Math.min(pageNow(), n - 1), idx = secAt();
+      stSec.textContent = 'Seite ' + (c + 1) + ' von ' + n + (idx >= 0 ? ' · ' + secs[idx].querySelector('h2').textContent : '');
+      stPct.textContent = Math.round((c + 1) / n * 100) + ' %';
+      prog.style.width = ((c + 1) / n * 100) + '%';
+      Array.prototype.forEach.call(links, function (a, i) { a.classList.toggle('cur', i === idx); });
+      bPrev.disabled = c <= 0; bNext.disabled = c >= n - 1;
+    }
+    function go(i) {
+      i = Math.max(0, Math.min(pageCount() - 1, i));
+      pgv.scrollLeft = i * STEP; pageStatus();
+    }
+    function relayout() { if (!pagesOn) return; metrics(); go(pageNow()); }
+    function currentSecIndexScroll() {
+      var cur = -1; secs.forEach(function (s, i) { if (s.getBoundingClientRect().top <= 140) cur = i; }); return cur;
+    }
+    function applyView() {
+      vBtns.forEach(function (b, i) { b.setAttribute('aria-pressed', String(i === vi)); });
+      ls(KEY + '-view', String(vi));
+      var want = vi === 1;
+      if (want === pagesOn) return;
+      var idx = pagesOn ? secAt() : currentSecIndexScroll();
+      pagesOn = want;
+      bPrev.hidden = bNext.hidden = !want;
+      if (want) {
+        root.setAttribute('data-pages', '1'); window.scrollTo(0, 0); metrics();
+        if (idx >= 0) secs[idx].scrollIntoView(); setTimeout(function () { go(pageNow()); }, 0);
+      } else {
+        root.removeAttribute('data-pages');
+        ['--pw', '--pg', '--ph'].forEach(function (n) { root.style.removeProperty(n); });
+        pgv.scrollLeft = 0;
+        if (idx >= 0) secs[idx].scrollIntoView(); else window.scrollTo(0, 0);
+        update();
+      }
+    }
+    [['Scrollen'], ['Seiten']].forEach(function (v, i) {
+      var b = document.createElement('button'); b.type = 'button'; b.textContent = v[0];
+      b.addEventListener('click', function () { vi = i; applyView(); });
+      viewBox.appendChild(b); vBtns.push(b);
+    });
+    bPrev.addEventListener('click', function () { go(pageNow() - 1); });
+    bNext.addEventListener('click', function () { go(pageNow() + 1); });
+    pgv.addEventListener('scroll', function () {
+      if (!pagesOn) return;
+      clearTimeout(snapT);
+      snapT = setTimeout(function () {
+        var t = pageNow() * STEP; if (Math.abs(pgv.scrollLeft - t) > 1) pgv.scrollLeft = t;
+        pageStatus();
+      }, 60);
+    }, { passive: true });
+    document.addEventListener('keydown', function (e) {
+      if (!pagesOn || e.ctrlKey || e.metaKey || e.altKey) return;
+      var t = e.target, tag = t && t.tagName;
+      if (tag === 'INPUT' || tag === 'TEXTAREA' || tag === 'SELECT') return;
+      var interactive = tag === 'BUTTON' || tag === 'A' || (t && t.getAttribute && t.getAttribute('role') === 'button');
+      if (e.key === 'ArrowRight' || e.key === 'PageDown' || (e.key === ' ' && !interactive)) { e.preventDefault(); go(pageNow() + 1); }
+      else if (e.key === 'ArrowLeft' || e.key === 'PageUp') { e.preventDefault(); go(pageNow() - 1); }
+    });
+    var tx = 0, ty = 0, tOk = false;
+    document.addEventListener('touchstart', function (e) {
+      if (!pagesOn || !e.touches.length) return;
+      tOk = !(e.target.closest && e.target.closest('.tw,figure,pre,input,textarea,select,.stylep,.toc,#gpop'));
+      tx = e.touches[0].clientX; ty = e.touches[0].clientY;
+    }, { passive: true });
+    document.addEventListener('touchend', function (e) {
+      if (!pagesOn || !tOk || !e.changedTouches.length) return;
+      var dx = e.changedTouches[0].clientX - tx, dy = e.changedTouches[0].clientY - ty;
+      if (Math.abs(dx) > 50 && Math.abs(dy) < Math.abs(dx) * 0.6) go(pageNow() + (dx < 0 ? 1 : -1));
+    }, { passive: true });
+    window.addEventListener('resize', function () { relayout(); });
+    ['stylePanel', 'bMinus', 'bPlus'].forEach(function (id) {
+      var el = document.getElementById(id); if (el) el.addEventListener('click', function () { setTimeout(relayout, 80); });
+    });
+    document.addEventListener('input', function () { setTimeout(relayout, 60); });
+    mainEl.addEventListener('click', function () { setTimeout(function () { pageStatus(); }, 30); });
+    if (document.fonts && document.fonts.ready) document.fonts.ready.then(relayout);
+    applyView();
+    applyFont(); applyCol();
+  })();
+
+})();
+</script>
+</body>
+</html>
