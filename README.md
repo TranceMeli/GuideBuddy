@@ -25,7 +25,7 @@ More pictures: [Screenshots](#screenshots).
 - Editor that looks like the finished guide: big title, level, duration and category as chips, optional fields folded under "More details"
 - Guide builder laid out like a design tool, starting from a blank page with nothing required: 22 tools on the left in groups (Structure, Text, Notices, Media), the options of the chosen tool on top, the guide as cards in the middle, and on the right a help card (what the tool does, how to use it, what readers see) above the properties of the selected element. A tool is chosen by click or key (shown next to it; Esc returns to Select) and placed by clicking "Place here" between the cards; dragging a tool onto the guide works too. Empty elements show a placeholder in the guide and in the live preview, which opens with "Show preview" on wide screens. On phones the tools are a "Tools" sheet and the properties replace the guide while an element is selected. A short "Before you publish" list advises (descriptive headings, steps with content, an expected result, meaningful link texts) and never blocks publishing
 - Text styles: authors can colour text (5 colours), highlight it (4 highlights) and choose a font (serif, handwriting, code style) from a fixed palette – in the rich text editor of free guides and, through a small formatting bar (bold, italic, code, list, link and the same styles), in every Markdown field. Content only stores class names (`c-teal`, `h-yellow`, `f-hand`), never colours or font names; the server keeps exactly these names. The standard look shows colours, highlights and fonts (lighter variants in dark mode). The fonts are loaded only by guides that use them
-- Status colours with a fixed meaning: yellow = Important (`important`), red = Error (`error`), green = Expected result (`result`), blue = Tip and Note; each box has an icon and a word. Output lines of terminal blocks (code fences with `console` and a `$` prompt) are coloured by meaning (error, warning, success)
+- Status colours with a fixed meaning: yellow = Important (`important`), coral = Warning (`warning`), dark red = Danger (`danger`), red = Error (`error`), green = Expected result (`result`), blue = Tip and Note; each box has an icon and a word. Output lines of terminal blocks (code fences with `console` and a `$` prompt) are coloured by meaning (error, warning, success)
 - Reading bars: a slim bar under the site header (title, Dark, Aa with text size, Contents) with a progress line, and a status bar at the bottom (section x of y, percent)
 - Forgiving editors: removing a part never asks first – it is removed at once and an "Undo" button brings it back for a few seconds. Leaving the editor with unsaved changes asks first, closing the tab shows the browser warning, and "Unsaved changes" appears next to Publish
 - Live preview while writing: editor on the left, the real reading template on the right with a draggable divider (mouse, touch or arrow keys; double-click resets; the width is remembered per browser) and a switch on phones; Markdown is rendered and sanitized by the server (`POST /api/markdown/render/`, no database access). A full server-side preview endpoint per guide also exists (saved in a savepoint and rolled back)
@@ -43,7 +43,10 @@ More pictures: [Screenshots](#screenshots).
 - English only: interface, reading templates, sample data and legal pages. Every guide still carries a language tag (`language`, always `en` for now, used as the `lang` attribute), so more languages can be added later without changing the API
 - Top navigation (guides, categories menu, new guide, account) with a mobile menu, and a footer with the operator's address
 - Reading view with a draggable divider between the guide and the comments
-- One look: serif text, a narrow column of about 60 characters, taller lines, one blue accent, hairline rules and small mono labels, calm long reading; light, dark and automatic mode
+- One look, "teal and paper": warm paper background, serif text in a narrow column of about 60 characters, a teal band with the search on the overview, a navy main action, and small mono labels (never below .8 rem, about 13 px); light, dark and automatic mode. Every category has its own colour and icon (cards, chips and placeholders; colour is never the only signal), and the colour pairs reach WCAG AA (4.5:1)
+- Builder like a drawing tool: edit buttons on top (undo and redo for the whole guide, duplicate, move up and down, delete; shortcuts Ctrl+Z, Ctrl+Y, Ctrl+D, Alt+Up/Down, Delete), tool search with folding groups and the tools used last, a side panel with Properties, Outline (click to jump), Checks and Help, a status line (elements, words, reading time, suggestions) and a draft that is kept in the browser while writing, with a question to restore it after a closed tab
+- Writing help, from guide-writing research: a how-to template on the blank page (goal, safety, materials, steps with results, outcome, troubleshooting, related guides as empty parts) and a "Before you publish" list with ten suggestions (verb in the title, introduction, one action per step, expected results, final result, captions …); it only advises
+- Reading helpers: breadcrumb, progress bar with "Section x of y", "Done" next to ticked steps, "Next: section" and "Back to top" at the end of each section; empty states (no guides, no comments) offer a next action; movement is switched off for people who ask for reduced motion
 - Images carry an optional caption and kind (Photo, Screenshot, Mockup (schematic), Diagram) that readers see in a numbered caption, so a drawn interface is never passed off as a screenshot; every image in guide text can be enlarged (click, tap or Enter; Esc closes)
 - Tables in guide text turn into one small card per row on phones, with the column name in front of every cell, instead of scrolling sideways
 - Legal pages (imprint, privacy, terms) as English templates for an operator based in Germany; old German page addresses (`/anmelden`, `/guides/<slug>/bearbeiten` …) and the former German guide slugs redirect permanently to the English ones
@@ -108,7 +111,7 @@ Installed with `npm install` in `frontend/`:
 | vue-router | ^5.3.1 | Routing |
 | @tiptap/vue-3, @tiptap/starter-kit, @tiptap/pm, @tiptap/extension-table, @tiptap/extensions | 3.31.4 | Rich-text editor of the free guide |
 | turndown, turndown-plugin-gfm | 7.2.4, 1.0.2 | Converts the editor's HTML to Markdown |
-| @fontsource-variable/plus-jakarta-sans, @fontsource-variable/jetbrains-mono, @fontsource-variable/source-serif-4, @fontsource-variable/caveat, @fontsource/ibm-plex-mono | 5.x | Self-hosted fonts (no requests to Google): interface, code, reading text, handwriting style, small labels |
+| @fontsource-variable/plus-jakarta-sans, @fontsource-variable/jetbrains-mono, @fontsource-variable/source-serif-4, @fontsource-variable/caveat | 5.x | Self-hosted fonts (no requests to Google): interface, code and small labels, reading text, handwriting style |
 | typescript | ^5.9.3 | Types (dev) |
 | vue-tsc | ^3.3.12 | Type checking (dev) |
 
@@ -141,6 +144,12 @@ npm run dev
 ```
 
 Open `http://localhost:3000`.
+
+On Windows, `start-dev.ps1` starts both servers in one step. It uses the next free port if 8000 or 3000 is taken and prints the addresses:
+
+```bash
+powershell -ExecutionPolicy Bypass -File .\start-dev.ps1
+```
 
 ### 3. E-mail in development
 
@@ -197,7 +206,12 @@ python manage.py flushexpiredtokens   # removes expired entries from the JWT blo
     <td width="50%"><img src="docs/screenshots/comments.png" alt="Comments on a guide"><br><sub><b>Comments:</b> questions on single elements, a marked answer, "Helpful" votes</sub></td>
   </tr>
   <tr>
-    <td colspan="2"><img src="docs/screenshots/overview-dark.png" alt="The overview in dark mode"><br><sub><b>Dark mode:</b> the overview</sub></td>
+    <td width="50%"><img src="docs/screenshots/builder-template.png" alt="The how-to template on a blank page"><br><sub><b>Template:</b> the parts of a how-to guide as empty parts with hints</sub></td>
+    <td width="50%"><img src="docs/screenshots/builder-checks.png" alt="Before you publish: ten suggestions"><br><sub><b>Writing check:</b> ten suggestions before publishing, never blocking</sub></td>
+  </tr>
+  <tr>
+    <td width="50%"><img src="docs/screenshots/home.png" alt="The overview with category colours"><br><sub><b>Overview:</b> search band, coloured categories and cards</sub></td>
+    <td width="50%"><img src="docs/screenshots/overview-dark.png" alt="The overview in dark mode"><br><sub><b>Dark mode:</b> the overview</sub></td>
   </tr>
 </table>
 

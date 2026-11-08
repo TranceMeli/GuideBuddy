@@ -59,6 +59,8 @@ required**: an empty guide is valid, and there is no fixed structure. Every elem
 | `table` | – | `rows`: up to 20 × 8 cells of 200; the first row is the heading | a table (cards on phones) |
 | `collapsible` | title (200) | `body` Markdown (3,000) | a line that opens |
 | `important` | Markdown (1,000) | – | yellow box "Important" |
+| `warning` | Markdown (1,000) | – | coral box "Warning": risk of injury or damage |
+| `danger` | Markdown (1,000) | – | dark red box "Danger": risk to life |
 | `error` | Markdown (1,000) | – | red box "Error" |
 | `tip` / `note` | Markdown (1,000) | – | blue box |
 | `result` | Markdown (1,000) | – | green box "Expected result" |
@@ -69,7 +71,7 @@ required**: an empty guide is valid, and there is no fixed structure. Every elem
 | `compare` | explanation (1,000) | `wrong`, `right` (3,000 each), `language` | two blocks marked Wrong and Right |
 | `download` | button label (120) | `url` (http/https) | a button with a download icon |
 
-Markdown kinds (`text`, `important`, `error`, `tip`, `note`, `result`, `quote`) accept bold,
+Markdown kinds (`text`, `important`, `warning`, `danger`, `error`, `tip`, `note`, `result`, `quote`) accept bold,
 italic, `code`, lists, links and the text styles below. The server sanitizes all of it.
 
 ## Images
@@ -98,11 +100,25 @@ Fixed meaning, always an icon and a word as well as the colour:
 
 | Box | Kind | Colour |
 |---|---|---|
-| Important | `important` | yellow |
+| Important | `important` | yellow (be careful) |
+| Warning | `warning` | coral (risk of injury or damage) |
+| Danger | `danger` | dark red, white text (risk to life) |
 | Error | `error` | red |
 | Tip | `tip` | blue |
 | Note | `note` | blue |
 | Expected result | `result` | green |
+
+Put warnings before the step they belong to, or at the start of the guide, not in a block
+further down. Use Danger rarely.
+
+## How-to template and writing check
+
+On a blank page the builder offers "Start from the how-to template": empty parts with a hint
+each (goal, safety, materials, steps with expected results, outcome, troubleshooting, related
+guides). Empty parts are not saved. "Before you publish" (`frontend/app/utils/publishChecks.ts`)
+only advises: a title that says what readers do, an introduction, headings, steps with something
+after the title, expected results, one action per step, a final result, captions and meaningful
+links. Publishing is never blocked.
 
 ## Search and PDF
 

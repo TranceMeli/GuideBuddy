@@ -132,6 +132,13 @@ async function showPreview(body: string, set: (html: string | null) => void, cur
 // Reply
 const replyTo = ref<number | null>(null)
 const replyBody = ref('')
+/** Empty state: sends readers to the writing field as a question (or to the login) */
+function askFirst() {
+  if (!loggedIn.value) return navigateTo({ path: '/login', query: { next: `/guides/${props.slug}` } })
+  form.kind = 'question'
+  document.getElementById('comment-body')?.focus()
+}
+
 function startReply(c: GuideComment) {
   replyTo.value = c.id
   replyBody.value = ''
@@ -217,7 +224,12 @@ function jumpTo(c: GuideComment) {
         <button type="button" class="link" @click="onElement = null; target = null">Show all</button>
       </p>
 
-      <p v-if="!total" class="muted">No comments yet. Ask a question or share what worked.</p>
+      <div v-if="!total" class="empty-state empty-state--small">
+        <GuideIcon name="info" :size="26" />
+        <h3>No comments yet</h3>
+        <p>Stuck on a step? Ask the first question, or share what worked for you.</p>
+        <button type="button" class="btn btn-primary btn-small" @click="askFirst">Ask a question</button>
+      </div>
       <p v-else-if="!visible.length" class="muted">Nothing matches this filter.</p>
 
       <ol class="gc-list">

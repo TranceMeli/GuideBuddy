@@ -1,9 +1,10 @@
 <script setup lang="ts">
 /**
  * Notice box with a fixed meaning (docs/guide-types.md). The label always comes first; an
- * icon and a word carry the meaning, never colour alone.
+ * icon and a word carry the meaning, never colour alone. Levels: note, important (careful),
+ * warning (risk of injury or damage), danger (risk to life).
  */
-export type CalloutKind = 'tip' | 'note' | 'warning' | 'error' | 'result'
+export type CalloutKind = 'tip' | 'note' | 'important' | 'warning' | 'danger' | 'error' | 'result'
 
 const props = defineProps<{ kind: CalloutKind; html?: string; label?: string }>()
 const t = useGuideLabels()
@@ -11,7 +12,9 @@ const t = useGuideLabels()
 const META = {
   tip: { icon: 'tip' },
   note: { icon: 'info' },
+  important: { icon: 'alert' },
   warning: { icon: 'alert' },
+  danger: { icon: 'stop' },
   error: { icon: 'close' },
   result: { icon: 'check-circle' },
 } as const
@@ -20,7 +23,7 @@ const text = computed(() => props.label ?? t.value[props.kind])
 </script>
 
 <template>
-  <aside class="callout" :class="`callout-${kind}`" :role="kind === 'warning' || kind === 'error' ? 'note' : undefined">
+  <aside class="callout" :class="`callout-${kind}`" :role="['important', 'warning', 'danger', 'error'].includes(kind) ? 'note' : undefined">
     <p class="callout-label" :lang="t.lang">
       <GuideIcon :name="meta.icon" class="callout-icon" :size="20" />
       <span>{{ text }}</span>

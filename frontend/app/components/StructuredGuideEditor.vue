@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import type { Category, Difficulty, Guide } from '~/types/guide'
+import type { ElementDraft } from '~/utils/elements'
 
 /**
  * Editor of a guide built from elements: a head that looks like the guide (big title, the
@@ -36,6 +37,50 @@ const tried = ref(false)
 
 // Asks before leaving with unsaved changes
 const { dirty, markSaved } = useUnsavedChanges(() => [form, elements.value])
+
+// Draft: the guide is also kept in this browser while writing, so a closed tab loses nothing
+const draftKey = `guidebuddy:draft:${props.guide?.slug ?? 'new'}`
+const draftSavedAt = ref('')
+const draftFound = ref<{ at: string; form: typeof form; elements: ElementDraft[] } | null>(null)
+const clock = (date: Date) => date.toLocaleTimeString('en-GB', { hour: '2-digit', minute: '2-digit' })
+onMounted(() => {
+  try {
+    const raw = localStorage.getItem(draftKey)
+    const draft = raw ? JSON.parse(raw) : null
+    if (draft && Array.isArray(draft.elements) && draft.form && (draft.elements.length || draft.form.title)) draftFound.value = draft
+  } catch {
+    // storage may be blocked: no draft then
+  }
+})
+let draftTimer: ReturnType<typeof setTimeout> | undefined
+watch([form, elements], () => {
+  clearTimeout(draftTimer)
+  draftTimer = setTimeout(() => {
+    if (!dirty.value || draftFound.value) return // an old draft waits for an answer first
+    try {
+      localStorage.setItem(draftKey, JSON.stringify({ at: new Date().toISOString(), form, elements: elements.value }))
+      draftSavedAt.value = clock(new Date())
+    } catch {
+      // storage may be blocked
+    }
+  }, 1500)
+}, { deep: true })
+onBeforeUnmount(() => clearTimeout(draftTimer))
+function restoreDraft() {
+  const draft = draftFound.value
+  if (!draft) return
+  Object.assign(form, draft.form)
+  elements.value = draft.elements
+  draftFound.value = null
+}
+function discardDraft() {
+  draftFound.value = null
+  try {
+    localStorage.removeItem(draftKey)
+  } catch {
+    // see above
+  }
+}
 
 const errors = ref<string[]>([])
 const saving = ref(false)
@@ -106,6 +151,11 @@ async function save() {
     })
     clearNuxtData((key) => key.startsWith('guide'))
     markSaved()
+    try {
+      localStorage.removeItem(draftKey)
+    } catch {
+      // see above
+    }
     await navigateTo(`/guides/${saved.slug}`)
   } catch (e) {
     await handleError(e)
@@ -119,6 +169,11 @@ async function save() {
   <LivePreviewLayout :status="previewFailed ? 'formatting currently unavailable' : ''">
   <form class="stack editor" novalidate @submit.prevent="save">
     <div v-if="user && !user.can_write" class="hint-box" role="status">{{ user.write_hint }}</div>
+    <div v-if="draftFound" class="hint-box draft-found" role="status">
+      <span>A draft from {{ clock(new Date(draftFound.at)) }} was found in this browser.</span>
+      <button type="button" class="btn btn-primary btn-small" @click="restoreDraft">Restore draft</button>
+      <button type="button" class="btn btn-secondary btn-small" @click="discardDraft">Discard</button>
+    </div>
     <div v-if="errors.length" ref="errorBox" class="error-box" role="alert" tabindex="-1">
       <ul><li v-for="message in errors" :key="message">{{ message }}</li></ul>
     </div>
@@ -172,7 +227,7 @@ async function save() {
       </div>
     </header>
 
-    <ElementsEditor v-model="elements" />
+    <ElementsEditor v-model="elements" :checks="checks" :saved-at="draftSavedAt" />
 
     <div v-if="guide">
       <label for="comment">What did you change? <span class="muted">(optional)</span></label>

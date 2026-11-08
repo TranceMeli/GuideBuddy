@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import type { BuilderGroup, BuilderPart } from '~/composables/useBuilder'
 import type { ElementKind } from '~/types/guide'
+import type { Check } from '~/utils/publishChecks'
 import type { ElementDraft, ToolId } from '~/utils/elements'
 
 /**
@@ -14,11 +15,13 @@ import type { ElementDraft, ToolId } from '~/utils/elements'
  * Empty elements show their placeholder, in the guide and in the live preview.
  */
 const elements = defineModel<ElementDraft[]>({ required: true })
+const props = defineProps<{ checks?: Check[]; savedAt?: string }>()
 const { say, removed, removeFromList, reveal, newPart, moving, dropTarget, over } = useBuilder()
 
 const tool = ref<ToolId>('select')
 const hover = ref<ToolId | null>(null)
 const selKey = ref<string | null>(null)
+const panelTab = ref<'props' | 'outline' | 'checks' | 'help'>('props')
 
 const PALETTE: BuilderGroup[] = TOOL_GROUPS.map((group) => ({
   group,
@@ -54,7 +57,8 @@ function summary(el: ElementDraft): string {
     default: return first(el.text)
   }
 }
-const cardPlaceholder = (el: ElementDraft) => (el.kind === 'divider' ? 'A line between two parts' : ELEMENT_PLACEHOLDERS[el.kind])
+const cardPlaceholder = (el: ElementDraft) => el.hint ?? (el.kind === 'divider' ? 'A line between two parts' : ELEMENT_PLACEHOLDERS[el.kind])
+const placeholderOf = (el: ElementDraft) => el.hint ?? ELEMENT_PLACEHOLDERS[el.kind]
 
 function select(key: string | null) {
   selKey.value = key
@@ -66,10 +70,31 @@ const cardId = (key: string) => `bd-card-${key}`
 function chooseTool(id: string) {
   const next = id as ToolId
   tool.value = next === 'select' || next === tool.value ? 'select' : next
+  if (tool.value !== 'select') panelTab.value = 'help'
+}
+
+// The tools used last, kept in this browser
+const recent = ref<string[]>([])
+onMounted(() => {
+  try {
+    const saved = JSON.parse(localStorage.getItem('guidebuddy:recent-tools') ?? '[]')
+    if (Array.isArray(saved)) recent.value = saved.filter((id) => typeof id === 'string' && id in TOOL).slice(0, 3)
+  } catch {
+    // storage may be blocked; the list then lasts for this visit
+  }
+})
+function rememberTool(kind: string) {
+  recent.value = [kind, ...recent.value.filter((id) => id !== kind)].slice(0, 3)
+  try {
+    localStorage.setItem('guidebuddy:recent-tools', JSON.stringify(recent.value))
+  } catch {
+    // see above
+  }
 }
 
 function insertAt(at: number, kind: ElementKind) {
   if (elements.value.length >= MAX_ELEMENTS) return say(`A guide has at most ${MAX_ELEMENTS} elements.`)
+  rememberTool(kind)
   const el = newElement(kind)
   elements.value.splice(at, 0, el)
   select(el.key)
@@ -95,11 +120,118 @@ function move(index: number, delta: -1 | 1) {
   ;[list[index], list[to]] = [list[to]!, list[index]!]
 }
 
+/** Copies an element right below itself (the copy is new: no id, own key) */
+function duplicate(index = selIndex.value) {
+  const el = elements.value[index]
+  if (!el) return
+  if (elements.value.length >= MAX_ELEMENTS) return say(`A guide has at most ${MAX_ELEMENTS} elements.`)
+  const copy = JSON.parse(JSON.stringify(el)) as ElementDraft
+  copy.key = localKey()
+  delete copy.id
+  elements.value.splice(index + 1, 0, copy)
+  select(copy.key)
+  reveal(cardId(copy.key))
+  say('Duplicated.')
+}
+
+// --- Undo and redo for the whole guide --------------------------------------------------------
+// Snapshots of the list, taken half a second after the last change, so typing counts as one step.
+const past = ref<string[]>([])
+const future = ref<string[]>([])
+const snapshot = () => JSON.stringify(elements.value)
+let current = snapshot()
+let applying = false
+let historyTimer: ReturnType<typeof setTimeout> | undefined
+
+function commit() {
+  clearTimeout(historyTimer)
+  const now = snapshot()
+  if (now === current) return
+  past.value.push(current)
+  if (past.value.length > 100) past.value.shift()
+  current = now
+  future.value = []
+}
+watch(elements, () => {
+  if (applying) return
+  clearTimeout(historyTimer)
+  historyTimer = setTimeout(commit, 500)
+}, { deep: true })
+onBeforeUnmount(() => clearTimeout(historyTimer))
+
+async function applySnapshot(json: string) {
+  applying = true
+  elements.value = JSON.parse(json) as ElementDraft[]
+  if (selKey.value && !elements.value.some((e) => e.key === selKey.value)) selKey.value = null
+  await nextTick()
+  applying = false
+}
+function undo() {
+  commit()
+  const before = past.value.pop()
+  if (before === undefined) return say('Nothing to undo.')
+  future.value.push(current)
+  current = before
+  applySnapshot(before)
+  say('Undone.')
+}
+function redo() {
+  commit()
+  const after = future.value.pop()
+  if (after === undefined) return say('Nothing to redo.')
+  past.value.push(current)
+  current = after
+  applySnapshot(after)
+  say('Redone.')
+}
+const canUndo = computed(() => past.value.length > 0 || snapshot() !== current)
+
+// --- Outline and numbers for the status bar ---------------------------------------------------
+const outline = computed(() =>
+  elements.value
+    .map((el, i) => ({ el, i }))
+    .filter(({ el }) => ['section', 'step', 'heading'].includes(el.kind))
+    .map(({ el, i }) => ({ key: el.key, kind: el.kind, label: label(el, i), text: el.text.trim() })),
+)
+function jump(key: string) {
+  select(key)
+  reveal(cardId(key))
+}
+const wordCount = (text?: string) => (text?.trim() ? text.trim().split(/\s+/).length : 0)
+const words = computed(() =>
+  elements.value.reduce((sum, el) => {
+    const d = el.data
+    const cells = (d.rows ?? []).flat().reduce((n, c) => n + wordCount(c), 0)
+    const nodes = (d.nodes ?? []).reduce((n, c) => n + wordCount(c), 0)
+    return sum + wordCount(el.text) + wordCount(d.body) + wordCount(d.wrong) + wordCount(d.right) + cells + nodes
+  }, 0),
+)
+const readMinutes = computed(() => Math.max(1, Math.round(words.value / 200)))
+const suggestions = computed(() => (props.checks ?? []).filter((c) => !c.ok).length)
+
 // Keyboard shortcuts of the tools (not while typing); Esc returns to Select
 function onKeydown(event: KeyboardEvent) {
-  if (event.metaKey || event.ctrlKey || event.altKey) return
   const target = event.target as HTMLElement | null
-  if (target && (target.isContentEditable || ['INPUT', 'TEXTAREA', 'SELECT'].includes(target.tagName))) return
+  const typing = Boolean(target && (target.isContentEditable || ['INPUT', 'TEXTAREA', 'SELECT'].includes(target.tagName)))
+  const mod = event.ctrlKey || event.metaKey
+  if (mod && !event.altKey) {
+    if (typing) return // text fields keep their own undo
+    const k = event.key.toLowerCase()
+    if (k === 'z' && !event.shiftKey) { event.preventDefault(); undo() } else if (k === 'y' || (k === 'z' && event.shiftKey)) { event.preventDefault(); redo() } else if (k === 'd' && selected.value) { event.preventDefault(); duplicate() }
+    return
+  }
+  if (event.altKey && !mod) {
+    if (typing || !selected.value || !['ArrowUp', 'ArrowDown'].includes(event.key)) return
+    event.preventDefault()
+    move(selIndex.value, event.key === 'ArrowUp' ? -1 : 1)
+    return
+  }
+  if (typing) return
+  if (event.key === 'Delete' && selected.value) {
+    event.preventDefault()
+    remove(selIndex.value)
+    return
+  }
   if (event.key === 'Escape') {
     tool.value = 'select'
     return
@@ -127,6 +259,13 @@ function dropAt(at: number) {
     if (from >= 0) moveWithin(elements.value, from, at)
   }
 }
+/** Fills a blank page with the parts of a how-to guide (empty, so nothing has to be kept) */
+function startFromTemplate() {
+  commit()
+  elements.value = howToTemplate()
+  select(elements.value[0]!.key)
+  say('Template added. Write into the parts you need and remove the rest.')
+}
 const canvasTarget = dropTarget('canvas', () => Boolean(newPart.value), () => insertAt(elements.value.length, newPart.value as ElementKind))
 
 // --- Properties -----------------------------------------------------------------------------
@@ -134,6 +273,8 @@ const canvasTarget = dropTarget('canvas', () => Boolean(newPart.value), () => in
 const panelTitle = computed(() => (selected.value ? label(selected.value, selIndex.value) : ''))
 const NOTICE_HINT: Partial<Record<ElementKind, string>> = {
   important: 'Yellow box. What matters, or what to watch out for.',
+  warning: 'Coral box. A risk of injury or damage, and how to avoid it.',
+  danger: 'Dark red box. An immediate threat to life or health.',
   error: 'Red box. An error, data loss or something that cannot be undone, and how to avoid it.',
   tip: 'A faster or easier way to do it.',
   note: 'Good to know, but not required.',
@@ -168,8 +309,23 @@ function removeColumn(c: number) {
 </script>
 
 <template>
-  <BuilderShell :editing="Boolean(selected)">
+  <BuilderShell v-model:tab="panelTab" :editing="Boolean(selected)">
     <template #options>
+      <BuilderToolbar
+        :can-undo="canUndo"
+        :can-redo="future.length > 0"
+        :has-selection="Boolean(selected)"
+        :can-up="selIndex > 0"
+        :can-down="selIndex >= 0 && selIndex < elements.length - 1"
+        :saved-at="savedAt"
+        @undo="undo"
+        @redo="redo"
+        @duplicate="duplicate()"
+        @up="move(selIndex, -1)"
+        @down="move(selIndex, 1)"
+        @remove="remove(selIndex)"
+      />
+      <span class="bd-opt-sep" aria-hidden="true" />
       <span class="bd-opt-tool"><GuideIcon :name="TOOL[tool].icon" :size="16" /> {{ TOOL[tool].label }}</span>
       <span class="bd-opt-sep" aria-hidden="true" />
       <span v-if="armed" class="bd-opt-hint">{{ TOOL[tool].what }} Click “Place here” in the guide. Esc cancels.</span>
@@ -177,7 +333,7 @@ function removeColumn(c: number) {
     </template>
 
     <template #palette>
-      <BuilderPalette :groups="PALETTE" :armed="tool" @add="chooseTool" @hover="hover = ($event as ToolId | null)" />
+      <BuilderPalette :groups="PALETTE" :armed="tool" :recent="recent" @add="chooseTool" @hover="hover = ($event as ToolId | null)" />
     </template>
 
     <template #help>
@@ -192,6 +348,31 @@ function removeColumn(c: number) {
       </dl>
     </template>
 
+    <template #outline>
+      <p v-if="!outline.length" class="muted small">Sections, steps and headings appear here. Click one to jump to it.</p>
+      <ol v-else class="bd-outline-list">
+        <li v-for="item in outline" :key="item.key" :class="`is-${item.kind}`">
+          <button type="button" :class="{ 'is-current': selKey === item.key }" @click="jump(item.key)">
+            <span class="bd-outline-kind">{{ item.label }}</span>
+            <span class="bd-outline-text">{{ item.text || 'Untitled' }}</span>
+          </button>
+        </li>
+      </ol>
+    </template>
+
+    <template v-if="checks" #checks>
+      <ul class="publish-checks-list">
+        <li v-for="check in checks" :key="check.id" :class="check.ok ? 'is-ok' : 'is-open'">
+          <span class="publish-checks-mark" aria-hidden="true">{{ check.ok ? '✓' : '!' }}</span>
+          <span>
+            {{ check.label }}<span class="visually-hidden">: {{ check.ok ? 'done' : 'to do' }}</span>
+            <small v-if="!check.ok">{{ check.hint }}</small>
+          </span>
+        </li>
+      </ul>
+      <p class="muted small">These only advise; you can always publish.</p>
+    </template>
+
     <template #panel>
       <BuilderPanel v-if="selected" :title="panelTitle" @done="select(null)" @remove="remove(selIndex)">
         <div class="bd-type-row">
@@ -202,12 +383,12 @@ function removeColumn(c: number) {
         <!-- section, step, heading -->
         <div v-if="['section', 'step', 'heading'].includes(selected.kind)">
           <label for="f-title">Title</label>
-          <input id="f-title" v-model="selected.text" type="text" maxlength="160" :placeholder="ELEMENT_PLACEHOLDERS[selected.kind]">
+          <input id="f-title" v-model="selected.text" type="text" maxlength="160" :placeholder="placeholderOf(selected)">
         </div>
 
         <!-- text, notices, quote -->
         <template v-else-if="MARKDOWN_KINDS.includes(selected.kind)">
-          <MarkdownField id="f-text" v-model="selected.text" :label="TOOL[selected.kind].label" :hint="NOTICE_HINT[selected.kind]" :maxlength="selected.kind === 'text' ? 5000 : 1000" :rows="selected.kind === 'text' ? 8 : 5" :placeholder="ELEMENT_PLACEHOLDERS[selected.kind]" />
+          <MarkdownField id="f-text" v-model="selected.text" :label="TOOL[selected.kind].label" :hint="NOTICE_HINT[selected.kind]" :maxlength="selected.kind === 'text' ? 5000 : 1000" :rows="selected.kind === 'text' ? 8 : 5" :placeholder="placeholderOf(selected)" />
           <div v-if="selected.kind === 'quote'">
             <label for="f-source">Source <span class="muted">(optional)</span></label>
             <input id="f-source" v-model="selected.data.source" type="text" maxlength="120">
@@ -316,12 +497,20 @@ function removeColumn(c: number) {
     <div class="bd-canvas" v-bind="canvasTarget">
       <p class="bd-status">
         <span>{{ elements.length }} {{ elements.length === 1 ? 'element' : 'elements' }}</span>
+        <span>{{ words }} {{ words === 1 ? 'word' : 'words' }}</span>
+        <span>about {{ readMinutes }} min read</span>
+        <button v-if="checks" type="button" class="bd-status-link" :class="{ 'is-open': suggestions }" @click="panelTab = 'checks'">
+          {{ suggestions ? `${suggestions} ${suggestions === 1 ? 'suggestion' : 'suggestions'}` : 'No suggestions' }}
+        </button>
       </p>
       <BuilderNotice />
 
       <div v-if="!elements.length && !armed" class="bd-empty">
         <strong>A blank page</strong>
         Choose a tool to start. Nothing is required: build the guide you want.
+        <span class="bd-empty-or">or</span>
+        <button type="button" class="btn btn-secondary btn-small" @click="startFromTemplate">Start from the how-to template</button>
+        <small>Goal, materials, steps with results, outcome and troubleshooting, as empty parts you fill in or delete.</small>
       </div>
 
       <template v-for="(el, i) in elements" :key="el.key">

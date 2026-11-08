@@ -1,20 +1,18 @@
 /*
- * Design tokens, style "Technisch & freundlich" (style D).
+ * Design tokens, look "teal and paper".
  *
- * One look (calm reading, serif text, a narrow column, one accent colour). Dark mode is
- * independent (data-mode="light" | "dark", none = follow the OS).
+ * One look (calm reading, serif text, a narrow column). Dark mode is independent
+ * (data-mode="light" | "dark", none = follow the OS).
  *
- * Colour roles (never distinguish by colour alone):
- *   primary and accent (one blue) actions, links, active step, badges, table heads, header bar,
- *                        progress, success, tip and result boxes
- *   warning (coral)      warnings only
- * Coral is never text on white; use the *-text variants (WCAG AA).
+ * Colour roles (never distinguish by colour alone, every pair reaches 4.5:1):
+ *   primary (navy)       the main action, active filters, table heads
+ *   accent (teal)        links, progress, step badges, the band on the overview
+ *   --c-<tint>-*         one colour per category: line (fg), tint (bg), text on the tint (ink)
+ *   warning (red), caution (yellow), ok (green)  fixed meaning of the notice boxes
+ * Coral is never text on white; use the *-text variants.
  */
 @import "@fontsource-variable/plus-jakarta-sans/wght.css";
 @import "@fontsource-variable/jetbrains-mono/wght.css";
-/* small labels of the standard look (section, box and figure labels) */
-@import "@fontsource/ibm-plex-mono/400.css";
-@import "@fontsource/ibm-plex-mono/500.css";
 /* only fetched when a guide uses the font (text styles "Serif" and "Handwriting") */
 @import "@fontsource-variable/source-serif-4/wght.css";
 @import "@fontsource-variable/caveat/wght.css";
@@ -22,7 +20,7 @@
 :root {
   --font-sans: "Plus Jakarta Sans Variable", "Plus Jakarta Sans", system-ui, sans-serif;
   --font-mono: "JetBrains Mono Variable", "JetBrains Mono", ui-monospace, monospace;
-  --font-label: "IBM Plex Mono", var(--font-mono);
+  --font-label: var(--font-mono); /* small labels: the same mono font as code, never below 13px */
   --font-read:"Source Serif 4 Variable", "Source Serif 4", Georgia, "Times New Roman", serif;
   --text-size: clamp(1.1875rem, 1.1rem + .3vw, 1.375rem); /* 19px, a little larger on big screens */
   --line-height: 1.7;
@@ -33,26 +31,27 @@
   --header-h: 3.4rem; /* height of the sticky site header */
 }
 
-/* --- Standard theme (textbook) ------------------------------------------------------ */
+/* --- Standard theme (teal and paper) ------------------------------------------------ */
 :root {
   color-scheme: light;
-  --primary: #00519e; --primary-hover: #003f7d; --primary-light: #eef3fa; --primary-text: #003f7d;
-  --accent: #00519e; --accent-light: #eef3fa; --accent-text: #003f7d;
+  --primary: #16314a; --primary-hover: #0e2236; --primary-light: #e6ecf2; --primary-text: #16314a;
+  --accent: #0b6b64; --accent-light: #d2f1ee; --accent-text: #0a4f4a;
   --warning: #e0533d; --warning-light: #fcece9; --warning-text: #b93a26; /* red: error, wrong, danger */
   --caution: #c98a00; --caution-light: #fdf3d3; --caution-text: #7a5200; /* yellow: important, careful */
   --ok: #2f7d4f; --ok-light: #e6f4ea; --ok-text: #1f6b3e; /* green: correct, success */
-  --text: #1c2333; --text-secondary: #3b4458; --text-muted: #5b6478;
-  --bg: #ffffff; --surface: #f6f8fb; --border: #d9dfea;
+  --danger: #7a2616; --danger-border: #3d1008; --on-danger: #ffffff; /* dark red box: risk to life */
+  --text: #1c2333; --text-secondary: #38425a; --text-muted: #566077;
+  --page: #f6f0e4; --bg: #fffdf7; --surface: #f1ead9; --border: #d8cdb6;
   --code-bg: #172033; --code-text: #e6eaf5;
   /* derived */
   --on-primary: #ffffff;
-  --link: var(--primary);
-  --line: #9aa6c2; /* connecting lines of the decision guide */
-  --bar: var(--primary); --bar-stripe: var(--accent); --bar-stripe-h: 3px; --bar-gap: 0px;
+  --link: var(--accent);
+  --line: #9aa6c2;
+  --bar: var(--accent); --bar-stripe: var(--accent); --bar-stripe-h: 3px; --bar-gap: 0px;
   --focus: var(--primary); --focus-offset: 2px;
-  --badge-bg: var(--primary); --badge-text: #ffffff;
+  --badge-bg: var(--accent); --badge-text: #ffffff;
   --done-bg: var(--accent-light); --done-text: var(--accent-text); --done-border: var(--accent-text);
-  --chip-bg: var(--primary-light); --chip-text: var(--primary-text); --chip-border: transparent;
+  --chip-bg: var(--accent-light); --chip-text: var(--accent-text); --chip-border: transparent;
   --table-head-bg: var(--primary); --table-head-text: #ffffff; --table-stripe: var(--surface);
   --code-border: transparent;
   --code-keyword: #c9a7ff; --code-name: #8ec5ff; --code-string: #9ee6b5; --code-number: #ffc38a;
@@ -60,8 +59,15 @@
   --wrong: var(--warning-text); --wrong-bg: var(--warning-light);
   --right: var(--ok-text); --right-bg: var(--ok-light);
   --image-filter: none;
-  /* teal tint of the placeholder illustrations on guide cards */
-  --tint-teal-bg: #e6f6f5; --tint-teal-fg: #0e7c74;
+  /* band on top of the overview and its search button */
+  --hero-bg: #0b6b64; --hero-text: #ffffff; --hero-sub: #d6f2ee; --hero-btn-bg: #fffdf7; --hero-btn-text: #16314a;
+  /* category colours: line, tint and text on the tint (each pair reaches 4.5:1) */
+  --c-blue-fg: #2f4fd0; --c-blue-bg: #dfe6fb; --c-blue-ink: #1a2c7a;
+  --c-teal-fg: #0b6b64; --c-teal-bg: #d2f1ee; --c-teal-ink: #0a4f4a;
+  --c-coral-fg: #b8432d; --c-coral-bg: #fbdcd5; --c-coral-ink: #7a2616;
+  --c-amber-fg: #8a5a00; --c-amber-bg: #fbe9bd; --c-amber-ink: #5a3b00;
+  --c-violet-fg: #6b3fb5; --c-violet-bg: #e9defa; --c-violet-ink: #3f2275;
+  --c-slate-fg: #4a5568; --c-slate-bg: #e5e0d2; --c-slate-ink: #2b3340;
   /* text styles picked by authors (classes c-*, h-*, f-*) */
   --tx-blue: #2f4fd0; --tx-teal: #0e7c74; --tx-coral: #b93a26; --tx-violet: #6b3fb5; --tx-gray: #5b6478;
   --hl-yellow: #fdf0b8; --hl-teal: #d2f1ee; --hl-blue: #dfe6fb; --hl-pink: #fbdce3;
@@ -70,34 +76,48 @@
 /* Dark mode of the standard look: chosen explicitly, or following the operating system */
 :root[data-mode="dark"] {
   color-scheme: dark;
-  --primary: #7c95ff; --primary-hover: #9aaeff; --primary-light: #1c2547; --primary-text: #b4c3ff;
-  --accent: #7c95ff; --accent-light: #1c2547; --accent-text: #b4c3ff;
+  --primary: #f3ead8; --primary-hover: #ffffff; --primary-light: #2b3a44; --primary-text: #f3ead8;
+  --accent: #4fd0c4; --accent-light: #123c3a; --accent-text: #b6f0ea;
   --warning: #f07a66; --warning-light: #3a1a15; --warning-text: #ff9f8e;
   --caution: #e0b13a; --caution-light: #3a2f12; --caution-text: #f2cf74;
   --ok: #5fc08a; --ok-light: #12301f; --ok-text: #8fdcae;
-  --text: #e6e9f2; --text-secondary: #c3c9d6; --text-muted: #9aa3b5;
-  --bg: #0f1422; --surface: #161c2d; --border: #2a3247;
-  --code-bg: #0a0e18; --code-text: #e6eaf5; --code-border: #2a3247;
-  --on-primary: #0f1422; --line: #4a5878; --badge-text: #0f1422; --table-head-text: #0f1422;
+  --danger: #5c1a10; --danger-border: #ff9f8e; --on-danger: #ffe3dd;
+  --text: #f3ead8; --text-secondary: #d9cfba; --text-muted: #b5a98f;
+  --page: #1d1a16; --bg: #28231c; --surface: #221e18; --border: #4a4234;
+  --code-bg: #12100d; --code-text: #f3ead8; --code-border: #4a4234;
+  --on-primary: #1d1a16; --line: #6b5f48; --badge-text: #12100d; --table-head-text: #1d1a16;
+  --hero-bg: #0b4f4a; --hero-text: #ffffff; --hero-sub: #c6ece7; --hero-btn-bg: #f3ead8; --hero-btn-text: #1d1a16;
+  --c-blue-fg: #8fa5ff; --c-blue-bg: #232c52; --c-blue-ink: #d3dbff;
+  --c-teal-fg: #4fd0c4; --c-teal-bg: #123c3a; --c-teal-ink: #b6f0ea;
+  --c-coral-fg: #ff9f8e; --c-coral-bg: #4a2018; --c-coral-ink: #ffd2c9;
+  --c-amber-fg: #e0b13a; --c-amber-bg: #3a2f12; --c-amber-ink: #f2cf74;
+  --c-violet-fg: #c3a6ff; --c-violet-bg: #2f2152; --c-violet-ink: #e3d6ff;
+  --c-slate-fg: #aab3c5; --c-slate-bg: #2a2f3a; --c-slate-ink: #d5dbe6;
   --tx-blue: #9db0ff; --tx-teal: #5fd9cd; --tx-coral: #ff9f8e; --tx-violet: #c3a6ff; --tx-gray: #aab3c5;
   --hl-yellow: #4a4116; --hl-teal: #124240; --hl-blue: #22305f; --hl-pink: #4a2430;
-  --tint-teal-bg: #10302e; --tint-teal-fg: #5fd9cd;
 }
 @media (prefers-color-scheme: dark) {
   :root:not([data-mode="light"]):not([data-mode="dark"]) {
     color-scheme: dark;
-    --primary: #7c95ff; --primary-hover: #9aaeff; --primary-light: #1c2547; --primary-text: #b4c3ff;
-    --accent: #7c95ff; --accent-light: #1c2547; --accent-text: #b4c3ff;
+    --primary: #f3ead8; --primary-hover: #ffffff; --primary-light: #2b3a44; --primary-text: #f3ead8;
+    --accent: #4fd0c4; --accent-light: #123c3a; --accent-text: #b6f0ea;
     --warning: #f07a66; --warning-light: #3a1a15; --warning-text: #ff9f8e;
     --caution: #e0b13a; --caution-light: #3a2f12; --caution-text: #f2cf74;
     --ok: #5fc08a; --ok-light: #12301f; --ok-text: #8fdcae;
-    --text: #e6e9f2; --text-secondary: #c3c9d6; --text-muted: #9aa3b5;
-    --bg: #0f1422; --surface: #161c2d; --border: #2a3247;
-    --code-bg: #0a0e18; --code-text: #e6eaf5; --code-border: #2a3247;
-    --on-primary: #0f1422; --line: #4a5878; --badge-text: #0f1422; --table-head-text: #0f1422;
+    --danger: #5c1a10; --danger-border: #ff9f8e; --on-danger: #ffe3dd;
+    --text: #f3ead8; --text-secondary: #d9cfba; --text-muted: #b5a98f;
+    --page: #1d1a16; --bg: #28231c; --surface: #221e18; --border: #4a4234;
+    --code-bg: #12100d; --code-text: #f3ead8; --code-border: #4a4234;
+    --on-primary: #1d1a16; --line: #6b5f48; --badge-text: #12100d; --table-head-text: #1d1a16;
+    --hero-bg: #0b4f4a; --hero-text: #ffffff; --hero-sub: #c6ece7; --hero-btn-bg: #f3ead8; --hero-btn-text: #1d1a16;
+    --c-blue-fg: #8fa5ff; --c-blue-bg: #232c52; --c-blue-ink: #d3dbff;
+    --c-teal-fg: #4fd0c4; --c-teal-bg: #123c3a; --c-teal-ink: #b6f0ea;
+    --c-coral-fg: #ff9f8e; --c-coral-bg: #4a2018; --c-coral-ink: #ffd2c9;
+    --c-amber-fg: #e0b13a; --c-amber-bg: #3a2f12; --c-amber-ink: #f2cf74;
+    --c-violet-fg: #c3a6ff; --c-violet-bg: #2f2152; --c-violet-ink: #e3d6ff;
+    --c-slate-fg: #aab3c5; --c-slate-bg: #2a2f3a; --c-slate-ink: #d5dbe6;
     --tx-blue: #9db0ff; --tx-teal: #5fd9cd; --tx-coral: #ff9f8e; --tx-violet: #c3a6ff; --tx-gray: #aab3c5;
     --hl-yellow: #4a4116; --hl-teal: #124240; --hl-blue: #22305f; --hl-pink: #4a2430;
-  --tint-teal-bg: #10302e; --tint-teal-fg: #5fd9cd;
   }
 }
 

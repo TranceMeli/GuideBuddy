@@ -216,16 +216,18 @@ class SmtpDeliveryTests(TestCase):
 
 
 class SeedSamplesTests(TestCase):
-    """seed_samples creates the sample guide, once."""
+    """seed_samples creates the sample guides, once."""
 
     def test_sample_is_created_once(self):
         from guides.models import Guide
 
         out = io.StringIO()
         call_command("seed_samples", stdout=out)
-        guide = Guide.objects.get()
+        self.assertEqual(Guide.objects.count(), 3)
+        guide = Guide.objects.get(slug="install-python-on-windows")
         self.assertEqual(guide.guide_type, "page")
         self.assertEqual(guide.elements.filter(kind="step").count(), 3)
+        self.assertTrue(Guide.objects.get(slug="bake-sourdough-bread-at-home").elements.filter(kind="warning").exists())
         call_command("seed_samples", stdout=out)
-        self.assertEqual(Guide.objects.count(), 1)
+        self.assertEqual(Guide.objects.count(), 3)
         self.assertIn("exists:", out.getvalue())

@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import type { Category, GuideListItem, Paginated } from '~/types/guide'
 
-const props = defineProps<{ categorySlug?: string }>()
+const props = defineProps<{ categorySlug?: string; heading: string }>()
 
 const route = useRoute()
 const router = useRouter()
@@ -73,17 +73,27 @@ const quick = computed(() => [
 function resetFilters() {
   setQuery({ level: undefined, duration: undefined, pdf: undefined })
 }
+/** Clears the search and every filter (the empty state offers it) */
+function clearAll() {
+  q.value = ''
+  setQuery({ q: undefined, level: undefined, duration: undefined, pdf: undefined })
+}
+const searching = computed(() => Boolean(param('q') || filtered.value))
 </script>
 
 <template>
   <div class="overview">
-    <form role="search" class="search" @submit.prevent="applySearch">
-      <label for="q" class="field-label">Search guides</label>
-      <div class="search-row">
-        <input id="q" v-model="q" type="search" placeholder="Guide, step or keyword …" autocomplete="off">
-        <button type="submit" class="btn btn-primary">Search</button>
-      </div>
-    </form>
+    <section class="overview-hero" aria-labelledby="overview-title">
+      <h1 id="overview-title">{{ heading }}</h1>
+      <p class="hero-sub">Step by step, from the first click to the finished result.</p>
+      <form role="search" class="search" @submit.prevent="applySearch">
+        <label for="q" class="field-label">Search guides</label>
+        <div class="search-row">
+          <input id="q" v-model="q" type="search" placeholder="Guide, step or keyword …" autocomplete="off">
+          <button type="submit" class="btn hero-btn"><GuideIcon name="search" :size="18" /> Search</button>
+        </div>
+      </form>
+    </section>
 
     <div class="filter-pills" role="group" aria-label="Quick filters">
       <button type="button" class="pill-btn" :aria-pressed="!filtered" @click="resetFilters">All</button>
@@ -96,10 +106,11 @@ function resetFilters() {
         v-for="c in categories ?? []"
         :key="c.id"
         :to="categoryLink(c.slug)"
-        class="pill-btn"
+        class="pill-btn pill-cat"
+        :class="`tint-${placeholderFor(c.slug, 'page', c.slug).tint}`"
         :aria-current="categorySlug === c.slug ? 'page' : undefined"
       >
-        {{ c.name }}
+        <GuideIcon :name="placeholderFor(c.slug, 'page', c.slug).icon" :size="16" /> {{ c.name }}
       </NuxtLink>
     </nav>
 
@@ -130,7 +141,14 @@ function resetFilters() {
         <ul v-if="list.results.length" class="guide-cards" :class="{ loading: status === 'pending' }">
           <GuideCard v-for="guide in list.results" :key="guide.slug" :guide="guide" />
         </ul>
-        <p v-else class="muted">No guides found.</p>
+        <div v-else class="empty-state">
+          <GuideIcon name="compass" :size="32" />
+          <h2>No guides found</h2>
+          <p v-if="searching">Nothing matches your search and filters. Try fewer words or clear the filters.</p>
+          <p v-else>There are no guides here yet. Write the first one.</p>
+          <button v-if="searching" type="button" class="btn btn-primary" @click="clearAll">Clear search and filters</button>
+          <NuxtLink v-else to="/guides/new" class="btn btn-primary">Write a guide</NuxtLink>
+        </div>
 
         <nav v-if="list.previous || list.next" aria-label="Pages" class="pager">
           <NuxtLink v-if="list.previous" :to="pageLink(page - 1)" class="btn btn-secondary btn-small">← Previous</NuxtLink>

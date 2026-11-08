@@ -1,6 +1,6 @@
 /* Base styles. Colours and fonts come from tokens.css (dark mode). */
 * { box-sizing: border-box; }
-body { margin: 0; background: var(--bg); color: var(--text); font: 400 1rem/1.65 var(--font-sans); }
+body { margin: 0; background: var(--page); color: var(--text); font: 400 1rem/1.65 var(--font-sans); }
 a { color: var(--link); }
 .skip { position: absolute; left: -999px; } .skip:focus { left: 8px; top: 8px; background: var(--bg); padding: 4px 8px; z-index: 10; }
 main { width: 100%; max-width: 110rem; margin: 0 auto; padding: 1.5rem clamp(1rem, 3vw, 2.5rem) 3rem; }
@@ -172,14 +172,14 @@ code, pre, kbd, samp { font-family: var(--font-mono); font-size: .92em; }
 /* --- Site navigation ------------------------------------------------------------- */
 .site { display: flex; flex-direction: column; min-height: 100vh; }
 .site > main { flex: 1; }
-.site-header { position: sticky; top: 0; z-index: 20; background: var(--bg); border-bottom: 1px solid var(--border); }
+.site-header { position: sticky; top: 0; z-index: 20; background: var(--bg); border-bottom: 3px solid var(--accent); }
 .site-bar { display: flex; align-items: center; gap: .5rem 1.5rem; max-width: 110rem; margin: 0 auto; padding: .55rem clamp(1rem, 3vw, 2.5rem); }
-.brand { font-weight: 700; font-size: 1.25rem; text-decoration: none; color: var(--text); letter-spacing: -0.01em; }
+.brand { font-weight: 700; font-size: 1.25rem; text-decoration: none; color: var(--primary-text); letter-spacing: -0.01em; }
 .site-menu { display: flex; flex: 1; align-items: center; justify-content: space-between; gap: .5rem 1rem; }
 .main-nav, .user-nav { display: flex; align-items: center; gap: .25rem; flex-wrap: wrap; }
 .nav-link { display: inline-flex; align-items: center; gap: .35rem; padding: .4rem .7rem; border-radius: var(--radius); color: var(--text-secondary); font-weight: 500; text-decoration: none; cursor: pointer; }
 .nav-link:hover { background: var(--surface); color: var(--text); }
-.nav-link.is-current { color: var(--primary-text); background: var(--primary-light); }
+.nav-link.is-current { color: var(--primary-text); background: var(--accent-light); }
 .nav-button { border: 0; background: none; font: inherit; }
 .nav-cta { color: var(--primary-text); }
 .nav-menu { position: relative; }

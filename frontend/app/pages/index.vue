@@ -12,8 +12,7 @@ flash.value = ''
 
 <template>
   <div>
-    <h1>Discover guides</h1>
     <p v-if="notice" class="ok-box" role="status">{{ notice }}</p>
-    <GuideBrowser />
+    <GuideBrowser heading="Discover guides" />
   </div>
 </template>

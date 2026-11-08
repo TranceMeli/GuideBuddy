@@ -207,6 +207,8 @@ class ElementKind(models.TextChoices):
     TABLE = "table", "Table"
     COLLAPSIBLE = "collapsible", "Collapsible"
     IMPORTANT = "important", "Important"
+    WARNING = "warning", "Warning"
+    DANGER = "danger", "Danger"
     ERROR = "error", "Error"
     TIP = "tip", "Tip"
     NOTE = "note", "Note"

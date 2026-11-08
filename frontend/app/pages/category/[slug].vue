@@ -23,7 +23,6 @@ useSeoMeta({
 
 <template>
   <div>
-    <h1>Category: {{ category?.name }}</h1>
-    <GuideBrowser :category-slug="slug" />
+    <GuideBrowser :category-slug="slug" :heading="`Category: ${category?.name}`" />
   </div>
 </template>

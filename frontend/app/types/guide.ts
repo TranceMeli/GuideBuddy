@@ -67,7 +67,7 @@ export interface GuideImage {
 export type ElementKind =
   | 'section' | 'step' | 'heading' | 'divider'
   | 'text' | 'list' | 'checklist' | 'quote' | 'link' | 'table' | 'collapsible'
-  | 'important' | 'error' | 'tip' | 'note' | 'result'
+  | 'important' | 'warning' | 'danger' | 'error' | 'tip' | 'note' | 'result'
   | 'image' | 'diagram' | 'terminal' | 'code' | 'compare' | 'download'
 
 /** What a kind needs besides its text (see guides/api/content.py); *_html is read only */

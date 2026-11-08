@@ -7,7 +7,7 @@ from .api.content import element_html
 from .models import ElementKind
 
 K = ElementKind
-BOX = {K.IMPORTANT: "Important", K.ERROR: "Error", K.TIP: "Tip", K.NOTE: "Note", K.RESULT: "Expected result"}
+BOX = {K.IMPORTANT: "Important", K.WARNING: "Warning", K.DANGER: "Danger", K.ERROR: "Error", K.TIP: "Tip", K.NOTE: "Note", K.RESULT: "Expected result"}
 
 
 def _pre(text):

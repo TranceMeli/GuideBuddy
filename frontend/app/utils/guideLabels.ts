@@ -9,7 +9,7 @@ import type { ComputedRef, InjectionKey } from 'vue'
 export interface GuideLabels {
   lang: string
   // notice boxes
-  tip: string; note: string; warning: string; error: string; result: string; focusResult: string
+  tip: string; note: string; important: string; warning: string; danger: string; error: string; result: string; focusResult: string
   // header
   level: string; duration: string; prerequisites: string; materials: string; goals: string
   levels: Record<string, string>
@@ -32,7 +32,7 @@ export interface GuideLabels {
 
 const en: GuideLabels = {
   lang: 'en',
-  tip: 'Tip', note: 'Note', warning: 'Important', error: 'Error', result: 'Expected result', focusResult: 'This is what it should look like',
+  tip: 'Tip', note: 'Note', important: 'Important', warning: 'Warning', danger: 'Danger', error: 'Error', result: 'Expected result', focusResult: 'This is what it should look like',
   level: 'Level', duration: 'Duration', prerequisites: 'Prerequisites', materials: 'What you need', goals: 'What you can do afterwards',
   levels: { beginner: 'Beginner', intermediate: 'Intermediate', advanced: 'Advanced' },
   count: {

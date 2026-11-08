@@ -15,6 +15,18 @@ const numbers = computed(() => {
   return props.guide.elements.map((el) => (el.kind === 'section' ? ++section : el.kind === 'step' ? ++step : 0))
 })
 
+// End of a section: where to go next, and back to the top (not in the preview)
+const feet = computed(() => {
+  const els = props.guide.elements
+  const hasSections = els.some((e) => e.kind === 'section')
+  return els.map((_, i) => {
+    if (props.preview || !hasSections) return null
+    const next = els[i + 1]
+    if (!next) return { title: '', id: 0 }
+    return next.kind === 'section' && next.id ? { title: next.text, id: next.id } : null
+  })
+})
+
 // --- Steps readers tick off (this browser only) ------------------------------------------
 const done = ref<Set<string>>(new Set())
 const storageKey = computed(() => `guidebuddy:done:${props.guide.slug}`)
@@ -49,8 +61,8 @@ function openComments(el: GuideElement) {
   if (el.id) target.value = { element: el.id, n: (target.value?.n ?? 0) + 1 }
 }
 
-const NOTICE: Record<string, 'tip' | 'note' | 'warning' | 'error' | 'result'> = {
-  important: 'warning', error: 'error', tip: 'tip', note: 'note', result: 'result',
+const NOTICE: Record<string, 'tip' | 'note' | 'important' | 'warning' | 'danger' | 'error' | 'result'> = {
+  important: 'important', warning: 'warning', danger: 'danger', error: 'error', tip: 'tip', note: 'note', result: 'result',
 }
 
 function figure(el: GuideElement) {
@@ -77,6 +89,7 @@ const items = (text: string) => text.split('\n').map((l) => l.trim()).filter(Boo
           <template v-else>{{ numbers[i] }}</template>
         </button>
         <h3 class="step-title"><span class="visually-hidden">{{ t.step }} {{ numbers[i] }}: </span>{{ el.text }}</h3>
+        <span v-if="done.has(stepKey(el, i))" class="step-done-word" :lang="t.lang">Done</span>
       </div>
       <h3 v-else-if="el.kind === 'heading'" class="el-heading">{{ el.text }}</h3>
       <hr v-else-if="el.kind === 'divider'" class="el-divider">
@@ -137,6 +150,10 @@ const items = (text: string) => text.split('\n').map((l) => l.trim()).filter(Boo
         </div>
       </div>
       <!-- eslint-enable vue/no-v-html -->
+      <p v-if="feet[i]" class="section-foot">
+        <a href="#main" class="foot-top"><GuideIcon name="arrow-up" :size="16" /> Back to top</a>
+        <a v-if="feet[i]!.id" :href="`#el-${feet[i]!.id}`" class="btn btn-primary btn-small">Next: {{ feet[i]!.title }} <GuideIcon name="arrow-right" :size="16" /></a>
+      </p>
       <button v-if="commentsOn && !preview && el.id" type="button" class="el-comment" :class="{ 'has-comments': counts[el.id] }" :aria-label="counts[el.id] ? `${counts[el.id]} comments on this element` : 'Comment on this element'" @click="openComments(el)">
         <GuideIcon name="info" :size="14" /><span v-if="counts[el.id]">{{ counts[el.id] }}</span><span v-else class="el-comment-add">Comment</span>
       </button>

@@ -60,6 +60,18 @@ class TypedGuideTests(APITestCase):
         listing = self.client.get("/api/guides/", {"type": "page"}).data["results"]
         self.assertEqual(listing[0]["step_count"], 1)
 
+    def test_warning_and_danger_notices(self):
+        payload = {"guide_type": "page", "title": "Hot pot", "elements": [
+            {"kind": "warning", "text": "The pot is **hot**. <script>x</script>"},
+            {"kind": "danger", "text": "Mains voltage can be fatal."},
+        ]}
+        data = self.create(payload).data
+        self.assertEqual([e["kind"] for e in data["elements"]], ["warning", "danger"])
+        self.assertIn("<strong>hot</strong>", data["elements"][0]["html"])
+        self.assertNotIn("<script", data["elements"][0]["html"])
+        too_long = {**payload, "elements": [{"kind": "danger", "text": "x" * 1001}]}
+        self.create(too_long, status=400)
+
     def test_an_empty_guide_is_fine(self):
         data = self.create({"guide_type": "page", "title": "Blank"}).data
         self.assertEqual(data["elements"], [])

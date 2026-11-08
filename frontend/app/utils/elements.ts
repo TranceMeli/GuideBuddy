@@ -49,6 +49,10 @@ export const TOOLS: ToolInfo[] = [
     what: 'A question or title that opens to show more.', how: 'Place it, then write the title and the text that opens.', readers: 'A line readers can open and close.' },
   { id: 'important', label: 'Important', icon: 'alert', group: 'Notices', shortcut: 'W',
     what: 'Draws attention to something that matters.', how: 'Place it near the step it belongs to and write one or two sentences.', readers: 'A yellow box labelled Important, with an icon.' },
+  { id: 'warning', label: 'Warning', icon: 'alert', group: 'Notices', shortcut: 'Y',
+    what: 'A risk of injury or damage. Put it before the step it belongs to, or at the start of the guide.', how: 'Place it, say what can happen and how to avoid it.', readers: 'A coral box labelled Warning, with an icon.' },
+  { id: 'danger', label: 'Danger', icon: 'stop', group: 'Notices', shortcut: 'D',
+    what: 'An immediate threat to life or health. Use it rarely.', how: 'Place it at the start of the guide or right before the step.', readers: 'A dark red box labelled Danger, with an icon.' },
   { id: 'error', label: 'Error', icon: 'close', group: 'Notices', shortcut: 'E',
     what: 'Shows an error readers may meet, and how to avoid it.', how: 'Place it, write the message first, then the fix.', readers: 'A red box labelled Error, with an icon.' },
   { id: 'tip', label: 'Tip', icon: 'tip', group: 'Notices', shortcut: 'P',
@@ -75,7 +79,7 @@ export const TOOL: Record<ToolId, ToolInfo> = Object.fromEntries(TOOLS.map((t) =
 export const TOOL_GROUPS = [...new Set(TOOLS.map((t) => t.group))]
 
 /** Kinds whose main text is Markdown (with the formatting bar) */
-export const MARKDOWN_KINDS: ElementKind[] = ['text', 'important', 'error', 'tip', 'note', 'result', 'quote']
+export const MARKDOWN_KINDS: ElementKind[] = ['text', 'important', 'warning', 'danger', 'error', 'tip', 'note', 'result', 'quote']
 
 /** Placeholder of an empty element: card line, field hint and grey text in the live preview */
 export const ELEMENT_PLACEHOLDERS: Record<ElementKind, string> = {
@@ -91,6 +95,8 @@ export const ELEMENT_PLACEHOLDERS: Record<ElementKind, string> = {
   table: 'Table',
   collapsible: 'Question or title',
   important: 'What matters here, and what to watch out for',
+  warning: 'What can go wrong (injury or damage), and how to avoid it',
+  danger: 'What can cause serious harm, and what to do instead',
   error: 'The error readers will see, and how to get rid of it',
   tip: 'A faster or easier way to do it',
   note: 'Good to know, but not required',
@@ -112,6 +118,8 @@ export interface ElementDraft {
   text: string
   data: ElementData
   image: GuideImage | null
+  /** Template guidance shown instead of the generic placeholder; never saved */
+  hint?: string
 }
 
 export const MAX_ELEMENTS = 300
@@ -131,6 +139,36 @@ function defaultData(kind: ElementKind): ElementData {
 }
 
 export const newElement = (kind: ElementKind): ElementDraft => ({ key: localKey(), kind, text: '', data: defaultData(kind), image: null })
+
+/**
+ * Starting point "How-to guide": the parts of a good guide, in order, as empty elements with
+ * a hint each. Empty elements are not saved, so what stays unused costs nothing. The parts come
+ * from the guide-writing research (goal, materials, warning first, steps with results, outcome,
+ * troubleshooting, related guides).
+ */
+const HOW_TO: [ElementKind, string, ElementData?][] = [
+  ['text', 'Goal: what will readers have achieved at the end, and who is this guide for?'],
+  ['warning', 'Safety first (optional): what can go wrong before step 1, and how to avoid it'],
+  ['section', 'What you need'],
+  ['checklist', 'Materials and tools with quantities, one per line'],
+  ['section', 'Part 1: name the first phase of the task'],
+  ['step', 'One action, starting with a verb'],
+  ['text', 'Where to do it and how, with exact values (time, temperature, size)'],
+  ['result', 'What readers should see now'],
+  ['step', 'The next action'],
+  ['text', 'Explain it in short sentences'],
+  ['result', 'What readers should see now'],
+  ['section', 'Outcome'],
+  ['result', 'What the finished result looks like, and how readers check that it worked'],
+  ['section', 'If something goes wrong'],
+  ['table', 'Symptom and solution', { rows: [['If you see …', 'Then …'], ['', '']] }],
+  ['section', 'Related guides'],
+  ['link', 'Title of a related guide'],
+]
+
+export function howToTemplate(): ElementDraft[] {
+  return HOW_TO.map(([kind, hint, data]) => ({ ...newElement(kind), hint, data: { ...defaultData(kind), ...data } }))
+}
 
 /** Data as the API wants it: no read-only *_html keys */
 function plainData(data: ElementData): ElementData {

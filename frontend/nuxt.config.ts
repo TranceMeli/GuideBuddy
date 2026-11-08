@@ -23,8 +23,15 @@ export default defineNuxtConfig({
       operatorAddress: 'Musterstraße 12, 70173 Stuttgart',
       operatorCountry: 'Germany',
       operatorEmail: 'hello@guidebuddy.example',
-      hostingProvider: '',
-      mailProvider: '',
+      operatorPhone: '+49 721 0000000',
+      operatorRepresentative: 'Max Mustermann (managing director, fictional)',
+      operatorRegister: 'Amtsgericht Mannheim, HRB 000000 (fictional)',
+      operatorVatId: '',
+      // Fictional demo project: the legal pages say so. Set to false for a real operation.
+      fictionalProject: true,
+      logRetentionDays: 7,
+      hostingProvider: 'Self-hosted demo server in Germany (fictional)',
+      mailProvider: 'None. In the demo, e-mails are only printed to the server console',
     },
   },
 
