@@ -37,7 +37,8 @@ export default defineEventHandler(async (event) => {
     headers,
     fetchOptions: {
       method: event.method,
-      body: hasBody ? await readRawBody(event, false) : undefined,
+      // readRawBody gives a Buffer; newer Node typings no longer accept it as BodyInit, but fetch does
+      body: (hasBody ? await readRawBody(event, false) : undefined) as BodyInit | undefined,
       redirect: 'manual',
     },
   })

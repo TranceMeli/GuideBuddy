@@ -5,9 +5,10 @@ import type { Check } from '~/utils/publishChecks'
 import type { ElementDraft, ToolId } from '~/utils/elements'
 
 /**
- * Guide builder, laid out like a design tool. Left: the tools. Top: the options of the chosen
- * tool. Middle: the guide as a list of cards, one per element, in the order readers see them.
- * Right: what the tool does, and the properties of the selected element.
+ * Guide builder, laid out like a design tool. Top: edit buttons (undo, redo, duplicate, move,
+ * delete) and the options of the chosen tool. Left: the tools. Middle: the guide as a list of
+ * cards, one per element, in the order readers see them. Right: a panel with the properties of
+ * the selected element, an outline, the writing suggestions and help for the chosen tool.
  *
  * The page starts blank and nothing is required. A tool is chosen by click or key (the keys
  * are shown next to the tools); an element is placed by clicking "Place here" between the
@@ -65,8 +66,7 @@ function select(key: string | null) {
 }
 const cardId = (key: string) => `bd-card-${key}`
 
-// --- Tools ---------------------------------------------------------------------------------
-
+// Tools
 function chooseTool(id: string) {
   const next = id as ToolId
   tool.value = next === 'select' || next === tool.value ? 'select' : next
@@ -134,7 +134,7 @@ function duplicate(index = selIndex.value) {
   say('Duplicated.')
 }
 
-// --- Undo and redo for the whole guide --------------------------------------------------------
+// Undo and redo for the whole guide
 // Snapshots of the list, taken half a second after the last change, so typing counts as one step.
 const past = ref<string[]>([])
 const future = ref<string[]>([])
@@ -186,7 +186,7 @@ function redo() {
 }
 const canUndo = computed(() => past.value.length > 0 || snapshot() !== current)
 
-// --- Outline and numbers for the status bar ---------------------------------------------------
+// Outline and numbers for the status bar
 const outline = computed(() =>
   elements.value
     .map((el, i) => ({ el, i }))
@@ -246,8 +246,7 @@ function onKeydown(event: KeyboardEvent) {
 onMounted(() => document.addEventListener('keydown', onKeydown))
 onBeforeUnmount(() => document.removeEventListener('keydown', onKeydown))
 
-// --- Drag and drop (mouse; touch and keyboard place with the tool) -------------------------
-
+// Drag and drop (mouse; touch and keyboard place with the tool)
 const gapAccepts = computed(() => Boolean(moving('element')) || Boolean(newPart.value))
 
 function dropAt(at: number) {
@@ -268,8 +267,7 @@ function startFromTemplate() {
 }
 const canvasTarget = dropTarget('canvas', () => Boolean(newPart.value), () => insertAt(elements.value.length, newPart.value as ElementKind))
 
-// --- Properties -----------------------------------------------------------------------------
-
+// Properties
 const panelTitle = computed(() => (selected.value ? label(selected.value, selIndex.value) : ''))
 const NOTICE_HINT: Partial<Record<ElementKind, string>> = {
   important: 'Yellow box. What matters, or what to watch out for.',

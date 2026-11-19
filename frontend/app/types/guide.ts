@@ -6,6 +6,8 @@ export interface Category {
 
 export type GuideType = 'page' | 'free'
 export type Difficulty = 'beginner' | 'intermediate' | 'advanced'
+/** Archived guides are out of search and overview; their link keeps working */
+export type GuideStatus = 'published' | 'outdated' | 'archived'
 
 export interface GuideListItem {
   slug: string
@@ -21,6 +23,7 @@ export interface GuideListItem {
   step_count: number
   has_pdf: boolean
   cover_image: GuideImage | null
+  status: GuideStatus
   updated_at: string
 }
 
@@ -99,6 +102,12 @@ export interface GuideElement {
 /** Detail response (also returned by the preview endpoints) */
 export interface Guide extends Omit<GuideListItem, 'step_count' | 'has_pdf'> {
   is_locked: boolean
+  /** Every saved change counts; version 1 is the guide as first published */
+  version: number
+  /** Everyone who changed the guide besides its author */
+  contributors: string[]
+  /** Open reports from readers who say the steps no longer work */
+  outdated_reports: number
   /** Steps of a free guide (guides built from elements use `elements`) */
   steps: Step[]
   elements: GuideElement[]
@@ -109,6 +118,8 @@ export interface Guide extends Omit<GuideListItem, 'step_count' | 'has_pdf'> {
   created_at: string
 }
 
+export type CommentKind = 'comment' | 'question' | 'error' | 'addition'
+
 export interface GuideComment {
   id: number
   author: string | null
@@ -117,7 +128,8 @@ export interface GuideComment {
   created_at: string
   edited_at: string | null
   can_edit: boolean
-  kind: 'comment' | 'question'
+  /** comment is shown as Feedback */
+  kind: CommentKind
   /** The element the comment is about (null: the whole guide, or the element was removed) */
   element: number | null
   /** Name of that element, kept even if it is removed later */
@@ -131,6 +143,17 @@ export interface GuideComment {
   /** The signed-in viewer marked it helpful */
   helpful: boolean
   can_mark_answer: boolean
+  /** Hidden by a moderator: readers get an empty text and the reason */
+  hidden: boolean
+  hidden_reason: string
+  hidden_at: string | null
+  hidden_by: string | null
+}
+
+export interface Suggestions {
+  guides: { slug: string; title: string }[]
+  categories: { slug: string; name: string }[]
+  did_you_mean: string
 }
 
 export interface HistoryEntry {

@@ -1,13 +1,17 @@
 <script setup lang="ts">
-import type { Guide } from '~/types/guide'
+import type { Guide, GuideListItem } from '~/types/guide'
 
 const route = useRoute()
 const slug = route.params.slug as string
 const config = useRuntimeConfig()
 const base = useApiBase()
 
-const { data: guide, error } = await useFetch<Guide>(`${base}/guides/${slug}/`, {
+const { data: guide, error, refresh } = await useFetch<Guide>(`${base}/guides/${slug}/`, {
   key: `guide-${slug}`,
+})
+const { data: related } = await useFetch<GuideListItem[]>(`${base}/guides/${slug}/related/`, {
+  key: `guide-related-${slug}`,
+  default: () => [],
 })
 
 if (!guide.value) {
@@ -64,18 +68,57 @@ const canDelete = computed(() => {
   if (isModerator.value) return true
   return !locked.value && !!guide.value?.created_by && guide.value.created_by === user.value.username
 })
+// Anyone who may edit can say that a guide is out of date; archiving follows the delete rule
+const canMark = computed(() => loggedIn.value && !!user.value?.can_write && (!locked.value || isModerator.value))
+const note = computed(() => (guide.value ? outdatedNote(guide.value.status, guide.value.outdated_reports) : ''))
 const deleting = ref(false)
 const deleteError = ref('')
+const { ask } = useConfirm()
+const toast = useToast()
+
+/** Archive, restore or mark a guide; the page shows the new status from the reloaded guide */
+async function changeStatus(action: 'archive' | 'restore' | 'mark-outdated' | 'mark-current', message: string) {
+  deleteError.value = ''
+  try {
+    await $fetch(`/api/guides/${slug}/${action}/`, { method: 'POST' })
+    await refresh()
+    toast.show(message)
+  } catch (e) {
+    if ((e as { statusCode?: number }).statusCode === 401) {
+      await clearSession()
+      await navigateTo({ path: '/login', query: { next: `/guides/${slug}` } })
+      return
+    }
+    deleteError.value = apiErrorMessages(e).join(' ')
+  }
+}
+
+async function archiveGuide() {
+  const sure = await ask({
+    title: `Archive “${guide.value?.title ?? ''}”?`,
+    body: 'The guide leaves search and the overview. Its link still works and shows a note that the guide is archived. You can restore it at any time.',
+    confirmLabel: 'Archive guide',
+    cancelLabel: 'Keep guide',
+  })
+  if (sure) await changeStatus('archive', 'Guide archived.')
+}
 
 async function deleteGuide() {
   deleteError.value = ''
   const title = guide.value?.title ?? ''
-  if (!confirm(`Really delete the guide “${title}”? It disappears for all readers.`)) return
+  const sure = await ask({
+    title: `Delete “${title}”?`,
+    body: 'The guide disappears for all readers. An admin can restore it from the history.',
+    confirmLabel: 'Delete guide',
+    cancelLabel: 'Keep guide',
+    danger: true,
+  })
+  if (!sure) return
   deleting.value = true
   try {
     await $fetch(`/api/guides/${slug}/`, { method: 'DELETE' })
     clearNuxtData((key) => key.startsWith('guide'))
-    useState<string>('flash').value = `The guide “${title}” was deleted.`
+    toast.show(`The guide “${title}” was deleted.`)
     await navigateTo('/')
   } catch (e) {
     if ((e as { statusCode?: number }).statusCode === 401) {
@@ -132,6 +175,16 @@ useHead({
 
     <ResizableColumns class="guide-layout" storage-key="guidebuddy:guide-split" :default-split="68" :min="45" :max="80" label="Resize guide and comments">
       <div class="guide-article">
+        <p v-if="guide.status === 'archived'" class="status-note is-archived" role="status">
+          <GuideIcon name="document" :size="18" />
+          <span><strong>This guide is archived.</strong> It no longer shows in search and the overview.</span>
+          <button v-if="canDelete" type="button" class="link-button" @click="changeStatus('restore', 'Guide restored.')">Restore guide</button>
+        </p>
+        <p v-else-if="note" class="status-note" role="status">
+          <GuideIcon name="alert" :size="18" />
+          <span><strong>This guide may be out of date.</strong> {{ note }}</span>
+          <button v-if="canMark && guide.status === 'outdated'" type="button" class="link-button" @click="changeStatus('mark-current', 'Guide marked as up to date.')">Mark as up to date</button>
+        </p>
         <GuideReader :guide="guide" :locked="locked">
           <template #tools>
             <span class="guide-tools">
@@ -140,6 +193,10 @@ useHead({
                 {{ locked ? 'Unlock' : 'Lock' }}
               </button>
               <NuxtLink :to="`/guides/${slug}/history`">History</NuxtLink>
+              <button v-if="canMark && guide.status === 'published'" type="button" class="link-button" @click="changeStatus('mark-outdated', 'Guide marked as outdated.')">
+                Mark as outdated
+              </button>
+              <button v-if="canDelete && guide.status !== 'archived'" type="button" class="link-button" @click="archiveGuide">Archive</button>
               <button v-if="canDelete" type="button" class="link-button danger" :disabled="deleting" @click="deleteGuide">
                 {{ deleting ? 'Deleting …' : 'Delete' }}
               </button>
@@ -164,11 +221,7 @@ useHead({
             <div>
               <label for="reason">Reason</label>
               <select id="reason" v-model="reportReason">
-                <option value="spam">Spam / advertising</option>
-                <option value="vandalism">Vandalism</option>
-                <option value="copyright">Copyright</option>
-                <option value="illegal">Illegal content</option>
-                <option value="other">Other</option>
+                <option v-for="r in GUIDE_REPORT_REASONS" :key="r.value" :value="r.value">{{ r.label }}</option>
               </select>
             </div>
             <div>
@@ -179,6 +232,13 @@ useHead({
           </form>
         </details>
         <p v-else class="muted"><NuxtLink :to="{ path: '/login', query: { next: `/guides/${slug}` } }">Sign in</NuxtLink> to report this guide.</p>
+
+        <section v-if="related?.length" class="related" aria-labelledby="related-title">
+          <h2 id="related-title">Related guides</h2>
+          <ul class="guide-cards">
+            <GuideCard v-for="item in related" :key="item.slug" :guide="item" />
+          </ul>
+        </section>
       </div>
 
       <template #end>

@@ -4,11 +4,11 @@
  * warning = warnings only. Every colored element also carries an icon or a label.
  */
 
-/* --- Editors -------------------------------------------------------------------- */
+/* Editors */
 .editor-heading { margin: 1.8rem 0 .3rem; font-size: 1.3rem; }
 .type-badge { display: inline-flex; gap: .4rem; margin: 0 0 1rem; padding: .2rem .7rem; border-radius: 999px; background: var(--primary-light); color: var(--primary-text); font-weight: 600; font-size: .9rem; }
 .editor-card { border: 1px solid var(--border); border-radius: var(--radius); padding: .8rem 1rem; margin: 0 0 1rem; background: var(--bg); }
-.editor-card legend { padding: 0 .4rem; font-weight: 700; }
+.editor-card legend { padding: 0 .4rem; font-weight: 600; }
 .editor-card .editor-card { background: var(--surface); }
 form.stack .editor-card > div, form.stack .type-editor div { margin-bottom: .7rem; }
 .editor-card-head { display: flex; gap: .7rem; align-items: flex-end; }
@@ -54,8 +54,8 @@ form.stack label.mode-option { display: inline-flex; margin: 0; font-weight: 500
 .type-card { display: grid; align-content: start; gap: .3rem; width: 100%; flex: 1; padding: 1rem 1.1rem .6rem; border: 0; background: transparent; color: var(--text); font: inherit; text-align: left; cursor: pointer; }
 .type-card:hover { background: var(--primary-light); }
 .type-sample { display: inline-flex; align-items: center; gap: .3rem; min-height: var(--tap); padding: 0 1.1rem; border-top: 1px solid var(--border); font-size: .92rem; font-weight: 600; }
-.type-icon { display: inline-grid; place-items: center; width: 2.2rem; height: 2.2rem; border-radius: 50%; background: var(--primary); color: var(--on-primary); font-weight: 700; }
-.type-name { font-weight: 700; font-size: 1.1rem; }
+.type-icon { display: inline-grid; place-items: center; width: 2.2rem; height: 2.2rem; border-radius: 50%; background: var(--primary); color: var(--on-primary); font-weight: 600; }
+.type-name { font-weight: 600; font-size: 1.1rem; }
 .type-description { color: var(--text-secondary); }
 .draft-preview-title { margin-top: 0; font-size: 1rem; color: var(--warning-text); }
 .draft-preview .reader { border-bottom: 1px solid var(--border); margin-bottom: 1rem; padding-bottom: 1rem; }
@@ -71,10 +71,10 @@ form.stack label.mode-option { display: inline-flex; margin: 0; font-weight: 500
 }
 
 
-/* --- Editor head: title as it will be read, key facts as chips ---------------------- */
+/* Editor head: title as it will be read, key facts as chips */
 .ed-head { margin: 0 0 1.4rem; }
 form.stack .ed-head > * { margin-bottom: 0; }
-.ed-head input.ed-title { width: 100%; padding: .2rem 0; border: 0; border-bottom: 2px solid transparent; border-radius: 0; background: transparent; font-size: clamp(1.6rem, 3cqi + 1rem, 2.2rem); font-weight: 700; line-height: 1.2; letter-spacing: -0.02em; }
+.ed-head input.ed-title { width: 100%; padding: .2rem 0; border: 0; border-bottom: 2px solid transparent; border-radius: 0; background: transparent; font-size: clamp(1.6rem, 3cqi + 1rem, 2.2rem); font-weight: 600; line-height: 1.2; letter-spacing: -0.02em; }
 .ed-head input.ed-subtitle { width: 100%; margin-top: .2rem; padding: .2rem 0; border: 0; border-bottom: 1px solid transparent; border-radius: 0; background: transparent; font-size: 1.1rem; color: var(--text-secondary); }
 .ed-head input.ed-title:hover, .ed-head input.ed-subtitle:hover { border-bottom-color: var(--border); }
 .ed-head input.ed-title:focus, .ed-head input.ed-subtitle:focus { outline: none; border-bottom-color: var(--primary); }
@@ -94,7 +94,7 @@ form.stack label.ed-chip { display: inline-flex; margin: 0; font-weight: 500; }
 .ed-more { margin-top: .9rem; padding: 1rem 1.1rem .2rem; border: 1px solid var(--border); border-radius: var(--radius-card); background: var(--surface); }
 form.stack .ed-more > div { margin-bottom: .9rem; }
 
-/* --- Building-block editor: palette, big box and writing field ------------------------ */
+/* Building-block editor: palette, big box and writing field */
 .steps-ed-wrap { container-type: inline-size; }
 .builder { display: grid; gap: 1rem; }
 form.stack .builder div { margin-bottom: 0; }
@@ -108,7 +108,7 @@ form.stack .builder .md-field, form.stack .builder .bd-panel-body > div { margin
 .bd-palette-body { display: none; padding: .6rem .7rem .8rem; }
 .bd-palette.is-open .bd-palette-body { display: block; }
 .bd-palette-hint { margin: 0 .2rem .5rem; }
-.bd-group { margin: .7rem .2rem .3rem; font-family: var(--font-sans); font-size: .8rem; font-weight: 700; letter-spacing: .05em; text-transform: uppercase; color: var(--text-muted); }
+.bd-group { margin: .7rem .2rem .3rem; font-family: var(--font-sans); font-size: .8rem; font-weight: 600; letter-spacing: .05em; text-transform: uppercase; color: var(--text-muted); }
 .bd-parts { list-style: none; margin: 0; padding: 0; display: grid; grid-template-columns: repeat(auto-fill, minmax(9.5rem, 1fr)); gap: .35rem; }
 .bd-part { display: flex; align-items: center; gap: .5rem; width: 100%; min-height: 2.5rem; padding: .3rem .6rem; border: 1px solid var(--border); border-radius: var(--radius); background: var(--bg); color: var(--text); font: inherit; font-family: var(--font-sans); font-size: .92rem; font-weight: 500; text-align: left; cursor: grab; }
 .bd-part:hover { border-color: var(--primary); color: var(--primary-text); }
@@ -169,9 +169,9 @@ form.stack .builder .bd-type-row label { margin: 0; }
 .bd-card-main { flex: 1; min-width: 0; display: flex; align-items: center; gap: .65rem; min-height: 2.8rem; padding: .3rem .4rem; border: 0; border-radius: var(--radius); background: transparent; color: var(--text); font: inherit; text-align: left; cursor: pointer; }
 .bd-card-icon { flex: none; color: var(--text-secondary); }
 .bd-card-text { display: grid; min-width: 0; }
-.bd-card-label { font-family: var(--font-sans); font-size: .8rem; font-weight: 700; letter-spacing: .05em; text-transform: uppercase; color: var(--text-secondary); }
+.bd-card-label { font-family: var(--font-sans); font-size: .8rem; font-weight: 600; letter-spacing: .05em; text-transform: uppercase; color: var(--text-secondary); }
 .bd-card-summary { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-weight: 600; }
-.bd-card-summary.is-empty { font-weight: 400; font-style: italic; color: var(--text-muted); }
+.bd-card-summary.is-empty { font-weight: 400; color: var(--text-muted); }
 .bd-tag { display: inline-block; margin-left: .45rem; padding: 0 .45rem; border-radius: 999px; background: var(--badge-bg); color: var(--badge-text); font-size: .8rem; letter-spacing: .04em; vertical-align: .1em; }
 .bd-x { position: relative; display: inline-grid; place-items: center; width: 2rem; height: 2rem; border: 0; border-radius: var(--radius); background: transparent; color: var(--text-muted); cursor: pointer; }
 .bd-x:hover { background: var(--warning-light); color: var(--warning-text); }
@@ -182,7 +182,7 @@ form.stack .builder .bd-type-row label { margin: 0; }
 .bd-block-list { list-style: none; margin: 0; padding: 0; }
 
 /* step number: state by colour AND shape (dashed = not started, dot = incomplete) */
-.ed-num { flex: none; display: inline-grid; place-items: center; width: 1.6rem; height: 1.6rem; border-radius: 7px; border: 1.5px solid var(--border); background: var(--bg); color: var(--text-secondary); font-family: var(--font-sans); font-size: .8rem; font-weight: 700; font-variant-numeric: tabular-nums; }
+.ed-num { flex: none; display: inline-grid; place-items: center; width: 1.6rem; height: 1.6rem; border-radius: 7px; border: 1.5px solid var(--border); background: var(--bg); color: var(--text-secondary); font-family: var(--font-sans); font-size: .8rem; font-weight: 600; font-variant-numeric: tabular-nums; }
 .ed-num[data-state="empty"] { border-style: dashed; }
 .ed-num[data-state="partial"] { border-color: var(--warning-text); color: var(--warning-text); position: relative; }
 .ed-num[data-state="partial"]::after { content: ""; position: absolute; top: -4px; right: -4px; width: 8px; height: 8px; border-radius: 50%; background: var(--warning-text); border: 2px solid var(--bg); }
@@ -242,7 +242,7 @@ form.stack .builder .bd-type-row label { margin: 0; }
 }
 
 
-/* --- Live preview: editor left, preview right ------------------------------------ */
+/* Live preview: editor left, preview right */
 .live-split { display: grid; gap: 1.5rem; }
 .live-switch { position: sticky; top: var(--header-h); z-index: 3; display: inline-flex; justify-self: start; gap: 3px; padding: 3px; border: 1px solid var(--border); border-radius: var(--radius); background: var(--surface); }
 .live-switch button { padding: .4rem 1rem; border: 0; border-radius: 6px; background: transparent; color: var(--text); font: inherit; font-weight: 500; cursor: pointer; }
@@ -276,7 +276,7 @@ form.stack .builder .bd-type-row label { margin: 0; }
 .reader h1, .reader h2, .reader h3 { hyphens: auto; overflow-wrap: break-word; }
 @media (max-width: 40rem) { .live-preview-page { padding: .9rem; } }
 
-/* --- Two resizable columns (guide | comments) ------------------------------------- */
+/* Two resizable columns (guide | comments) */
 .resizable-columns { display: grid; gap: 1.5rem; }
 .resizable-start, .resizable-end { min-width: 0; }
 .resizable-handle { display: none; }
@@ -290,7 +290,7 @@ form.stack .builder .bd-type-row label { margin: 0; }
   .resizable-columns.is-dragging iframe { pointer-events: none; }
 }
 
-/* --- Before you publish: advice list above the publish button ------------------------------ */
+/* Before you publish: advice list above the publish button */
 .publish-checks { border: 1px solid var(--border); border-radius: var(--radius-card); padding: .2rem 1rem; background: var(--bg); }
 .publish-checks summary { display: flex; flex-wrap: wrap; gap: .3rem 1rem; align-items: baseline; justify-content: space-between; padding: .7rem 0; cursor: pointer; font-weight: 600; }
 .publish-checks-count { font-family: var(--font-label); font-size: .8rem; font-weight: 400; color: var(--text-secondary); }
@@ -298,29 +298,29 @@ form.stack .builder .bd-type-row label { margin: 0; }
 .publish-checks-list { list-style: none; margin: 0 0 .6rem; padding: 0; }
 .publish-checks-list li { display: flex; gap: .6rem; padding: .5rem 0; border-top: 1px solid var(--border); font-size: .95rem; line-height: 1.4; }
 .publish-checks-list small { display: block; margin-top: .15rem; color: var(--text-secondary); font-size: .85rem; }
-.publish-checks-mark { flex: none; width: 1.3rem; height: 1.3rem; border-radius: 50%; display: inline-flex; align-items: center; justify-content: center; font-size: .8rem; font-weight: 700; }
+.publish-checks-mark { flex: none; width: 1.3rem; height: 1.3rem; border-radius: 50%; display: inline-flex; align-items: center; justify-content: center; font-size: .8rem; font-weight: 600; }
 .publish-checks-list .is-ok .publish-checks-mark { background: var(--ok-light); color: var(--ok-text); }
 .publish-checks-list .is-open .publish-checks-mark { background: var(--caution-light); color: var(--caution-text); }
 
-/* --- Tool layout: options bar on top, tools left, canvas in the middle, properties right ---- */
+/* Tool layout: options bar on top, tools left, canvas in the middle, properties right */
 .bd-options { grid-area: opts; display: flex; flex-wrap: wrap; align-items: center; gap: .4rem .9rem; min-height: 2.8rem; padding: .45rem .8rem; border: 1px solid var(--border); border-radius: var(--radius-card); background: var(--surface); font-family: var(--font-sans); font-size: .9rem; }
-.bd-opt-tool { display: inline-flex; align-items: center; gap: .4rem; font-weight: 700; }
+.bd-opt-tool { display: inline-flex; align-items: center; gap: .4rem; font-weight: 600; }
 .bd-opt-sep { width: 1px; height: 1.3rem; background: var(--border); }
 .bd-opt-label { color: var(--text-secondary); }
 .bd-opt-seg { display: inline-flex; border: 1px solid var(--border); border-radius: var(--radius); overflow: hidden; background: var(--bg); }
 .bd-opt-seg button { min-height: 2rem; padding: 0 .7rem; border: 0; border-right: 1px solid var(--border); background: transparent; color: var(--text); font: inherit; cursor: pointer; }
 .bd-opt-seg button:last-child { border-right: 0; }
-.bd-opt-seg button[aria-pressed="true"] { background: var(--accent-light); color: var(--accent-text); font-weight: 700; }
+.bd-opt-seg button[aria-pressed="true"] { background: var(--accent-light); color: var(--accent-text); font-weight: 600; }
 .bd-opt-hint { color: var(--text-secondary); }
 .bd-side { grid-area: side; } .bd-main { grid-area: main; } .bd-props { grid-area: props; min-width: 0; }
 .bd-props-empty { padding: .9rem; border: 1px dashed var(--border); border-radius: var(--radius-card); }
 .bd-props-title { margin: 0 0 .3rem; font-family: var(--font-label); font-size: .8rem; letter-spacing: .06em; text-transform: uppercase; color: var(--accent-text); }
-.bd-key { margin-left: auto; padding: 0 .3rem; border: 1px solid var(--border); border-radius: 4px; background: var(--bg); font: 500 .8rem/1.5 var(--font-label); color: var(--text-secondary); }
-.bd-part.is-armed { border-color: var(--accent); background: var(--accent-light); color: var(--accent-text); font-weight: 700; }
-.bd-place { display: flex; align-items: center; justify-content: center; gap: .35rem; width: 100%; min-height: 2.2rem; border: 1.5px dashed var(--accent); border-radius: var(--radius); background: var(--accent-light); color: var(--accent-text); font: inherit; font-family: var(--font-sans); font-weight: 700; cursor: pointer; }
+.bd-key { margin-left: auto; padding: 0 .3rem; border: 1px solid var(--border); border-radius: 4px; background: var(--bg); font: 600 .8rem/1.5 var(--font-label); color: var(--text-secondary); }
+.bd-part.is-armed { border-color: var(--accent); background: var(--accent-light); color: var(--accent-text); font-weight: 600; }
+.bd-place { display: flex; align-items: center; justify-content: center; gap: .35rem; width: 100%; min-height: 2.2rem; border: 1.5px dashed var(--accent); border-radius: var(--radius); background: var(--accent-light); color: var(--accent-text); font: inherit; font-family: var(--font-sans); font-weight: 600; cursor: pointer; }
 .bd-gap.has-place { min-height: 2.4rem; }
 .bd-card.is-target { border-style: dashed; border-color: var(--accent); cursor: copy; }
-.bd-card.is-target .bd-card-main::after { content: "Place here"; margin-left: auto; padding: .1rem .5rem; border-radius: 99px; background: var(--accent); color: var(--on-primary); font: 700 .8rem var(--font-sans); }
+.bd-card.is-target .bd-card-main::after { content: "Place here"; margin-left: auto; padding: .1rem .5rem; border-radius: 99px; background: var(--accent); color: var(--on-primary); font: 600 .8rem var(--font-sans); }
 @container (min-width: 36rem) {
   .builder { grid-template-columns: 11.5rem minmax(0, 1fr); grid-template-areas: "opts opts" "side main"; }
   .builder.is-editing { grid-template-columns: minmax(15rem, 19rem) minmax(0, 1fr); grid-template-areas: "opts opts" "props main"; }
@@ -354,7 +354,7 @@ form.stack .builder .bd-type-row label { margin: 0; }
 
 /* Help card of the tool (what it does, how to use it, what readers see) above the properties */
 .bd-help { margin: 0 0 .8rem; padding: .8rem .9rem; border: 1px solid var(--border); border-radius: var(--radius-card); background: var(--bg); font-family: var(--font-sans); font-size: .9rem; line-height: 1.45; }
-.bd-help-title { display: flex; align-items: center; gap: .45rem; margin: 0 0 .35rem; font-weight: 700; }
+.bd-help-title { display: flex; align-items: center; gap: .45rem; margin: 0 0 .35rem; font-weight: 600; }
 .bd-help-title .icon { color: var(--accent); }
 .bd-help-key { margin-left: auto; }
 .bd-help dl { margin: .5rem 0 0; display: grid; gap: .45rem; }
@@ -373,7 +373,7 @@ form.stack .builder .bd-type-row label { margin: 0; }
 .bd-empty-or { display: block; margin: .6rem 0; font-size: .85rem; color: var(--text-muted); }
 .bd-empty small { display: block; max-width: 28rem; margin: .5rem auto 0; font-size: .85rem; color: var(--text-muted); }
 
-/* --- Builder: edit buttons, tabs, outline, tool search, status line --------------------------- */
+/* Builder: edit buttons, tabs, outline, tool search, status line */
 .bd-tb { display: inline-flex; flex-wrap: wrap; align-items: center; gap: .3rem; }
 .bd-tb-btn { display: inline-flex; align-items: center; gap: .35rem; min-height: 2rem; padding: 0 .6rem; border: 1px solid var(--border); border-radius: var(--radius); background: var(--bg); color: var(--text); font: inherit; font-family: var(--font-sans); font-size: .88rem; cursor: pointer; }
 .bd-tb-btn:hover:not(:disabled) { border-color: var(--primary); color: var(--primary-text); }

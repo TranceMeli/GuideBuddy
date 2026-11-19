@@ -31,7 +31,7 @@
   --header-h: 3.4rem; /* height of the sticky site header */
 }
 
-/* --- Standard theme (teal and paper) ------------------------------------------------ */
+/* Standard theme (teal and paper) */
 :root {
   color-scheme: light;
   --primary: #16314a; --primary-hover: #0e2236; --primary-light: #e6ecf2; --primary-text: #16314a;
@@ -121,7 +121,7 @@
   }
 }
 
-/* --- Things every theme shares ---------------------------------------------------- */
+/* Things every theme shares */
 /* Safety net for what authors bring in: emoji and colours in guide text and comments,
    embedded PDFs and document previews are shown in grayscale too. */
 :where(a, button, input, select, textarea, summary, [tabindex]):focus-visible {

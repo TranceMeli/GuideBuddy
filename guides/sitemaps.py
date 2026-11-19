@@ -8,7 +8,7 @@ class GuideSitemap(Sitemap):
     priority = 0.8
 
     def items(self):
-        return Guide.objects.all()
+        return Guide.objects.exclude(status="archived")
 
     def lastmod(self, obj):
         return obj.updated_at

@@ -45,6 +45,10 @@ function baseGuide(type: GuideType, common: CommonFields, categories: Category[]
     cover_image: common.cover ?? null,
     attachment_info: null,
     is_locked: false,
+    status: saved?.status ?? 'published',
+    version: 0, // the live preview shows no version line
+    contributors: [],
+    outdated_reports: 0,
     created_by: saved?.created_by ?? null,
     created_at: saved?.created_at ?? new Date().toISOString(),
     updated_at: new Date().toISOString(),

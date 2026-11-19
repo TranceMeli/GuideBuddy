@@ -1,7 +1,7 @@
 <script setup lang="ts">
 /**
- * Line icons (stroke only, currentColor), so they turn into black line drawings in the
- * mono theme. Always decorative here: the meaning is carried by visible text.
+ * Line icons (stroke only, currentColor), so they take the colour of the text around them.
+ * Always decorative here: the meaning is carried by visible text.
  */
 const props = defineProps<{ name: IconName; size?: number }>()
 </script>

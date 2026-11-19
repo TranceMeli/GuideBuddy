@@ -4,18 +4,20 @@
  * No gradients, no shadows except the focus ring.
  */
 
-/* --- Reading typography ------------------------------------------------------------ */
+/* Reading typography */
 .reader { font-size: var(--text-size); line-height: var(--line-height); }
 .reader h1, .reader h2, .reader h3 { letter-spacing: -0.01em; hyphens: auto; overflow-wrap: break-word; }
 .reading, .reader .prose { max-width: var(--measure); hyphens: auto; overflow-wrap: break-word; }
 .reader pre, .reader code { hyphens: none; }
 .reader-toolbar { display: flex; flex-wrap: wrap; gap: .75rem; align-items: center; margin-bottom: 1rem; font-size: .95rem; }
 
-/* --- Buttons --------------------------------------------------------------------- */
+/* Buttons */
 .btn { display: inline-flex; align-items: center; justify-content: center; gap: .45rem; min-height: var(--tap); padding: .55rem 1.1rem; border-radius: var(--radius); border: 1px solid transparent; font: inherit; font-weight: 600; line-height: 1.2; text-decoration: none; cursor: pointer; }
 .btn:disabled { opacity: .5; cursor: not-allowed; }
 .btn-primary { background: var(--primary); color: var(--on-primary); }
 .btn-primary:hover:not(:disabled) { background: var(--primary-hover); }
+.btn-danger { background: var(--danger); color: var(--on-danger); }
+.btn-danger:hover:not(:disabled) { filter: brightness(1.15); }
 .btn-secondary { background: var(--bg); color: var(--primary-text); border-color: var(--border); }
 .btn-secondary:hover:not(:disabled) { border-color: var(--primary); }
 .btn-ghost { background: transparent; color: var(--text-secondary); }
@@ -36,13 +38,13 @@
 .pill-cat:hover { border-color: var(--c-fg); color: var(--c-ink); }
 .pill-cat[aria-current="page"] { background: var(--c-fg); border-color: var(--c-fg); color: var(--badge-text); }
 
-/* --- Header bar and head ---------------------------------------------------------- */
+/* Header bar and head */
 .guide-bar { height: 6px; background: var(--bar); border-radius: 3px 3px 0 0; margin-bottom: calc(var(--bar-gap) + var(--bar-stripe-h) + 1.25rem); position: relative; }
 .guide-bar-stripe { position: absolute; left: 0; right: 0; top: calc(6px + var(--bar-gap)); height: var(--bar-stripe-h); background: var(--bar-stripe); }
 .guide-header { margin-bottom: 1.75rem; }
 .guide-kicker { display: flex; flex-wrap: wrap; gap: .4rem .6rem; align-items: center; margin: 0 0 .4rem; }
-.type-label, .tile-label, .section-chip { font-size: 13px; font-weight: 700; letter-spacing: .06em; text-transform: uppercase; color: var(--primary-text); }
-.guide-title { margin: .1rem 0 .3rem; font-size: clamp(2rem, 4.5vw, 44px); font-weight: 700; line-height: 1.15; }
+.type-label, .tile-label, .section-chip { font-size: 13px; font-weight: 600; letter-spacing: .06em; text-transform: uppercase; color: var(--primary-text); }
+.guide-title { margin: .1rem 0 .3rem; font-size: clamp(2rem, 4.5vw, 44px); font-weight: 600; line-height: 1.15; }
 .guide-subtitle { margin: 0 0 .6rem; font-size: 19px; color: var(--text-secondary); max-width: var(--measure); }
 .guide-intro { max-width: var(--measure); margin: .8rem 0; }
 .guide-actions { display: flex; flex-wrap: wrap; gap: .6rem; align-items: center; margin: 1.1rem 0 .6rem; }
@@ -52,9 +54,9 @@
 .before-start h2 { margin: .2rem 0 .3rem; font-size: 1rem; }
 .before-start ul { margin: 0; padding-left: 1.2rem; }
 ul.check-list { list-style: none; padding-left: 0; }
-ul.check-list li::before { content: "✓ "; color: var(--accent-text); font-weight: 700; }
+ul.check-list li::before { content: "✓ "; color: var(--accent-text); font-weight: 600; }
 
-/* --- Meta chips -------------------------------------------------------------------- */
+/* Meta chips */
 .meta-chips { display: flex; flex-wrap: wrap; gap: .45rem; list-style: none; padding: 0; margin: .7rem 0; }
 .meta-chip { display: inline-flex; align-items: center; gap: .4rem; min-height: 32px; padding: .2rem .8rem; border-radius: 999px; background: var(--chip-bg); color: var(--chip-text); border: 1px solid var(--chip-border); font-size: .9rem; font-weight: 500; }
 .level-bars { display: inline-flex; gap: 2px; align-items: flex-end; height: .85rem; }
@@ -62,32 +64,32 @@ ul.check-list li::before { content: "✓ "; color: var(--accent-text); font-weig
 .level-bars i:nth-child(1) { height: 40%; } .level-bars i:nth-child(2) { height: 70%; } .level-bars i:nth-child(3) { height: 100%; }
 .level-bars[data-level="1"] i:nth-child(-n+1), .level-bars[data-level="2"] i:nth-child(-n+2), .level-bars[data-level="3"] i { opacity: 1; }
 
-/* --- Step badge -------------------------------------------------------------------- */
-.step-badge { flex: none; display: inline-grid; place-items: center; width: 40px; height: 40px; border-radius: 10px; background: var(--badge-bg); color: var(--badge-text); border: 2px solid var(--badge-bg); font-weight: 700; font-size: 1.05rem; font-variant-numeric: tabular-nums; }
+/* Step badge */
+.step-badge { flex: none; display: inline-grid; place-items: center; width: 40px; height: 40px; border-radius: 10px; background: var(--badge-bg); color: var(--badge-text); border: 2px solid var(--badge-bg); font-weight: 600; font-size: 1.05rem; font-variant-numeric: tabular-nums; }
 .step-badge.is-done { background: var(--done-bg); color: var(--done-text); border-color: var(--done-border); }
 .step-badge.is-open { background: var(--bg); color: var(--text-secondary); border-color: var(--border); }
 .step-badge.is-small { width: 28px; height: 28px; border-radius: 7px; font-size: .85rem; }
 
-/* --- Callouts (TIPP, HINWEIS, ACHTUNG, ERGEBNIS) ----------------------------------- */
+/* Callouts */
 .callout { margin: 1rem 0; padding: .85rem 1.1rem; border-radius: var(--radius); }
-.callout-label { display: flex; align-items: center; gap: .45rem; margin: 0 0 .25rem; font-size: 13px; font-weight: 700; letter-spacing: .06em; text-transform: uppercase; }
+.callout-label { display: flex; align-items: center; gap: .45rem; margin: 0 0 .25rem; font-size: 13px; font-weight: 600; letter-spacing: .06em; text-transform: uppercase; }
 .callout-body > :first-child { margin-top: 0; } .callout-body > :last-child { margin-bottom: 0; }
 .callout-tip, .callout-result { background: var(--accent-light); } .callout-tip .callout-label, .callout-result .callout-label { color: var(--accent-text); }
 .callout-note { background: var(--primary-light); } .callout-note .callout-label { color: var(--primary-text); }
 .callout-warning { background: var(--caution-light); } .callout-warning .callout-label { color: var(--caution-text); }
 .callout-error { background: var(--warning-light); } .callout-error .callout-label { color: var(--warning-text); }
 
-/* --- Tables (DataTable and Markdown tables) ---------------------------------------- */
+/* Tables (DataTable and Markdown tables) */
 .table-scroll { max-width: 100%; overflow-x: auto; margin: 1rem 0; }
 .data-table, .reader .prose table { border-collapse: collapse; width: 100%; font-size: .95rem; }
 .reader .prose table { display: block; max-width: 100%; overflow-x: auto; }
-.data-table th, .reader .prose th { background: var(--table-head-bg); color: var(--table-head-text); font-weight: 700; text-align: left; padding: .55rem .75rem; }
+.data-table th, .reader .prose th { background: var(--table-head-bg); color: var(--table-head-text); font-weight: 600; text-align: left; padding: .55rem .75rem; }
 .data-table td, .reader .prose td { padding: .5rem .75rem; border-bottom: 1px solid var(--border); }
 .data-table tbody tr:nth-child(even), .reader .prose tbody tr:nth-child(even) { background: var(--table-stripe); }
 
-/* --- Code blocks ------------------------------------------------------------------- */
+/* Code blocks */
 .code-block { margin: 1rem 0; }
-.code-head { display: flex; flex-wrap: wrap; gap: .5rem; align-items: center; min-height: 32px; margin-bottom: .3rem; font-size: 13px; font-weight: 700; letter-spacing: .04em; text-transform: uppercase; color: var(--text-muted); }
+.code-head { display: flex; flex-wrap: wrap; gap: .5rem; align-items: center; min-height: 32px; margin-bottom: .3rem; font-size: 13px; font-weight: 600; letter-spacing: .04em; text-transform: uppercase; color: var(--text-muted); }
 .code-lang { font-family: var(--font-mono); text-transform: none; letter-spacing: 0; font-weight: 500; }
 .code-copy { margin-left: auto; display: inline-flex; gap: .3rem; align-items: center; min-height: 32px; padding: .15rem .6rem; border: 1px solid var(--border); border-radius: var(--radius); background: var(--bg); color: var(--text-secondary); font: inherit; font-size: .8rem; cursor: pointer; }
 .code-block pre, .reader .prose pre, .reader .prose .codehilite { margin: 0; padding: .9rem 1rem; border-radius: var(--radius); background: var(--code-bg); color: var(--code-text); border: 1px solid var(--code-border); font-family: var(--font-mono); font-size: .875rem; line-height: 1.55; overflow-x: auto; }
@@ -98,13 +100,13 @@ ul.check-list li::before { content: "✓ "; color: var(--accent-text); font-weig
 .code-block--right pre { box-shadow: inset 4px 0 0 var(--accent); }
 .code-pair { display: grid; grid-template-columns: repeat(auto-fit, minmax(16rem, 1fr)); gap: 0 1rem; }
 
-/* --- Progress ---------------------------------------------------------------------- */
+/* Progress */
 .progress-row { display: flex; align-items: center; gap: .6rem; }
 .progress { flex: 1; height: 8px; border-radius: 999px; background: var(--surface); border: 1px solid var(--border); overflow: hidden; }
 .progress-bar { height: 100%; background: var(--accent); transition: width .2s; }
 .progress-text { font-size: .85rem; font-weight: 600; color: var(--text-secondary); white-space: nowrap; font-variant-numeric: tabular-nums; }
 
-/* --- A) Step by step ------------------------------------------------------------- */
+/* Step by step */
 .steps-reader { container-type: inline-size; }
 .steps-layout { display: grid; grid-template-columns: minmax(0, 1fr); gap: 1.5rem; }
 @container (min-width: 52rem) {
@@ -112,24 +114,24 @@ ul.check-list li::before { content: "✓ "; color: var(--accent-text); font-weig
   .toc { position: sticky; top: calc(var(--header-h) + 1rem); max-height: calc(100vh - var(--header-h) - 2rem); overflow: auto; }
 }
 .toc { padding: 1rem; border: 1px solid var(--border); border-radius: var(--radius-card); background: var(--surface); }
-.toc-title { margin: 0 0 .5rem; font-weight: 700; }
+.toc-title { margin: 0 0 .5rem; font-weight: 600; }
 .toc ol { list-style: none; margin: 0; padding: 0; }
 .toc-sections > li { margin-top: .9rem; }
-.toc-section { display: block; margin-bottom: .2rem; font-size: .8rem; font-weight: 700; letter-spacing: .06em; text-transform: uppercase; color: var(--text-muted); }
+.toc-section { display: block; margin-bottom: .2rem; font-size: .8rem; font-weight: 600; letter-spacing: .06em; text-transform: uppercase; color: var(--text-muted); }
 .toc-steps a { display: flex; gap: .55rem; align-items: center; min-height: var(--tap); padding: .2rem .45rem; border-radius: var(--radius); color: var(--text-secondary); text-decoration: none; line-height: 1.3; }
 .toc-steps a:hover { background: var(--bg); color: var(--primary-text); }
-.toc-steps .is-active a { background: var(--primary-light); color: var(--primary-text); font-weight: 700; }
+.toc-steps .is-active a { background: var(--primary-light); color: var(--primary-text); font-weight: 600; }
 .toc-steps .is-done a { color: var(--text-muted); }
 .toc-tools { display: flex; flex-wrap: wrap; gap: .5rem; align-items: center; margin: 1rem 0 0; }
 .section-chip { display: inline-block; margin: 0 0 .2rem; padding: .1rem .6rem; border-radius: 999px; background: var(--primary-light); }
 .guide-section { margin-bottom: 2rem; }
-.section-title { margin: 0 0 .8rem; font-size: 1.5rem; font-weight: 700; }
+.section-title { margin: 0 0 .8rem; font-size: 1.5rem; font-weight: 600; }
 .step-card { margin: 0 0 1rem; padding: 1.25rem 1.4rem; border: 1px solid var(--border); border-radius: var(--radius-card); background: var(--bg); scroll-margin-top: calc(var(--header-h) + 1rem); }
 .free-steps { list-style: none; margin: 0; padding: 0; display: grid; grid-template-columns: minmax(0, 1fr); gap: 1rem; } /* the step badge carries the number */
 .step-card.is-active { border: 2px solid var(--primary); }
 .step-card.is-collapsed { padding-block: .8rem; }
 .step-head { display: flex; flex-wrap: wrap; align-items: center; gap: .6rem .85rem; }
-.step-title { margin: 0; font-size: 1.35rem; font-weight: 700; line-height: 1.3; flex: 1 1 12rem; min-width: 0; overflow-wrap: anywhere; }
+.step-title { margin: 0; font-size: 1.35rem; font-weight: 600; line-height: 1.3; flex: 1 1 12rem; min-width: 0; overflow-wrap: anywhere; }
 .step-card.is-collapsed .step-title { font-size: 1.1rem; color: var(--text-secondary); }
 .step-expand { flex: none; }
 .step-body { margin-top: .8rem; }
@@ -143,10 +145,10 @@ ul.check-list li::before { content: "✓ "; color: var(--accent-text); font-weig
 .mistake { padding: .9rem 1.1rem; border: 1px solid var(--border); border-radius: var(--radius-card); }
 .mistake-title { display: flex; gap: .4rem; align-items: center; margin: 0 0 .4rem; color: var(--warning-text); }
 .mistake-title strong { color: var(--text); }
-.mistake-label { display: flex; gap: .4rem; align-items: center; margin: 0; font-weight: 700; color: var(--accent-text); }
+.mistake-label { display: flex; gap: .4rem; align-items: center; margin: 0; font-weight: 600; color: var(--accent-text); }
 
 
-/* --- F) Guide overview -------------------------------------------------------------- */
+/* Guide overview */
 .overview-hero { margin: 0 0 1.25rem; padding: 1.4rem clamp(1rem, 3vw, 2rem) 1.5rem; border-radius: var(--radius-card); background: var(--hero-bg); color: var(--hero-text); }
 .overview-hero h1 { margin: 0; font-size: clamp(1.7rem, 1.3rem + 1.4vw, 2.4rem); letter-spacing: -0.02em; }
 .hero-sub { margin: .25rem 0 0; color: var(--hero-sub); }
@@ -166,7 +168,13 @@ ul.check-list li::before { content: "✓ "; color: var(--accent-text); font-weig
 .filters select { width: auto; min-width: 10rem; min-height: var(--tap); }
 .result-count { margin: 0 0 .6rem; color: var(--text-muted); font-size: .9rem; }
 .guide-cards { list-style: none; margin: 0; padding: 0; display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 1rem; transition: opacity .15s; }
-.guide-cards.loading { opacity: .5; }
+/* Loading: cards keep their place instead of the list fading out */
+.guide-skeleton { border-top-color: var(--border); background: var(--bg); }
+.sk { border-radius: 6px; background: var(--surface); }
+.sk-image { height: 140px; border-radius: 0; }
+.sk-line { height: .9rem; margin-top: .6rem; }
+.sk-short { width: 45%; }
+.sk-medium { width: 75%; }
 .guide-card { position: relative; display: flex; flex-direction: column; border: 1px solid var(--border); border-top: 4px solid var(--c-fg); border-radius: var(--radius-card); background: var(--c-bg); overflow: hidden; }
 .guide-card:hover { border-color: var(--c-fg); }
 .guide-card:has(.card-link:focus-visible) { outline: 3px solid var(--focus); outline-offset: 2px; }
@@ -178,8 +186,8 @@ ul.check-list li::before { content: "✓ "; color: var(--accent-text); font-weig
 .card-image.is-placeholder::after { width: 90px; height: 90px; right: -20px; bottom: -30px; }
 .card-image-icon { position: relative; display: grid; place-items: center; width: 88px; height: 88px; border-radius: 50%; background: var(--bg); border: 1px solid var(--c-fg); }
 .card-body { display: flex; flex-direction: column; flex: 1; padding: .9rem 1.1rem 1rem; }
-.card-kicker { display: flex; align-items: center; gap: .35rem; margin: 0 0 .25rem; font-size: 13px; font-weight: 700; letter-spacing: .05em; text-transform: uppercase; color: var(--c-ink); }
-.card-title { margin: 0 0 .3rem; font-size: 19px; font-weight: 700; line-height: 1.3; letter-spacing: -0.01em; }
+.card-kicker { display: flex; align-items: center; gap: .35rem; margin: 0 0 .25rem; font-size: 13px; font-weight: 600; letter-spacing: .05em; text-transform: uppercase; color: var(--c-ink); }
+.card-title { margin: 0 0 .3rem; font-size: 19px; font-weight: 600; line-height: 1.3; letter-spacing: -0.01em; }
 .card-link { color: var(--text); text-decoration: none; }
 .card-link::after { content: ""; position: absolute; inset: 0; } /* whole card is one link */
 .card-link:focus-visible { outline: none; }
@@ -195,7 +203,7 @@ ul.check-list li::before { content: "✓ "; color: var(--accent-text); font-weig
 .empty-state--small h3 { margin: 0; font-size: 1.05rem; }
 .pager { display: flex; flex-wrap: wrap; gap: 1rem; align-items: center; justify-content: center; margin-top: 1.5rem; }
 
-/* --- Standard theme: serif reading, one accent -------------------------------------------
+/* Standard theme: serif reading, one accent
    Reading content is set in the serif font; buttons, labels and chips stay sans so the
    interface reads as interface. Callouts get a bar on the left instead of a full tint. */
 :root .reader { font-family: var(--font-read); }
@@ -206,11 +214,10 @@ ul.check-list li::before { content: "✓ "; color: var(--accent-text); font-weig
 :root .callout-warning { border-left-color: var(--warning); background: color-mix(in srgb, var(--warning) 8%, var(--bg)); }
 :root .callout-result { border-left-style: dashed; }
 
-/* --- Lernskript look: hairline rules instead of cards, small mono labels --------------------
-   Same structure as the HTML Lernskripte: a mono label ("SECTION 2") above the heading with a
-   rule below, steps separated by hairlines, boxes framed by rules above and below, figure
-   captions in mono. Colours stay with the tokens. */
-:root .reader :is(.section-chip, .callout-label, .figure-caption, .guide-kicker .type-label) { font-family: var(--font-label); font-weight: 500; letter-spacing: .06em; }
+/* Hairline rules instead of cards, small mono labels: a label ("SECTION 2") above the heading
+   with a rule below, steps separated by hairlines, boxes with a bar on the left, figure captions
+   in mono. Colours stay with the tokens. */
+:root .reader :is(.section-chip, .callout-label, .figure-caption, .guide-kicker .type-label) { font-family: var(--font-label); font-weight: 600; letter-spacing: .06em; }
 :root .reader .section-chip { display: block; margin: 0 0 .6rem; padding: 0; border-radius: 0; background: none; font-size: .8rem; color: var(--accent); }
 :root .reader .section-title { margin: 0 0 .9rem; padding-bottom: .6rem; border-bottom: 1px solid var(--text); font-size: 1.65rem; line-height: 1.2; text-wrap: balance; }
 :root .reader .guide-section { margin-bottom: 2.6rem; }
@@ -236,10 +243,10 @@ ul.check-list li::before { content: "✓ "; color: var(--accent-text); font-weig
 :root .reader .figure-caption { font-size: .8rem; line-height: 1.5; text-align: center; color: var(--text-secondary); }
 :root .reader .figure-caption::before { font-weight: 500; color: var(--text-secondary); }
 
-/* --- Images: numbered captions and the enlarged view -------------------------------------- */
+/* Images: numbered captions and the enlarged view */
 .reader { counter-reset: figure; }
 .figure-caption { margin: .45rem 0 0; font-size: .9rem; line-height: 1.45; color: var(--text-secondary); }
-.figure-caption::before { counter-increment: figure; content: attr(data-figure) " " counter(figure) " · "; font-weight: 700; color: var(--text); }
+.figure-caption::before { counter-increment: figure; content: attr(data-figure) " " counter(figure) " · "; font-weight: 600; color: var(--text); }
 img[data-zoom] { cursor: zoom-in; }
 .lightbox { padding: 0; border: 0; background: transparent; max-width: 96vw; max-height: 96vh; overflow: visible; }
 .lightbox::backdrop { background: rgb(0 0 0 / .78); }
@@ -248,7 +255,7 @@ img[data-zoom] { cursor: zoom-in; }
 .lightbox-caption { max-width: 60ch; font-size: .92rem; color: var(--text-secondary); text-align: center; }
 .lightbox-inner form { margin: 0; }
 
-/* --- Tables on phones: every row becomes a small card with the column name in front -------
+/* Tables on phones: every row becomes a small card with the column name in front
    (ReaderEnhancer puts data-label on the cells; without it the table just scrolls.) */
 @media (max-width: 34rem) {
   .reader .prose table.is-stackable { display: block; overflow: visible; }
@@ -257,10 +264,10 @@ img[data-zoom] { cursor: zoom-in; }
   .reader .prose table.is-stackable tr { margin: 0 0 .8rem; border: 1px solid var(--border); border-radius: var(--radius); overflow: hidden; background: var(--bg); }
   .reader .prose table.is-stackable :is(td, th) { display: grid; grid-template-columns: minmax(5rem, 38%) minmax(0, 1fr); gap: .6rem; padding: .5rem .75rem; border-bottom: 1px solid var(--border); background: transparent; color: var(--text); text-align: left; }
   .reader .prose table.is-stackable :is(td, th):last-child { border-bottom: 0; }
-  .reader .prose table.is-stackable :is(td, th)::before { content: attr(data-label); font-family: var(--font-sans); font-size: .82em; font-weight: 700; color: var(--text-secondary); }
+  .reader .prose table.is-stackable :is(td, th)::before { content: attr(data-label); font-family: var(--font-sans); font-size: .82em; font-weight: 600; color: var(--text-secondary); }
 }
 
-/* --- Text styles chosen by authors ----------------------------------------------------
+/* Text styles chosen by authors
    Content only carries class names (see guides/templatetags/guide_extras.py). Standard look:
    text colours, highlights and fonts (lighter variants in dark mode). */
 :root .c-blue { color: var(--tx-blue); }
@@ -277,7 +284,7 @@ img[data-zoom] { cursor: zoom-in; }
 .f-hand { font-family: "Caveat Variable", "Caveat", "Segoe Print", "Bradley Hand", cursive; font-size: 1.3em; line-height: 1; }
 .f-code { font-family: var(--font-mono); font-size: .92em; }
 
-/* --- Print ("Print version" switches to the light mode first) --------------------- */
+/* Print ("Print version" switches to the light mode first) */
 @page { size: A4; margin: 16mm 14mm 18mm; }
 @media print {
   .site-header, .site-footer, .guide-actions, .guide-tools-row, .reader-toolbar, .toc-tools, .step-nav, .step-expand,
@@ -299,7 +306,7 @@ img[data-zoom] { cursor: zoom-in; }
 .toc { overflow-x: hidden; }
 .toc-steps a > span:last-child, .toc-section { min-width: 0; hyphens: auto; overflow-wrap: break-word; }
 
-/* --- Reading bars: slim bar under the site header, status bar at the bottom --------------- */
+/* Reading bars: slim bar under the site header, status bar at the bottom */
 .rbar { position: sticky; top: var(--header-h); z-index: 8; margin: 0 calc(-1 * var(--page-pad, 1rem)) .6rem; padding: .45rem var(--page-pad, 1rem); background: var(--bg); border-bottom: 1px solid var(--border); }
 .rbar-in { margin: 0; display: flex; align-items: center; gap: .75rem; }
 .rbar-title { flex: 1; min-width: 0; margin: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font: 400 .8rem/1.3 var(--font-label); color: var(--text-secondary); }
@@ -316,7 +323,7 @@ img[data-zoom] { cursor: zoom-in; }
 .rbar-panel li:last-child a { border-bottom: 0; }
 .rbar-panel a::before { content: counter(t); min-width: 1.4rem; font: 400 .8rem/1.6 var(--font-label); color: var(--text-secondary); }
 .rbar-panel a:hover, .rbar-panel a.is-current { color: var(--accent); }
-.rbar-panel h4 { margin: 0 0 .5rem; font: 500 .8rem/1 var(--font-label); letter-spacing: .06em; text-transform: uppercase; color: var(--text-secondary); }
+.rbar-panel h4 { margin: 0 0 .5rem; font: 600 .8rem/1 var(--font-label); letter-spacing: .06em; text-transform: uppercase; color: var(--text-secondary); }
 .rbar-opts { display: flex; flex-wrap: wrap; gap: .4rem; }
 .rstatus { position: fixed; z-index: 8; left: 0; right: 0; bottom: 0; padding: .55rem 1rem calc(.55rem + env(safe-area-inset-bottom, 0px)); background: var(--bg); border-top: 1px solid var(--border); }
 .rstatus-in { margin: 0; display: flex; justify-content: space-between; gap: 1rem; font: 400 .8rem/1.3 var(--font-label); color: var(--text-secondary); }
@@ -327,20 +334,20 @@ main { --page-pad: clamp(1rem, 3vw, 2.5rem); }
 @media (max-width: 40rem) { main { --page-pad: 1rem; } }
 .rbars { display: contents; }
 
-/* --- Terminal output by meaning: red error, yellow warning, green success ---------------- */
+/* Terminal output by meaning: red error, yellow warning, green success */
 .codehilite .go[data-tone="err"] { color: #f4a6a0; }
 .codehilite .go[data-tone="warn"] { color: #f2cf74; }
 .codehilite .go[data-tone="ok"] { color: #8fdcae; }
 
 
-/* --- Guides built from elements ------------------------------------------------------------ */
+/* Guides built from elements */
 .elements-reader > * { max-width: 100%; }
 .el-block { margin: 0 0 1rem; }
 .el-step { display: flex; align-items: center; gap: .85rem; margin: 1.8rem 0 .7rem; padding-top: 1rem; border-top: 1px solid var(--border); }
-.el-step .step-title { margin: 0; font-size: 1.35rem; font-weight: 700; line-height: 1.3; flex: 1; min-width: 0; overflow-wrap: anywhere; }
-.el-badge { flex: none; display: inline-grid; place-items: center; width: 40px; height: 40px; border-radius: 10px; background: var(--badge-bg); color: var(--badge-text); border: 2px solid var(--badge-bg); font: 700 1.1rem var(--font-sans); cursor: pointer; }
+.el-step .step-title { margin: 0; font-size: 1.35rem; font-weight: 600; line-height: 1.3; flex: 1; min-width: 0; overflow-wrap: anywhere; }
+.el-badge { flex: none; display: inline-grid; place-items: center; width: 40px; height: 40px; border-radius: 10px; background: var(--badge-bg); color: var(--badge-text); border: 2px solid var(--badge-bg); font: 600 1.1rem var(--font-sans); cursor: pointer; }
 .el-badge.is-done { background: var(--done-bg); color: var(--done-text); border-color: var(--done-border); }
-.el-heading { margin: 1.5rem 0 .4rem; font-size: 1.1rem; font-weight: 700; }
+.el-heading { margin: 1.5rem 0 .4rem; font-size: 1.1rem; font-weight: 600; }
 .el-divider { margin: 1.8rem 0; border: 0; border-top: 1px solid var(--border); }
 .el-checklist { list-style: none; margin: 0 0 1rem; padding: 0; }
 .el-checklist li { border-top: 1px solid var(--border); }
@@ -353,7 +360,7 @@ main { --page-pad: clamp(1rem, 3vw, 2.5rem); }
 .el-quote footer::before { content: "— "; }
 .el-link a { display: inline-flex; align-items: center; gap: .3rem; font-weight: 600; }
 .el-collapsible { border-top: 1px solid var(--border); border-bottom: 1px solid var(--border); padding: .3rem 0; }
-.el-collapsible summary { cursor: pointer; padding: .4rem 0; font-weight: 700; }
+.el-collapsible summary { cursor: pointer; padding: .4rem 0; font-weight: 600; }
 .el-image { margin: 1.2rem 0; }
 .el-image img { display: block; width: 100%; height: auto; border-radius: var(--radius-card); }
 .el-diagram ol { list-style: none; margin: 0; padding: 0; display: flex; flex-wrap: wrap; align-items: center; gap: .5rem; }
@@ -363,16 +370,16 @@ main { --page-pad: clamp(1rem, 3vw, 2.5rem); }
 .el-code .codehilite, .el-code pre { margin: 0; }
 .el-compare-note { margin: 0 0 .5rem; }
 .el-compare-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(16rem, 1fr)); gap: .8rem; }
-.el-compare-label { display: flex; align-items: center; gap: .4rem; margin: 0 0 .3rem; font-family: var(--font-label); font-size: .8rem; font-weight: 500; letter-spacing: .06em; text-transform: uppercase; }
+.el-compare-label { display: flex; align-items: center; gap: .4rem; margin: 0 0 .3rem; font-family: var(--font-label); font-size: .8rem; font-weight: 600; letter-spacing: .06em; text-transform: uppercase; }
 .el-wrong .el-compare-label { color: var(--wrong); }
 .el-right .el-compare-label { color: var(--right); }
 .el-wrong > .prose, .el-right > .prose { padding: .2rem; border-radius: var(--radius); }
 .el-wrong > .prose { border: 1px solid var(--wrong); }
 .el-right > .prose { border: 1px solid var(--right); }
 
-/* --- Comment buttons on the elements of a guide ------------------------------------------- */
+/* Comment buttons on the elements of a guide */
 .el-row { position: relative; }
-.step-done-word { flex: none; font: 500 .8rem var(--font-label); letter-spacing: .06em; text-transform: uppercase; color: var(--ok-text); }
+.step-done-word { flex: none; font: 600 .8rem var(--font-label); letter-spacing: .06em; text-transform: uppercase; color: var(--ok-text); }
 .section-foot { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: .75rem 1rem; margin: 1.6rem 0 2.4rem; padding-top: .9rem; border-top: 1px dashed var(--border); }
 .foot-top { text-decoration: none; display: inline-flex; align-items: center; gap: .3rem; min-height: var(--tap); color: var(--text-secondary); font-family: var(--font-sans); font-weight: 500; }
 .el-comment { position: absolute; top: .1rem; right: 0; display: inline-flex; align-items: center; gap: .25rem; min-height: 1.7rem; padding: 0 .5rem; border: 1px dashed transparent; border-radius: 99px; background: transparent; color: var(--text-secondary); font: 600 .8rem var(--font-sans); cursor: pointer; opacity: 0; transition: opacity .12s; }
@@ -383,7 +390,7 @@ main { --page-pad: clamp(1rem, 3vw, 2.5rem); }
 @media (hover: none) { .el-comment { opacity: 1; } .el-comment-add { display: none; } .el-comment:not(.has-comments) { border-style: solid; } }
 .el-row:target { scroll-margin-top: calc(var(--header-h) + 3.5rem); }
 
-/* --- Comments panel ------------------------------------------------------------------------- */
+/* Comments panel */
 .gc h2 { display: flex; align-items: baseline; gap: .5rem; }
 .gc-count { font: 400 .8rem var(--font-label); color: var(--text-secondary); }
 .gc-filters { display: flex; flex-wrap: wrap; gap: .35rem; align-items: center; margin: 0 0 .8rem; }
@@ -395,7 +402,7 @@ main { --page-pad: clamp(1rem, 3vw, 2.5rem); }
 .gc-item { padding: .9rem 0; border-top: 1px solid var(--border); }
 .gc-head { display: flex; flex-wrap: wrap; align-items: center; gap: .15rem .5rem; font-size: .9rem; }
 .gc-head time { color: var(--text-muted); }
-.gc-tag { padding: .02rem .4rem; border-radius: 4px; font: 500 .8rem var(--font-label); letter-spacing: .06em; text-transform: uppercase; display: inline-flex; gap: .2rem; align-items: center; }
+.gc-tag { padding: .02rem .4rem; border-radius: 4px; font: 600 .8rem var(--font-label); letter-spacing: .06em; text-transform: uppercase; display: inline-flex; gap: .2rem; align-items: center; }
 .gc-tag--author { background: var(--accent-light); color: var(--accent-text); }
 .gc-tag--question { background: var(--caution-light); color: var(--caution-text); }
 .gc-tag--answer { background: var(--ok-light); color: var(--ok-text); }
@@ -406,7 +413,7 @@ main { --page-pad: clamp(1rem, 3vw, 2.5rem); }
 .gc-actions { display: flex; flex-wrap: wrap; gap: .2rem .9rem; align-items: center; font-family: var(--font-sans); font-size: .82rem; }
 .gc-actions button { display: inline-flex; align-items: center; gap: .25rem; padding: 0; border: 0; background: none; color: var(--text-secondary); font: inherit; cursor: pointer; min-height: 1.8rem; }
 .gc-actions button:hover:not(:disabled) { color: var(--accent-text); text-decoration: underline; }
-.gc-actions button[aria-pressed="true"] { color: var(--accent-text); font-weight: 700; }
+.gc-actions button[aria-pressed="true"] { color: var(--accent-text); font-weight: 600; }
 .gc-actions button:disabled { cursor: default; opacity: .6; }
 .gc-open { color: var(--caution-text); }
 .gc-replies { margin: .6rem 0 0 1rem; padding-left: .8rem; border-left: 2px solid var(--border); }
@@ -418,7 +425,7 @@ main { --page-pad: clamp(1rem, 3vw, 2.5rem); }
 .gc-kind { display: inline-flex; gap: .3rem; }
 .gc-about select { min-height: 2rem; max-width: 100%; font-size: .85rem; }
 .gc-limit { margin-left: auto; font-size: .8rem; }
-.gc-n { margin-left: .15rem; padding: 0 .35rem; border-radius: 99px; background: var(--surface); font-size: .8rem; font-weight: 700; }
+.gc-n { margin-left: .15rem; padding: 0 .35rem; border-radius: 99px; background: var(--surface); font-size: .8rem; font-weight: 600; }
 
 /* Movement is only a hint, never needed: people who ask for less of it get none */
 @media (prefers-reduced-motion: reduce) {
@@ -432,3 +439,41 @@ main { --page-pad: clamp(1rem, 3vw, 2.5rem); }
 .el-checklist { padding: .5rem 1rem; border: 1px solid var(--border); border-radius: var(--radius-card); background: var(--bg); }
 .reader:not(.reader-free) .el-checklist { background: var(--page); }
 @media print { .reader:not(.reader-free) { border: 0; padding: 0; background: none; } }
+
+/* Status, trust line and notes of a guide */
+.status-chip { display: inline-flex; align-items: center; gap: .3rem; padding: .12rem .55rem; border-radius: 8px; font: 600 13px/1.4 var(--font-label); background: var(--surface); color: var(--text-secondary); }
+.status-chip.status-ok { background: var(--ok-light); color: var(--ok-text); }
+.status-chip.status-caution { background: var(--caution-light); color: var(--caution-text); }
+.guide-trust { margin: .4rem 0 0; font-size: .9rem; color: var(--text-secondary); }
+.status-note { display: flex; flex-wrap: wrap; gap: .4rem .8rem; align-items: center; margin: 0 0 1rem; padding: .7rem 1rem; border-radius: var(--radius); border-left: 4px solid var(--caution); background: var(--caution-light); color: var(--caution-text); }
+.status-note.is-archived { border-left-color: var(--text-muted); background: var(--surface); color: var(--text-secondary); }
+.status-note .icon { flex: none; }
+.status-note > span { flex: 1 1 16rem; }
+.related { margin: 2rem 0 1rem; }
+.related h2 { font-size: 1.15rem; margin: 0 0 .75rem; }
+.related .guide-cards { grid-template-columns: repeat(auto-fill, minmax(15rem, 1fr)); }
+
+/* Comments: kinds, hidden by a moderator, community rules */
+.gc-tag--error { background: var(--warning-light); color: var(--warning-text); }
+.gc-tag--addition { background: var(--ok-light); color: var(--ok-text); }
+.gc-hidden .icon { vertical-align: -2px; margin-right: .3rem; }
+.gc-hidden { display: block; margin: .3rem 0; padding: .4rem .6rem; border-radius: var(--radius); background: var(--surface); color: var(--text-secondary); font-size: .9rem; }
+.gc-body.is-hidden { border-left: 3px solid var(--border); padding-left: .6rem; color: var(--text-secondary); }
+.gc-rules { margin-top: .6rem; font-size: .9rem; color: var(--text-secondary); }
+.gc-rules summary { cursor: pointer; font-weight: 600; }
+.gc-rules ul { margin: .4rem 0 0; padding-left: 1.2rem; }
+
+/* Search suggestions and the first-visit hint */
+.search-box { position: relative; flex: 1; }
+.search-box input { width: 100%; }
+.suggest { position: absolute; z-index: 20; left: 0; right: 0; top: calc(100% + 4px); margin: 0; padding: .25rem; list-style: none; background: var(--bg); color: var(--text); border: 1px solid var(--border); border-radius: var(--radius); }
+.suggest li { display: flex; justify-content: space-between; gap: 1rem; padding: .5rem .65rem; border-radius: 6px; cursor: pointer; }
+.suggest li.active, .suggest li:hover { background: var(--accent-light); color: var(--accent-text); }
+.suggest-hint { font: 600 .8rem var(--font-label); color: var(--text-secondary); }
+.suggest li.active .suggest-hint, .suggest li:hover .suggest-hint { color: inherit; }
+.first-visit { display: flex; flex-wrap: wrap; gap: .75rem 1rem; align-items: flex-start; margin: 1rem 0; padding: .9rem 1.1rem; border-radius: var(--radius-card); background: var(--accent-light); color: var(--accent-text); }
+.first-visit .icon { flex: none; margin-top: .15rem; }
+.first-visit-text { flex: 1 1 18rem; }
+.first-visit h2 { margin: 0 0 .25rem; font-size: 1.05rem; }
+.first-visit ul { margin: 0; padding-left: 1.1rem; }
+.first-visit-actions { display: flex; gap: .5rem; align-items: center; }

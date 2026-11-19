@@ -23,6 +23,7 @@ const placeholder = computed(() => placeholderFor(props.guide.category?.slug, pr
       <h2 class="card-title" :lang="guide.language">
         <NuxtLink :to="`/guides/${guide.slug}`" class="card-link">{{ guide.title }}</NuxtLink>
       </h2>
+      <p v-if="guide.status === 'outdated'" class="status-chip status-caution" lang="en"><GuideIcon name="alert" :size="14" /> Outdated</p>
       <p v-if="guide.summary" class="card-summary" :lang="guide.language">{{ guide.summary }}</p>
       <MetaChips
         :difficulty="guide.difficulty"

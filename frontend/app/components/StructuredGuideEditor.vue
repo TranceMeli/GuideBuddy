@@ -37,6 +37,7 @@ const tried = ref(false)
 
 // Asks before leaving with unsaved changes
 const { dirty, markSaved } = useUnsavedChanges(() => [form, elements.value])
+const toast = useToast()
 
 // Draft: the guide is also kept in this browser while writing, so a closed tab loses nothing
 const draftKey = `guidebuddy:draft:${props.guide?.slug ?? 'new'}`
@@ -156,6 +157,7 @@ async function save() {
     } catch {
       // see above
     }
+    toast.show(props.guide ? 'Changes saved.' : 'Guide published.')
     await navigateTo(`/guides/${saved.slug}`)
   } catch (e) {
     await handleError(e)

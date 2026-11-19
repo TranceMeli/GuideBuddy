@@ -1,10 +1,10 @@
 <script setup lang="ts">
-import type { Guide, GuideComment } from '~/types/guide'
+import type { CommentKind, Guide, GuideComment } from '~/types/guide'
 
 /**
- * Comments of a guide: on the whole guide or on one of its elements, as comment or question,
+ * Comments of a guide: on the whole guide or on one of its elements, as feedback, question, error or addition,
  * with replies (one level), "Helpful", an answer marked on a question, and a report button per
- * comment. The counts per element go to useState('gb-comment-counts'), where the reading view
+ * comment, and hiding by moderators with a reason. The counts per element go to useState('gb-comment-counts'), where the reading view
  * picks them up for its comment buttons; a click on such a button arrives as
  * useState('gb-comment-target') and filters the list to that element.
  */
@@ -26,8 +26,8 @@ watch(comments, (list) => {
 }, { immediate: true })
 onBeforeUnmount(() => { counts.value = {}; target.value = null })
 
-// --- Filters and order -----------------------------------------------------------------
-type Filter = 'all' | 'questions' | 'unanswered' | 'steps'
+// Filters and order
+type Filter = 'all' | 'questions' | 'unanswered' | 'errors' | 'steps'
 const filter = ref<Filter>('all')
 const sort = ref<'newest' | 'oldest' | 'helpful'>('newest')
 const onElement = ref<number | null>(null) // set by a click on a comment button in the guide
@@ -47,6 +47,7 @@ const visible = computed(() => {
   if (onElement.value) list = list.filter((c) => c.element === onElement.value)
   if (filter.value === 'questions') list = list.filter((c) => c.kind === 'question')
   if (filter.value === 'unanswered') list = list.filter((c) => c.kind === 'question' && !answered(c))
+  if (filter.value === 'errors') list = list.filter((c) => c.kind === 'error')
   if (filter.value === 'steps') list = list.filter((c) => c.anchor)
   return [...list].sort((a, b) =>
     sort.value === 'oldest' ? a.created_at.localeCompare(b.created_at)
@@ -57,11 +58,12 @@ const counted = computed(() => ({
   all: topLevel.value.length,
   questions: topLevel.value.filter((c) => c.kind === 'question').length,
   unanswered: topLevel.value.filter((c) => c.kind === 'question' && !answered(c)).length,
+  errors: topLevel.value.filter((c) => c.kind === 'error').length,
   steps: topLevel.value.filter((c) => c.anchor).length,
 }))
 const total = computed(() => (comments.value ?? []).length)
 
-// --- The places a comment can be about ---------------------------------------------------
+// The places a comment can be about
 const places = computed(() => {
   let section = 0
   let step = 0
@@ -85,8 +87,15 @@ watch(target, (value) => {
 })
 const onElementLabel = computed(() => places.value.find((p) => p.id === onElement.value)?.label ?? '')
 
-// --- Writing -------------------------------------------------------------------------------
-const form = reactive({ body: '', kind: 'comment' as 'comment' | 'question', element: null as number | null })
+// Writing
+const form = reactive({ body: '', kind: 'comment' as CommentKind, element: null as number | null })
+const kindHint = computed(() => COMMENT_KINDS.find((k) => k.value === form.kind)?.hint ?? '')
+// The community rules stay open until the reader has sent a first comment
+const rulesSeen = ref(true)
+// The page is rendered for everybody; a signed-in reader reloads once (after hydration) to get their own view
+// (their votes, what they may edit, and the text of hidden comments for moderators)
+onNuxtReady(() => { if (loggedIn.value) refresh() })
+onMounted(() => { try { rulesSeen.value = localStorage.getItem('guidebuddy:rules-seen') === '1' } catch { rulesSeen.value = false } })
 const errors = ref<string[]>([])
 const saving = ref(false)
 const preview = ref<string | null>(null)
@@ -117,6 +126,8 @@ async function send() {
   saving.value = false
   if (ok) {
     form.body = ''
+    rulesSeen.value = true
+    try { localStorage.setItem('guidebuddy:rules-seen', '1') } catch { /* private mode: the rules just stay open */ }
     await refresh()
   }
 }
@@ -197,6 +208,20 @@ async function sendReport(c: GuideComment) {
   }
 }
 
+// Moderators hide a comment with a reason and show it again later
+const hiding = ref<number | null>(null)
+const hideReason = ref('')
+async function hideComment(c: GuideComment) {
+  if (await guard(() => $fetch<unknown>(`/api/guides/${props.slug}/comments/${c.id}/hide/`, { method: 'POST', body: { reason: hideReason.value } }))) {
+    hiding.value = null
+    hideReason.value = ''
+    await refresh()
+  }
+}
+async function showAgain(c: GuideComment) {
+  if (await guard(() => $fetch<unknown>(`/api/guides/${props.slug}/comments/${c.id}/hide/`, { method: 'DELETE' }))) await refresh()
+}
+
 const dateOf = (iso: string) => new Date(iso).toLocaleDateString('en-GB')
 const mine = (c: GuideComment) => loggedIn.value && c.author === user.value?.username
 function jumpTo(c: GuideComment) {
@@ -212,7 +237,7 @@ function jumpTo(c: GuideComment) {
 
     <template v-else>
       <div v-if="total" class="gc-filters" role="group" aria-label="Show">
-        <button v-for="f in ([['all', 'All'], ['questions', 'Questions'], ['unanswered', 'Unanswered'], ['steps', 'On the guide']] as const)" :key="f[0]" type="button" class="gc-pill" :aria-pressed="filter === f[0]" @click="filter = f[0]; onElement = null">
+        <button v-for="f in ([['all', 'All'], ['questions', 'Questions'], ['unanswered', 'Unanswered'], ['errors', 'Errors'], ['steps', 'On the guide']] as const)" :key="f[0]" type="button" class="gc-pill" :aria-pressed="filter === f[0]" @click="filter = f[0]; onElement = null">
           {{ f[1] }} {{ counted[f[0]] }}
         </button>
         <label class="gc-sort"><span class="visually-hidden">Sort by</span>
@@ -238,11 +263,17 @@ function jumpTo(c: GuideComment) {
           <div class="gc-head">
             <strong>{{ c.author ?? 'Deleted account' }}</strong>
             <span v-if="c.by_guide_author" class="gc-tag gc-tag--author">Author</span>
-            <span v-if="c.kind === 'question'" class="gc-tag gc-tag--question">Question</span>
+            <span v-if="kindLabel(c.kind)" class="gc-tag" :class="`gc-tag--${c.kind}`">{{ kindLabel(c.kind) }}</span>
             <time :datetime="c.created_at">{{ dateOf(c.created_at) }}</time>
             <span v-if="c.edited_at" class="muted">(edited)</span>
           </div>
-          <button v-if="c.anchor" type="button" class="gc-anchor" :disabled="!c.element" :title="c.element ? 'Show in the guide' : 'This element was removed'" @click="jumpTo(c)">
+          <p v-if="c.hidden" class="gc-hidden" role="note">
+            <GuideIcon name="eye" :size="14" />
+            Hidden by a moderator{{ c.hidden_by ? ` (${c.hidden_by})` : '' }}: {{ c.hidden_reason }}.
+            <time v-if="c.hidden_at" :datetime="c.hidden_at">{{ dateOf(c.hidden_at) }}</time>
+            <button v-if="isModerator" type="button" class="link" @click="showAgain(c)">Show again</button>
+          </p>
+          <button v-if="c.anchor && (!c.hidden || isModerator)" type="button" class="gc-anchor" :disabled="!c.element" :title="c.element ? 'Show in the guide' : 'This element was removed'" @click="jumpTo(c)">
             <GuideIcon name="link" :size="13" /> {{ c.anchor }}
           </button>
 
@@ -258,22 +289,29 @@ function jumpTo(c: GuideComment) {
           </form>
           <!-- body_html is sanitized by the backend. -->
           <!-- eslint-disable-next-line vue/no-v-html -->
-          <div v-else class="gc-body prose" v-html="c.body_html" />
+          <div v-else-if="c.body_html" class="gc-body prose" :class="{ 'is-hidden': c.hidden }" v-html="c.body_html" />
 
-          <div class="gc-actions">
+          <div v-if="!c.hidden || isModerator" class="gc-actions">
             <button type="button" :aria-pressed="c.helpful" :disabled="mine(c)" :title="mine(c) ? 'You cannot rate your own comment' : undefined" @click="toggleHelpful(c)">
               <GuideIcon name="star" :size="14" /> Helpful<span v-if="c.helpful_count" class="gc-n">{{ c.helpful_count }}</span>
             </button>
             <button v-if="loggedIn" type="button" @click="startReply(c)">Reply</button>
             <button v-if="c.can_edit && editing !== c.id" type="button" @click="startEdit(c)">Edit</button>
             <button v-if="loggedIn && !mine(c)" type="button" @click="reporting = reporting === c.id ? null : c.id">Report</button>
+            <button v-if="isModerator && !c.hidden" type="button" @click="hiding = hiding === c.id ? null : c.id">Hide</button>
             <span v-if="c.kind === 'question' && !answered(c)" class="gc-open">No answer yet</span>
           </div>
+
+          <form v-if="hiding === c.id" class="gc-report stack" @submit.prevent="hideComment(c)">
+            <label :for="`hide-${c.id}`">Reason shown to readers</label>
+            <input :id="`hide-${c.id}`" v-model="hideReason" type="text" maxlength="200" required placeholder="It broke the community rules (personal attack)">
+            <div class="actions"><button type="submit" class="button">Hide comment</button><button type="button" class="secondary" @click="hiding = null">Cancel</button></div>
+          </form>
 
           <form v-if="reporting === c.id" class="gc-report stack" @submit.prevent="sendReport(c)">
             <label :for="`reason-${c.id}`">Reason</label>
             <select :id="`reason-${c.id}`" v-model="reportReason">
-              <option value="spam">Spam or advertising</option><option value="vandalism">Vandalism</option><option value="illegal">Illegal content</option><option value="other">Other</option>
+              <option v-for="o in COMMENT_REPORT_REASONS" :key="o.value" :value="o.value">{{ o.label }}</option>
             </select>
             <label :for="`remark-${c.id}`">Remark <span class="muted">(optional)</span></label>
             <textarea :id="`remark-${c.id}`" v-model="reportRemark" rows="2" maxlength="1000" />
@@ -290,6 +328,11 @@ function jumpTo(c: GuideComment) {
                 <time :datetime="r.created_at">{{ dateOf(r.created_at) }}</time>
                 <span v-if="r.edited_at" class="muted">(edited)</span>
               </div>
+              <p v-if="r.hidden" class="gc-hidden" role="note">
+                <GuideIcon name="eye" :size="14" />
+                Hidden by a moderator{{ r.hidden_by ? ` (${r.hidden_by})` : '' }}: {{ r.hidden_reason }}.
+                <button v-if="isModerator" type="button" class="link" @click="showAgain(r)">Show again</button>
+              </p>
               <form v-if="editing === r.id" class="stack comment-form" @submit.prevent="saveEdit(r)">
                 <label :for="`edit-${r.id}`" class="visually-hidden">Edit reply</label>
                 <textarea :id="`edit-${r.id}`" v-model="editBody" rows="3" maxlength="5000" required />
@@ -299,19 +342,25 @@ function jumpTo(c: GuideComment) {
                 </div>
               </form>
               <!-- eslint-disable-next-line vue/no-v-html -->
-              <div v-else class="gc-body prose" v-html="r.body_html" />
-              <div class="gc-actions">
+              <div v-else-if="r.body_html" class="gc-body prose" :class="{ 'is-hidden': r.hidden }" v-html="r.body_html" />
+              <div v-if="!r.hidden || isModerator" class="gc-actions">
                 <button type="button" :aria-pressed="r.helpful" :disabled="mine(r)" @click="toggleHelpful(r)">
                   <GuideIcon name="star" :size="14" /> Helpful<span v-if="r.helpful_count" class="gc-n">{{ r.helpful_count }}</span>
                 </button>
                 <button v-if="r.can_mark_answer" type="button" @click="toggleAnswer(r)">{{ r.is_answer ? 'Unmark answer' : 'Mark as answer' }}</button>
                 <button v-if="r.can_edit && editing !== r.id" type="button" @click="startEdit(r)">Edit</button>
                 <button v-if="loggedIn && !mine(r)" type="button" @click="reporting = reporting === r.id ? null : r.id">Report</button>
+                <button v-if="isModerator && !r.hidden" type="button" @click="hiding = hiding === r.id ? null : r.id">Hide</button>
               </div>
+              <form v-if="hiding === r.id" class="gc-report stack" @submit.prevent="hideComment(r)">
+                <label :for="`hide-${r.id}`">Reason shown to readers</label>
+                <input :id="`hide-${r.id}`" v-model="hideReason" type="text" maxlength="200" required placeholder="It broke the community rules (personal attack)">
+                <div class="actions"><button type="submit" class="button">Hide comment</button><button type="button" class="secondary" @click="hiding = null">Cancel</button></div>
+              </form>
               <form v-if="reporting === r.id" class="gc-report stack" @submit.prevent="sendReport(r)">
                 <label :for="`reason-${r.id}`">Reason</label>
                 <select :id="`reason-${r.id}`" v-model="reportReason">
-                  <option value="spam">Spam or advertising</option><option value="vandalism">Vandalism</option><option value="illegal">Illegal content</option><option value="other">Other</option>
+                  <option v-for="o in COMMENT_REPORT_REASONS" :key="o.value" :value="o.value">{{ o.label }}</option>
                 </select>
                 <div class="actions"><button type="submit" class="button">Send report</button><button type="button" class="secondary" @click="reporting = null">Cancel</button></div>
               </form>
@@ -341,9 +390,8 @@ function jumpTo(c: GuideComment) {
       </div>
       <div v-if="preview" class="comment-preview"><strong>Preview</strong><div class="prose" v-html="preview" /></div>
       <div class="gc-row">
-        <span class="gc-kind" role="group" aria-label="Kind">
-          <button type="button" class="gc-pill" :aria-pressed="form.kind === 'comment'" @click="form.kind = 'comment'">Comment</button>
-          <button type="button" class="gc-pill" :aria-pressed="form.kind === 'question'" @click="form.kind = 'question'">Question</button>
+        <span class="gc-kind" role="group" aria-label="What kind of comment is this?">
+          <button v-for="k in COMMENT_KINDS" :key="k.value" type="button" class="gc-pill" :aria-pressed="form.kind === k.value" @click="form.kind = k.value">{{ k.label }}</button>
         </span>
         <label class="gc-about"><span class="visually-hidden">About</span>
           <select v-model="form.element">
@@ -357,7 +405,16 @@ function jumpTo(c: GuideComment) {
         <button type="submit" class="button" :disabled="saving">{{ saving ? 'Sending …' : 'Send comment' }}</button>
         <button type="button" class="secondary" @click="showPreview(form.body, (h) => (preview = h), preview)">{{ preview ? 'Hide preview' : 'Preview' }}</button>
       </div>
-      <p class="muted small">Be kind. Comments can be reported.</p>
+      <p class="muted small">{{ kindHint }}</p>
+      <details class="gc-rules" :open="!rulesSeen">
+        <summary>Community rules</summary>
+        <ul>
+          <li>Stay on the topic of the guide and be respectful.</li>
+          <li>Do not share personal data or advertise.</li>
+          <li>Name the step and what you saw, so the author can act on it.</li>
+          <li>A moderator can hide a comment that breaks these rules. The reason stays visible.</li>
+        </ul>
+      </details>
     </form>
     <p v-else class="muted">
       <NuxtLink :to="{ path: '/login', query: { next: `/guides/${slug}` } }">Sign in</NuxtLink> to write a comment.

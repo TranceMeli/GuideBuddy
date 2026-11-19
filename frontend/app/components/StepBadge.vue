@@ -1,7 +1,7 @@
 <script setup lang="ts">
 /**
  * Number badge of a step: 40px square, radius 10px.
- * active = filled (royal blue / black), done = check icon, open = frame only.
+ * active = filled (accent colour), done = check icon, open = frame only.
  */
 withDefaults(defineProps<{ number: number; state?: 'active' | 'done' | 'open'; small?: boolean }>(), {
   state: 'active',

@@ -27,7 +27,7 @@ const feet = computed(() => {
   })
 })
 
-// --- Steps readers tick off (this browser only) ------------------------------------------
+// Steps readers tick off (this browser only)
 const done = ref<Set<string>>(new Set())
 const storageKey = computed(() => `guidebuddy:done:${props.guide.slug}`)
 const stepKey = (el: GuideElement, index: number) => String(el.id ?? `n${numbers.value[index]}`)

@@ -138,3 +138,23 @@ export function apiErrorMessages(error: unknown): string[] {
 export function apiErrorCode(error: unknown): string {
   return String((error as { data?: { code?: string } })?.data?.code ?? '')
 }
+
+/**
+ * Splits an error response into messages for single form fields and everything else, so a form
+ * can show each message under its field. Only the listed top-level fields are taken out.
+ */
+export function apiFieldErrors(error: unknown, fields: string[]): { fields: Record<string, string[]>; other: string[] } {
+  const data = (error as { data?: unknown })?.data
+  const found: Record<string, string[]> = {}
+  if (data && typeof data === 'object' && !Array.isArray(data)) {
+    for (const name of fields) {
+      const value = (data as Record<string, unknown>)[name]
+      if (typeof value === 'string') found[name] = [value]
+      else if (Array.isArray(value) && value.length && value.every((v) => typeof v === 'string')) found[name] = value as string[]
+    }
+  }
+  if (!Object.keys(found).length) return { fields: {}, other: apiErrorMessages(error) }
+  const rest = { ...(data as Record<string, unknown>) }
+  for (const name of Object.keys(found)) delete rest[name]
+  return { fields: found, other: Object.keys(rest).length ? apiErrorMessages({ ...(error as object), data: rest }) : [] }
+}

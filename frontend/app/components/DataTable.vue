@@ -1,7 +1,7 @@
 <script setup lang="ts">
 /**
  * Table with head row; scrolls horizontally on narrow screens instead of breaking the page.
- * Royal blue head, striped rows.
+ * Navy head, striped rows.
  * Markdown tables inside .prose get the same look from CSS.
  */
 defineProps<{ head: string[]; rows: string[][]; caption?: string }>()

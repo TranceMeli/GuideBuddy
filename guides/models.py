@@ -55,11 +55,23 @@ class Difficulty(models.TextChoices):
 
 
 # Languages a guide can be written in (BCP 47 tag). GuideBuddy is English only for now;
-# the field stays so the lang attribute of the reading view, PDF and EPUB keeps a source
+# the field stays so the lang attribute of the reading view and the PDF keeps a source
 # and more languages can be added later without changing the API.
 GUIDE_LANGUAGES = [
     ("en", "English"),
 ]
+
+
+# Reasons of history records that only move a guide between statuses (not edits of its content)
+STATUS_CHANGE_REASONS = ["Guide archived", "Guide restored", "Guide marked as outdated", "Guide marked as up to date"]
+
+
+class GuideStatus(models.TextChoices):
+    """Where a guide stands. Drafts live in the author's browser until the guide is published."""
+
+    PUBLISHED = "published", "Published"
+    OUTDATED = "outdated", "Outdated"  # still readable, with a note that steps may no longer work
+    ARCHIVED = "archived", "Archived"  # out of search and overview, the link keeps working
 
 
 class Guide(models.Model):
@@ -87,6 +99,9 @@ class Guide(models.Model):
         "GuideImage", null=True, blank=True, on_delete=models.SET_NULL, related_name="+"
     )
     attachment = models.FileField("Attachment", upload_to="guide-attachments/%Y/%m/", blank=True)
+    status = models.CharField(
+        "Status", max_length=10, choices=GuideStatus.choices, default=GuideStatus.PUBLISHED
+    )
     is_locked = models.BooleanField(
         "Locked",
         default=False,
@@ -248,8 +263,10 @@ class GuideComment(models.Model):
     """A comment on a guide, on one of its elements, or a reply to another comment (one level)."""
 
     class Kind(models.TextChoices):
-        COMMENT = "comment", "Comment"
+        COMMENT = "comment", "Feedback"
         QUESTION = "question", "Question"
+        ERROR = "error", "Error"  # a step that does not work or is wrong
+        ADDITION = "addition", "Addition"  # a tip or detail the guide is missing
 
     guide = models.ForeignKey(Guide, on_delete=models.CASCADE, related_name="comments")
     kind = models.CharField("Kind", max_length=10, choices=Kind.choices, default=Kind.COMMENT)
@@ -273,6 +290,16 @@ class GuideComment(models.Model):
     body = models.TextField("Comment", max_length=5000)
     created_at = models.DateTimeField(auto_now_add=True)
     edited_at = models.DateTimeField(null=True, blank=True)
+    # Moderation: a hidden comment shows only the reason; who hid it and when stays on record
+    hidden_at = models.DateTimeField(null=True, blank=True)
+    hidden_reason = models.CharField("Reason for hiding", max_length=200, blank=True)
+    hidden_by = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        null=True,
+        blank=True,
+        on_delete=models.SET_NULL,
+        related_name="hidden_comments",
+    )
 
     history = HistoricalRecords()
 
@@ -327,7 +354,10 @@ class Report(models.Model):
 
     class Reason(models.TextChoices):
         SPAM = "spam", "Spam or advertising"
+        HARASSMENT = "harassment", "Harassment"
         VANDALISM = "vandalism", "Vandalism or false content"
+        OUTDATED = "outdated", "Outdated: steps no longer work"
+        PRIVACY = "privacy", "Personal data"
         COPYRIGHT = "copyright", "Copyright infringement"
         ILLEGAL = "illegal", "Illegal content"
         OTHER = "other", "Other"

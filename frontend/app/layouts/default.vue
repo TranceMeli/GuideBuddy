@@ -78,6 +78,8 @@ async function onLogout() {
     </main>
 
     <ReaderEnhancer />
+    <AppToast />
+    <ConfirmDialog />
 
     <footer class="site-footer">
       <div class="footer-grid">

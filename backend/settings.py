@@ -28,8 +28,7 @@ def env_list(name, default):
     return [item.strip() for item in items if item.strip()]
 
 
-# --- Mode and secrets --------------------------------------------------------
-
+# Mode and secrets
 # DJANGO_DEBUG=0 switches to production mode (secure cookies, HSTS, ...)
 DEBUG = env_bool("DJANGO_DEBUG", True)
 
@@ -47,8 +46,7 @@ ALLOWED_HOSTS = env_list("DJANGO_ALLOWED_HOSTS", ["localhost", "127.0.0.1", "[::
 FRONTEND_URL = os.environ.get("FRONTEND_URL", "http://localhost:3000")
 
 
-# --- Apps --------------------------------------------------------------------
-
+# Apps
 INSTALLED_APPS = [
     "django.contrib.admin",
     "django.contrib.auth",
@@ -100,8 +98,7 @@ TEMPLATES = [
 WSGI_APPLICATION = "backend.wsgi.application"
 
 
-# --- Database (SQLite) -------------------------------------------------------
-
+# Database (SQLite)
 DATABASES = {
     "default": {
         "ENGINE": "django.db.backends.sqlite3",
@@ -121,8 +118,7 @@ DATABASES = {
 BACKUP_DIR = Path(os.environ.get("DJANGO_BACKUP_DIR", BASE_DIR / "backups"))
 
 
-# --- Passwords and accounts --------------------------------------------------
-
+# Passwords and accounts
 AUTH_PASSWORD_VALIDATORS = [
     {"NAME": "django.contrib.auth.password_validation.UserAttributeSimilarityValidator"},
     {"NAME": "django.contrib.auth.password_validation.MinimumLengthValidator"},
@@ -138,16 +134,14 @@ PASSWORD_RESET_TIMEOUT = 60 * 60 * 24
 NEW_ACCOUNT_WAIT_HOURS = int(os.environ.get("NEW_ACCOUNT_WAIT_HOURS", 0 if DEBUG else 24))
 
 
-# --- Language and time -------------------------------------------------------
-
+# Language and time
 LANGUAGE_CODE = "en"
 TIME_ZONE = "Europe/Berlin"
 USE_I18N = True
 USE_TZ = True
 
 
-# --- Static files ------------------------------------------------------------
-
+# Static files
 STATIC_URL = "static/"
 STATICFILES_DIRS = [BASE_DIR / "static"]
 STATIC_ROOT = BASE_DIR / "staticfiles"  # target of "collectstatic" (production)
@@ -163,8 +157,7 @@ LOGIN_REDIRECT_URL = "guides:home"
 LOGOUT_REDIRECT_URL = "guides:home"
 
 
-# --- REST API (Django REST Framework) ---------------------------------------
-
+# REST API (Django REST Framework)
 REST_FRAMEWORK = {
     "DEFAULT_AUTHENTICATION_CLASSES": ["guides.auth.SoftJWTAuthentication"],
     "DEFAULT_PERMISSION_CLASSES": ["rest_framework.permissions.IsAuthenticatedOrReadOnly"],
@@ -213,7 +206,7 @@ CORS_ALLOWED_ORIGINS = env_list(
 TURNSTILE_SECRET_KEY = os.environ.get("TURNSTILE_SECRET_KEY", "")
 
 
-# --- E-mail ------------------------------------------------------------------
+# E-mail
 # Without EMAIL_HOST, e-mails appear in the terminal of the Django server (development).
 # Set EMAIL_HOST (and credentials) as environment variables to really send them.
 
@@ -243,8 +236,7 @@ else:
     }
 
 
-# --- Security in production (DJANGO_DEBUG=0) ---------------------------------
-
+# Security in production (DJANGO_DEBUG=0)
 if not DEBUG:
     SESSION_COOKIE_SECURE = True
     CSRF_COOKIE_SECURE = True

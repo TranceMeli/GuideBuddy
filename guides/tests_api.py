@@ -30,8 +30,7 @@ class ApiTests(APITestCase):
         self.assertEqual(response.status_code, 200)
         self.client.credentials(HTTP_AUTHORIZATION=f"Bearer {response.data['access']}")
 
-    # --- Reading ---
-
+    # Reading
     def test_list_is_public_paginated_and_searchable(self):
         response = self.client.get("/api/guides/")
         self.assertEqual(response.status_code, 200)
@@ -346,8 +345,7 @@ class ApiTests(APITestCase):
         )
         self.assertEqual(response.status_code, 404)
 
-    # --- Writing ---
-
+    # Writing
     def test_write_requires_token(self):
         self.assertEqual(self.client.post("/api/guides/", {"title": "x"}, format="json").status_code, 401)
         self.assertEqual(

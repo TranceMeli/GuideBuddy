@@ -3,6 +3,8 @@ from django.contrib.auth.models import User
 from django.contrib.auth.password_validation import validate_password
 from django.contrib.auth.tokens import default_token_generator
 from django.core.exceptions import ValidationError as DjangoValidationError
+from difflib import get_close_matches
+
 from django.db import transaction
 from django.db.models import Count, Prefetch, Q
 from django.http import FileResponse
@@ -32,6 +34,7 @@ from ..models import (
     Guide,
     GuideComment,
     GuideImage,
+    GuideStatus,
     Profile,
     Report,
     CommentVote,
@@ -52,6 +55,7 @@ from .serializers import (
     GuideCommentSerializer,
     GuideListSerializer,
     GuideSerializer,
+    HideCommentSerializer,
     LoginSerializer,
     MarkdownRenderSerializer,
     PasswordResetConfirmSerializer,
@@ -107,8 +111,12 @@ class GuideViewSet(
             "create", "update", "preview_create", "preview_update", "attachment_preview"
         ):
             return [IsAuthenticated(), CanWrite()]
-        if self.action == "destroy":
+        if self.action in ("destroy", "archive", "restore"):
             return [IsAuthenticated(), CanDelete()]
+        if self.action in ("mark_outdated", "mark_current"):
+            return [IsAuthenticated(), CanWrite()]
+        if self.action in ("comment_hide", "lock", "unlock"):
+            return [IsModerator()]
         if self.action == "report":
             return [IsAuthenticated()]
         if self.action in ("edit_comment", "comment_preview", "comment_helpful", "comment_answer", "comment_report"):
@@ -117,14 +125,13 @@ class GuideViewSet(
             return [IsAuthenticated(), CanWrite()]
         if self.action == "comments" and self.request.method == "POST":
             return [IsAuthenticated()]
-        if self.action in ("lock", "unlock"):
-            return [IsModerator()]
         return [IsAuthenticatedOrReadOnly()]
 
     def get_throttles(self):
         # Reading is unlimited; writing and reporting are rate limited
         if self.action in (
-            "create", "update", "destroy", "preview_create", "preview_update", "attachment_preview"
+            "create", "update", "destroy", "preview_create", "preview_update", "attachment_preview",
+            "archive", "restore", "mark_outdated", "mark_current",
         ):
             self.throttle_scope = "write"
         elif self.action == "report":
@@ -167,7 +174,11 @@ class GuideViewSet(
             queryset = queryset.filter(duration_minutes__lte=int(params["max_duration"]))
         if params.get("has_pdf") == "1":
             queryset = queryset.filter(attachment__iendswith=".pdf")
-        queryset = _search(queryset, params.get("q"))
+        queryset = _search(queryset.exclude(status=GuideStatus.ARCHIVED), params.get("q"))
+        return self._with_step_count(queryset)
+
+    @staticmethod
+    def _with_step_count(queryset):
         return queryset.annotate(
             step_count=Count("steps", distinct=True)
             + Count("elements", filter=Q(elements__kind="step"), distinct=True)
@@ -318,6 +329,8 @@ class GuideViewSet(
         )
         if comment.author_id != request.user.pk and not is_moderator(request.user):
             raise PermissionDenied("You can only edit your own comments.")
+        if comment.hidden_at is not None and not is_moderator(request.user):
+            raise PermissionDenied("A moderator hid this comment, so it cannot be edited.")
 
         serializer = GuideCommentSerializer(comment, data=request.data)
         serializer.is_valid(raise_exception=True)
@@ -354,6 +367,25 @@ class GuideViewSet(
             GuideComment.objects.filter(parent=comment.parent).exclude(pk=comment.pk).update(is_answer=False)
         comment.is_answer = request.method == "POST"
         comment._change_reason = "Answer marked" if comment.is_answer else "Answer unmarked"
+        comment.save()
+        comment = self._comment(guide, comment_id)
+        return Response(GuideCommentSerializer(comment, context={"request": request}).data)
+
+    @action(detail=True, methods=["post", "delete"], url_path=r"comments/(?P<comment_id>[0-9]+)/hide")
+    def comment_hide(self, request, slug=None, comment_id=None):
+        """Moderators hide a comment with a reason (POST) or show it again (DELETE)."""
+        guide = self.get_object()
+        comment = self._comment(guide, comment_id)
+        if request.method == "POST":
+            serializer = HideCommentSerializer(data=request.data)
+            serializer.is_valid(raise_exception=True)
+            comment.hidden_at = timezone.now()
+            comment.hidden_by = request.user
+            comment.hidden_reason = serializer.validated_data["reason"]
+            comment._change_reason = "Comment hidden"
+        else:
+            comment.hidden_at, comment.hidden_by, comment.hidden_reason = None, None, ""
+            comment._change_reason = "Comment shown again"
         comment.save()
         comment = self._comment(guide, comment_id)
         return Response(GuideCommentSerializer(comment, context={"request": request}).data)
@@ -446,6 +478,74 @@ class GuideViewSet(
     def unlock(self, request, slug=None):
         return self._set_locked(request, False)
 
+    def _set_status(self, new_status, reason, allowed_from):
+        """Move a guide to a new status; asking for the status it has is not an error."""
+        guide = self.get_object()
+        if guide.status != new_status:
+            if guide.status not in allowed_from:
+                raise ValidationError({"detail": f"A guide that is {guide.get_status_display().lower()} cannot do this."})
+            guide.status = new_status
+            guide._change_reason = reason
+            guide.save(update_fields=["status"])  # a status change is not an edit: updated_at stays
+        return Response({"status": guide.status})
+
+    @action(detail=True, methods=["post"])
+    def archive(self, request, slug=None):
+        """Take a guide out of search and overview without deleting it (author and moderators)."""
+        return self._set_status(
+            GuideStatus.ARCHIVED, "Guide archived", {GuideStatus.PUBLISHED, GuideStatus.OUTDATED}
+        )
+
+    @action(detail=True, methods=["post"])
+    def restore(self, request, slug=None):
+        return self._set_status(GuideStatus.PUBLISHED, "Guide restored", {GuideStatus.ARCHIVED})
+
+    @action(detail=True, methods=["post"], url_path="mark-outdated")
+    def mark_outdated(self, request, slug=None):
+        """Show readers that steps may no longer work (anyone who may edit the guide)."""
+        return self._set_status(GuideStatus.OUTDATED, "Guide marked as outdated", {GuideStatus.PUBLISHED})
+
+    @action(detail=True, methods=["post"], url_path="mark-current")
+    def mark_current(self, request, slug=None):
+        return self._set_status(GuideStatus.PUBLISHED, "Guide marked as up to date", {GuideStatus.OUTDATED})
+
+    @action(detail=True, methods=["get"])
+    def related(self, request, slug=None):
+        """Up to three other guides of the same category, newest first."""
+        guide = self.get_object()
+        if guide.category_id is None:
+            return Response([])
+        others = (
+            Guide.objects.select_related("category")
+            .filter(category_id=guide.category_id)
+            .exclude(pk=guide.pk)
+            .exclude(status=GuideStatus.ARCHIVED)
+        )
+        related = self._with_step_count(others).order_by("-updated_at")[:3]
+        return Response(GuideListSerializer(related, many=True, context={"request": request}).data)
+
+    @action(detail=False, methods=["get"])
+    def suggest(self, request):
+        """Suggestions while typing in the search: guides and categories, or the closest title."""
+        query = (request.query_params.get("q") or "").strip()[:80]
+        if len(query) < 2:
+            return Response({"guides": [], "categories": [], "did_you_mean": ""})
+        visible = Guide.objects.exclude(status=GuideStatus.ARCHIVED)
+        guides = [
+            {"slug": slug, "title": title}
+            for slug, title in visible.filter(title__icontains=query).values_list("slug", "title")[:5]
+        ]
+        categories = [
+            {"slug": slug, "name": name}
+            for slug, name in Category.objects.filter(name__icontains=query).values_list("slug", "name")[:2]
+        ]
+        did_you_mean = ""
+        if not guides and not categories:
+            titles = {title.lower(): title for title in visible.values_list("title", flat=True)}
+            close = get_close_matches(query.lower(), titles, n=1, cutoff=0.6)
+            did_you_mean = titles[close[0]] if close else ""
+        return Response({"guides": guides, "categories": categories, "did_you_mean": did_you_mean})
+
 
 class GuideImageViewSet(viewsets.GenericViewSet):
     """Images for guide content: upload (POST /api/images/) and show (GET /api/images/<id>/).
@@ -519,9 +619,7 @@ class ReportViewSet(mixins.ListModelMixin, viewsets.GenericViewSet):
         return Response(ReportSerializer(report).data)
 
 
-# --- Accounts -----------------------------------------------------------------
-
-
+# Accounts
 class PublicAuthView(APIView):
     """Base for endpoints without login (a stale token is ignored)."""
 

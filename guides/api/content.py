@@ -32,9 +32,7 @@ class MarkdownHtmlMixin:
         return data
 
 
-# --- Images -------------------------------------------------------------------
-
-
+# Images
 class GuideImageSerializer(serializers.ModelSerializer):
     url = serializers.SerializerMethodField()
 
@@ -66,8 +64,7 @@ class GuideImageUploadSerializer(serializers.Serializer):
         return upload
 
 
-# --- Elements -------------------------------------------------------------------
-
+# Elements
 K = ElementKind
 # Longest main text of each kind
 TEXT_LIMITS = {
@@ -189,8 +186,7 @@ class ElementSerializer(serializers.ModelSerializer):
         return data
 
 
-# --- Rules per guide type -----------------------------------------------------
-
+# Rules per guide type
 TYPE_BLOCKS = {
     GuideType.PAGE: {"elements"},
     GuideType.FREE: {"steps"},
@@ -208,9 +204,7 @@ def validate_for_type(attrs, guide_type, creating):
         raise serializers.ValidationError(errors)
 
 
-# --- Saving -------------------------------------------------------------------
-
-
+# Saving
 def resolve_image(guide, user, image_id, label):
     """The image `image_id` if this user may use it for this guide (attaching it), else an error."""
     if image_id is None:

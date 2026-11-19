@@ -109,8 +109,7 @@ export const ELEMENT_PLACEHOLDERS: Record<ElementKind, string> = {
   download: 'Label of the download button',
 }
 
-// --- Drafts -------------------------------------------------------------------------
-
+// Drafts
 export interface ElementDraft {
   key: string
   id?: number
@@ -120,6 +119,8 @@ export interface ElementDraft {
   image: GuideImage | null
   /** Template guidance shown instead of the generic placeholder; never saved */
   hint?: string
+  /** The data a template part came with (a table heading); while it is unchanged the part counts as blank */
+  untouched?: string
 }
 
 export const MAX_ELEMENTS = 300
@@ -167,7 +168,10 @@ const HOW_TO: [ElementKind, string, ElementData?][] = [
 ]
 
 export function howToTemplate(): ElementDraft[] {
-  return HOW_TO.map(([kind, hint, data]) => ({ ...newElement(kind), hint, data: { ...defaultData(kind), ...data } }))
+  return HOW_TO.map(([kind, hint, data]) => {
+    const element = { ...newElement(kind), hint, data: { ...defaultData(kind), ...data } }
+    return data ? { ...element, untouched: JSON.stringify(element.data) } : element
+  })
 }
 
 /** Data as the API wants it: no read-only *_html keys */
@@ -187,6 +191,7 @@ export function draftFromGuide(guide?: Guide): ElementDraft[] {
 /** An element nobody wrote anything into is not saved */
 export function isBlank(el: ElementDraft): boolean {
   if (el.kind === 'divider') return false
+  if (el.untouched !== undefined && JSON.stringify(el.data) === el.untouched) return true
   const d = el.data
   if (el.kind === 'image') return !el.image
   if (el.kind === 'table') return !(d.rows ?? []).some((row) => row.some((cell) => cell.trim()))

@@ -10,7 +10,7 @@ from rest_framework import serializers
 from rest_framework.validators import UniqueValidator
 
 from ..attachments import attachment_kind, stored_preview_html
-from ..models import Category, Guide, GuideComment, GuideType, Report, Step
+from ..models import STATUS_CHANGE_REASONS, Category, Guide, GuideComment, GuideType, Report, Step
 from ..permissions import is_moderator, write_denial
 from ..templatetags.guide_extras import render_markdown
 from .content import (
@@ -59,6 +59,8 @@ class GuideCommentSerializer(serializers.ModelSerializer):
     helpful_count = serializers.SerializerMethodField()
     helpful = serializers.SerializerMethodField()
     can_mark_answer = serializers.SerializerMethodField()
+    hidden = serializers.SerializerMethodField()
+    hidden_by = serializers.StringRelatedField(read_only=True, default=None)
 
     class Meta:
         model = GuideComment
@@ -66,12 +68,27 @@ class GuideCommentSerializer(serializers.ModelSerializer):
             "id", "author", "body", "body_html", "created_at", "edited_at", "can_edit",
             "kind", "element_id", "parent_id", "element", "anchor", "parent", "is_answer",
             "by_guide_author", "helpful_count", "helpful", "can_mark_answer",
+            "hidden", "hidden_reason", "hidden_at", "hidden_by",
         ]
-        read_only_fields = ["id", "author", "body_html", "created_at", "edited_at", "can_edit", "anchor", "is_answer"]
+        read_only_fields = [
+            "id", "author", "body_html", "created_at", "edited_at", "can_edit", "anchor", "is_answer",
+            "hidden_reason", "hidden_at", "hidden_by",
+        ]
 
     def _user(self):
         request = self.context.get("request")
         return request.user if request is not None and request.user.is_authenticated else None
+
+    def get_hidden(self, obj):
+        return obj.hidden_at is not None
+
+    def to_representation(self, instance):
+        data = super().to_representation(instance)
+        # Readers see only why a comment was hidden; moderators still see what it said
+        if instance.hidden_at is not None and not is_moderator(self._user()):
+            data.update(body="", body_html="", can_edit=False, can_mark_answer=False, helpful_count=0, helpful=False)
+            data["hidden_by"] = None
+        return data
 
     def get_body_html(self, obj):
         return str(render_markdown(obj.body))
@@ -101,6 +118,10 @@ class GuideCommentSerializer(serializers.ModelSerializer):
 
 class GuideCommentPreviewSerializer(serializers.Serializer):
     body = serializers.CharField(max_length=5000, allow_blank=False, trim_whitespace=True)
+
+
+class HideCommentSerializer(serializers.Serializer):
+    reason = serializers.CharField(max_length=200, trim_whitespace=True)
 
 
 class GuideAttachmentUploadSerializer(serializers.Serializer):
@@ -175,6 +196,7 @@ class GuideListSerializer(serializers.ModelSerializer):
             "step_count",
             "has_pdf",
             "cover_image",
+            "status",
             "updated_at",
         ]
 
@@ -219,6 +241,9 @@ class GuideSerializer(MarkdownHtmlMixin, serializers.ModelSerializer):
         write_only=True, required=False, allow_blank=True, max_length=200
     )
     created_by = serializers.StringRelatedField(read_only=True)
+    version = serializers.SerializerMethodField()
+    contributors = serializers.SerializerMethodField()
+    outdated_reports = serializers.SerializerMethodField()
 
     class Meta:
         model = Guide
@@ -241,11 +266,38 @@ class GuideSerializer(MarkdownHtmlMixin, serializers.ModelSerializer):
             "attachment_info",
             "change_comment",
             "is_locked",
+            "status",
+            "version",
+            "contributors",
+            "outdated_reports",
             "created_by",
             "created_at",
             "updated_at",
         ]
-        read_only_fields = ["slug", "is_locked", "created_at", "updated_at"]
+        read_only_fields = ["slug", "is_locked", "status", "created_at", "updated_at"]
+
+    def get_version(self, obj):
+        """Every saved edit counts: version 1 is the guide as first published."""
+        return obj.history.exclude(history_change_reason__in=STATUS_CHANGE_REASONS).count() if obj.pk else 1
+
+    def get_contributors(self, obj):
+        """Everyone who changed the guide besides its author."""
+        if not obj.pk:
+            return []
+        names = (
+            obj.history.exclude(history_user=None)
+            .exclude(history_change_reason__in=STATUS_CHANGE_REASONS)
+            .values_list("history_user__username", flat=True)
+            .distinct()
+        )
+        author = obj.created_by.get_username() if obj.created_by_id else None
+        return sorted(name for name in names if name != author)
+
+    def get_outdated_reports(self, obj):
+        """Readers who said that the steps no longer work (open reports about the guide)."""
+        if not obj.pk:
+            return 0
+        return obj.reports.filter(reason=Report.Reason.OUTDATED, reported_comment=None, resolved_at=None).count()
 
     def get_attachment_info(self, obj):
         if not obj.attachment:

@@ -40,12 +40,12 @@ def _list_response(request, guides, **context):
 
 
 def home(request):
-    return _list_response(request, Guide.objects.all())
+    return _list_response(request, Guide.objects.exclude(status="archived"))
 
 
 def category_detail(request, slug):
     category = get_object_or_404(Category, slug=slug)
-    return _list_response(request, category.guides.all(), category=category)
+    return _list_response(request, category.guides.exclude(status="archived"), category=category)
 
 
 def guide_detail(request, slug):

@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import type { Category, GuideListItem, Paginated } from '~/types/guide'
+import type { Category, GuideListItem, Paginated, Suggestions } from '~/types/guide'
 
 const props = defineProps<{ categorySlug?: string; heading: string }>()
 
@@ -30,6 +30,67 @@ watch(q, () => {
   timer = setTimeout(applySearch, 300)
 })
 onBeforeUnmount(() => clearTimeout(timer))
+
+// Suggestions while typing: guides, categories, or the closest title after a typo
+const NO_SUGGESTIONS: Suggestions = { guides: [], categories: [], did_you_mean: '' }
+const suggestions = ref<Suggestions>(NO_SUGGESTIONS)
+const listOpen = ref(false)
+const active = ref(-1)
+let suggestTimer: ReturnType<typeof setTimeout> | undefined
+
+interface Option { key: string; label: string; hint: string; to?: string; fix?: string }
+const options = computed<Option[]>(() => [
+  ...suggestions.value.guides.map((g) => ({ key: `g-${g.slug}`, label: g.title, hint: 'Guide', to: `/guides/${g.slug}` })),
+  ...suggestions.value.categories.map((c) => ({ key: `c-${c.slug}`, label: c.name, hint: 'Category', to: `/category/${c.slug}` })),
+  ...(suggestions.value.did_you_mean
+    ? [{ key: 'did-you-mean', label: `Did you mean “${suggestions.value.did_you_mean}”?`, hint: 'Spelling', fix: suggestions.value.did_you_mean }]
+    : []),
+])
+
+watch(q, (value) => {
+  clearTimeout(suggestTimer)
+  active.value = -1
+  const text = value.trim()
+  if (text.length < 2) {
+    suggestions.value = NO_SUGGESTIONS
+    return
+  }
+  suggestTimer = setTimeout(async () => {
+    try {
+      const result = await $fetch<Suggestions>(`${base}/guides/suggest/`, { query: { q: text } })
+      if (q.value.trim() === text) suggestions.value = result // ignore an answer to older text
+    } catch {
+      suggestions.value = NO_SUGGESTIONS // suggestions are a help only; the search itself still works
+    }
+  }, 200)
+})
+onBeforeUnmount(() => clearTimeout(suggestTimer))
+
+function choose(option: Option) {
+  listOpen.value = false
+  if (option.to) return navigateTo(option.to)
+  if (option.fix) {
+    q.value = option.fix
+    applySearch()
+  }
+}
+function onKey(event: KeyboardEvent) {
+  const count = options.value.length
+  if (event.key === 'Escape') {
+    listOpen.value = false
+  } else if (event.key === 'ArrowDown' && count) {
+    event.preventDefault()
+    listOpen.value = true
+    active.value = (active.value + 1) % count
+  } else if (event.key === 'ArrowUp' && count) {
+    event.preventDefault()
+    active.value = (active.value - 1 + count) % count
+  } else if (event.key === 'Enter' && listOpen.value && active.value >= 0) {
+    event.preventDefault()
+    choose(options.value[active.value]!)
+  }
+}
+const showList = computed(() => listOpen.value && options.value.length > 0)
 
 const page = computed(() => Number(route.query.page ?? 1) || 1)
 const param = (name: string) => (typeof route.query[name] === 'string' ? (route.query[name] as string) : '')
@@ -89,11 +150,44 @@ const searching = computed(() => Boolean(param('q') || filtered.value))
       <form role="search" class="search" @submit.prevent="applySearch">
         <label for="q" class="field-label">Search guides</label>
         <div class="search-row">
-          <input id="q" v-model="q" type="search" placeholder="Guide, step or keyword …" autocomplete="off">
+          <div class="search-box">
+            <input
+              id="q"
+              v-model="q"
+              type="search"
+              placeholder="Guide, step or keyword …"
+              autocomplete="off"
+              role="combobox"
+              aria-autocomplete="list"
+              aria-controls="search-suggestions"
+              :aria-expanded="showList"
+              :aria-activedescendant="active >= 0 && showList ? `suggest-${active}` : undefined"
+              @focus="listOpen = true"
+              @blur="listOpen = false"
+              @input="listOpen = true"
+              @keydown="onKey"
+            >
+            <ul v-show="showList" id="search-suggestions" class="suggest" role="listbox" aria-label="Suggestions">
+              <li
+                v-for="(option, i) in options"
+                :id="`suggest-${i}`"
+                :key="option.key"
+                role="option"
+                :aria-selected="i === active"
+                :class="{ active: i === active }"
+                @mousedown.prevent
+                @click="choose(option)"
+              >
+                <span>{{ option.label }}</span><span class="suggest-hint">{{ option.hint }}</span>
+              </li>
+            </ul>
+          </div>
           <button type="submit" class="btn hero-btn"><GuideIcon name="search" :size="18" /> Search</button>
         </div>
       </form>
     </section>
+
+    <FirstVisitTip v-if="!categorySlug" />
 
     <div class="filter-pills" role="group" aria-label="Quick filters">
       <button type="button" class="pill-btn" :aria-pressed="!filtered" @click="resetFilters">All</button>
@@ -137,8 +231,14 @@ const searching = computed(() => Boolean(param('q') || filtered.value))
     <div aria-live="polite">
       <p v-if="error" class="error-box">The guides could not be loaded. Is the backend running?</p>
       <template v-else-if="list">
-        <p class="result-count">{{ list.count }} {{ list.count === 1 ? 'guide' : 'guides' }}</p>
-        <ul v-if="list.results.length" class="guide-cards" :class="{ loading: status === 'pending' }">
+        <p class="result-count">{{ status === 'pending' ? 'Loading guides …' : `${list.count} ${list.count === 1 ? 'guide' : 'guides'}` }}</p>
+        <ul v-if="status === 'pending'" class="guide-cards" aria-hidden="true">
+          <li v-for="n in Math.min(Math.max(list.results.length, 3), 6)" :key="n" class="guide-card guide-skeleton">
+            <div class="sk sk-image" />
+            <div class="card-body"><div class="sk sk-line sk-short" /><div class="sk sk-line" /><div class="sk sk-line sk-medium" /></div>
+          </li>
+        </ul>
+        <ul v-else-if="list.results.length" class="guide-cards">
           <GuideCard v-for="guide in list.results" :key="guide.slug" :guide="guide" />
         </ul>
         <div v-else class="empty-state">

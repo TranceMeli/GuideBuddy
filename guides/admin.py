@@ -29,8 +29,8 @@ class ElementInline(admin.StackedInline):
 
 @admin.register(Guide)
 class GuideAdmin(SimpleHistoryAdmin):
-    list_display = ("title", "guide_type", "category", "is_locked", "created_by", "updated_at")
-    list_filter = ("guide_type", "category", "difficulty", "is_locked")
+    list_display = ("title", "guide_type", "category", "status", "is_locked", "created_by", "updated_at")
+    list_filter = ("guide_type", "status", "category", "difficulty", "is_locked")
     search_fields = ("title", "subtitle", "summary")
     inlines = [ElementInline, StepInline]
     actions = ["lock_guides", "unlock_guides"]

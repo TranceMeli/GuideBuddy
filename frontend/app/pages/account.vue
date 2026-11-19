@@ -6,9 +6,17 @@ const { user, clearSession } = useAuth()
 const password = ref('')
 const errors = ref<string[]>([])
 const busy = ref(false)
+const { ask } = useConfirm()
 
 async function deleteAccount() {
-  if (!confirm('Really delete your account for good?')) return
+  const sure = await ask({
+    title: 'Delete your account?',
+    body: 'Your account and e-mail address are deleted for good. Your guides and comments stay, but are no longer linked to you.',
+    confirmLabel: 'Delete account',
+    cancelLabel: 'Keep account',
+    danger: true,
+  })
+  if (!sure) return
   errors.value = []
   busy.value = true
   try {

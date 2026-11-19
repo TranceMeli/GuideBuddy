@@ -124,8 +124,7 @@ export async function callBackend<T>(
   }
 }
 
-// --- Automatic renewal -------------------------------------------------------
-
+// Automatic renewal
 // Concurrent requests with the same refresh token share one renewal. Django replaces the
 // refresh token on every renewal; without this, the second parallel request would fail
 // with the old token and sign the user out.

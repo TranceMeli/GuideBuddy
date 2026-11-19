@@ -34,8 +34,7 @@ const livePreview = computed(() => {
   return buildFreePreviewGuide(form, steps, props.categories, md, props.guide)
 })
 
-// --- File -------------------------------------------------------------------
-
+// File
 const ALLOWED = /\.(pdf|docx|xlsx|pptx|png|jpe?g|gif|webp|md|txt|csv)$/i
 const MAX_BYTES = 10 * 1024 * 1024
 const fileInput = ref<HTMLInputElement | null>(null)
@@ -120,8 +119,17 @@ function onDrop(event: DragEvent) {
   selectFile(files[0])
 }
 
+const { ask } = useConfirm()
+
 async function removeAttachment() {
-  if (!props.guide || !confirm('Really remove the attached file?')) return
+  if (!props.guide) return
+  const sure = await ask({
+    title: 'Remove the attached file?',
+    body: 'Readers can no longer open or download it. You can attach another file later.',
+    confirmLabel: 'Remove file',
+    danger: true,
+  })
+  if (!sure) return
   try {
     await $fetch<unknown>(`${base}/guides/${props.guide.slug}/attachment/`, { method: 'DELETE' })
     attachmentInfo.value = null
@@ -131,8 +139,7 @@ async function removeAttachment() {
   }
 }
 
-// --- Saving -----------------------------------------------------------------
-
+// Saving
 async function handleError(e: unknown) {
   if ((e as { statusCode?: number }).statusCode === 401) {
     await clearSession()
@@ -182,10 +189,15 @@ function buildPayload() {
 async function save() {
   const payload = buildPayload()
   if (!payload) return
-  if (
-    form.mode === 'upload' && existingSteps.length &&
-    !confirm('The current text of this guide will be replaced by the file. Continue?')
-  ) return
+  if (form.mode === 'upload' && existingSteps.length) {
+    const replace = await ask({
+      title: 'Replace the text with the file?',
+      body: 'The current text of this guide is replaced by the file.',
+      confirmLabel: 'Replace text',
+      danger: true,
+    })
+    if (!replace) return
+  }
 
   saving.value = true
   try {

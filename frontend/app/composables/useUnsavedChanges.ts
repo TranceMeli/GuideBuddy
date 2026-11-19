@@ -8,6 +8,7 @@ import type { Ref } from 'vue'
  */
 export function useUnsavedChanges(source: () => unknown): { dirty: Ref<boolean>; markSaved: () => void } {
   const dirty = ref(false)
+  const { ask } = useConfirm()
   let armed = false
 
   // Rich text and list fields normalise their content once after mounting; only changes
@@ -26,7 +27,14 @@ export function useUnsavedChanges(source: () => unknown): { dirty: Ref<boolean>;
   onBeforeUnmount(() => window.removeEventListener('beforeunload', onBeforeUnload))
 
   onBeforeRouteLeave(() => {
-    if (dirty.value && !confirm('You have unsaved changes. Leave this page anyway?')) return false
+    if (!dirty.value) return true
+    return ask({
+      title: 'Leave without saving?',
+      body: 'Your changes on this page are lost.',
+      confirmLabel: 'Leave page',
+      cancelLabel: 'Stay and keep writing',
+      danger: true,
+    })
   })
 
   return { dirty, markSaved: () => (dirty.value = false) }
